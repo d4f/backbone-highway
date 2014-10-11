@@ -153,7 +153,7 @@ BackboneMarionette.authed = <?php if ($_SESSION['logged_in']): ?>true<?php else:
 
 ## Example
 
-An implementation example ```index.php``` file is available is available in the repository. To run it create an apache vhost or using any web server you like.
+An implementation example ```index.php``` file is available in the repository. To run it create an apache vhost or using any web server you like.
 
 So that client-side routing can work, every request sent to the server must be answered with the same code,
 therefore an ```.htaccess``` file activating mod_rewrite and redirecting all the requests to the ```index.php``` file is also available in the repository.
