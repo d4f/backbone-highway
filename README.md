@@ -1,4 +1,4 @@
-# MarionetteRouter :: Routing Marionette with style \o/
+# Routing Marionette with style \o/
 ----
 
 ```Backbone.MarionetteRouter``` wraps the ```Backbone.Marionette``` router to simplify it's use and bring new functionnalities
@@ -12,7 +12,6 @@ Added functionnalities compared to the ```Backbone.Marionette``` router are :
  * Declaring routes to be executed only when a user is either logged in or not, or in both cases
 
 ## General use
-----
 
 Declaring routes goes through executing a simple method : ```Backbone.MarionetteRouter.map();```
 
@@ -62,7 +61,6 @@ CM.Router.go("home");
 Route parameters can be passed in as an ```Array``` in the second parameter.
 
 ## Route declaration parameters
-----
 
 The ```path``` and ```action``` parameters are the base of a route. But a few more parameters exist to extend the control of the route.
 
@@ -136,7 +134,7 @@ simply leave out the ```authed``` parameter in the route declaration.
 **Important**
 
 Only the server has the authority to tell if a connected client is a logged in user or not.
-So for this to be achieved, the server has to print out a small piece of JavaScript to tell the router the current client's state :
+So for this system to actually work, the server has to print out a small piece of JavaScript to tell the router the current client's state :
 
 ```php
 <script type="text/javascript" src="backbone.marionetterouter.js"></script>
