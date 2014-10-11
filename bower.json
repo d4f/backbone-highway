@@ -4,8 +4,8 @@
   "authors": [
     "Carl OGREN <carl.ogren@citizen-media.fr>"
   ],
-  "description": "Route Backbone.Marionette with style",
-  "main": "src/backbone.marionette.router.js",
+  "description": "Routing Marionette with style \\o/",
+  "main": "src/backbone.marionette-router.js",
   "keywords": [
     "backbone",
     "marionette",
