@@ -13,7 +13,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git@bitbucket.org:citizen-media/marionetterouter.git"
+    "url": "git://github.com/citizen-media/marionette-router.git"
   },
   "license": "MIT",
   "ignore": [
