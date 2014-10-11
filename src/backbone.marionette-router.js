@@ -325,9 +325,9 @@
 					args.push(arg);
 				});
 
-				self.dispatcher.trigger.apply(self.dispatcher, args);
+				this.dispatcher.trigger.apply(self.dispatcher, args);
 			} else if (_.isString(trigger)) {
-				self.dispatcher.trigger.call(self.dispatcher, trigger);
+				this.dispatcher.trigger.call(this.dispatcher, trigger);
 			} else {
 				this.log("[Backbone.MarionetteRouter.processTrigger] Bad trigger format, needs to be a string or an object");
 			}
