@@ -1,9 +1,9 @@
 # Routing Marionette with style \o/
 ----
 
-```Backbone.MarionetteRouter``` wraps the ```Backbone.Marionette``` router to simplify it's use and bring new functionnalities
+This library wraps the ```Backbone.Marionette``` router to simplify it's use and bring new functionnalities
 
-It's structure and API is inspired by routers in the node.js frameworks Meteor and ExpressJS.
+It's structure and API is inspired by routers in the Node.js frameworks: Meteor and ExpressJS.
 
 Added functionnalities compared to the ```Backbone.Marionette``` router are :
 
