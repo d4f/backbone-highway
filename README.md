@@ -55,7 +55,7 @@ $(function() {
 Once the app and router are started, the easiest way of redirecting the user to a route is by using the route name :
 
 ```javascript
-CM.Router.go("home");
+Backbone.MarionetteRouter.go("home");
 ```
 
 Route parameters can be passed in as an ```Array``` in the second parameter.
@@ -75,18 +75,17 @@ The ```path``` and ```action``` parameters are the base of a route. But a few mo
 
   // Execute triggers before the 'action' controller
   "before": [
-    "core:display",
-    "users:display"
+    "core:display"
   ],
 
   // Main controller for the route
   "action": function(userId) {
-    CM.vent.trigger("users:display_edit", [userId]);
+    // Render a user edit form
   },
 
   // Execute triggers after the 'action' controller
   "after": [
-    "core:post_analysis"
+    "core:post_triggers"
   ]
 }
 ```
