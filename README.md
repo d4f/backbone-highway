@@ -146,7 +146,7 @@ So for this system to actually work, the server has to print out a small piece o
 ```php
 <script type="text/javascript" src="backbone.marionetterouter.js"></script>
 <script type="text/javascript">
-BackboneMarionette.authed = <?php if ($_SESSION['logged_in']): ?>true<?php else: ?>false<?php endif; ?>;
+Backbone.MarionetteRouter.authed = <?php if ($_SESSION['logged_in']): ?>true<?php else: ?>false<?php endif; ?>;
 </script>
 ```
 
