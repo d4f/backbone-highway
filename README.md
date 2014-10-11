@@ -11,6 +11,14 @@ Added functionnalities compared to the ```Backbone.Marionette``` router are :
  * Aliasing a route to another
  * Declaring routes to be executed only when a user is either logged in or not, or in both cases
 
+## Installation
+
+You can install the library via bower :
+
+```
+bower install marionette-router
+```
+
 ## General use
 
 Declaring routes goes through executing a simple method : ```Backbone.MarionetteRouter.map();```
@@ -141,3 +149,11 @@ So for this system to actually work, the server has to print out a small piece o
 BackboneMarionette.authed = <?php if ($_SESSION['logged_in']): ?>true<?php else: ?>false<?php endif; ?>;
 </script>
 ```
+
+
+## Example
+
+An implementation example ```index.php``` file is available is available in the repository. To run it create an apache vhost or using any web server you like.
+
+So that client-side routing can work, every request sent to the server must be answered with the same code,
+therefore an ```.htaccess``` file activating mod_rewrite and redirecting all the requests to the ```index.php``` file is also available in the repository.
