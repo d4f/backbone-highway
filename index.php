@@ -1,11 +1,81 @@
+<?php
+
+
+
+?>
+<!DOCTYPE html>
 <html>
 <head>
 	<title>MarionetteRouter Test</title>
 
 	<style>
-	nav li.logout {
-		display: none;
-	}
+
+		html, body {
+			margin: 0;
+			padding: 0;
+			overflow: auto;
+			font-family: Arial, Helvetica, sans-serif;
+		}
+
+		body {
+
+		}
+
+		header {
+			width: 100%;
+			background: rgba(0, 0, 0, 0.8);
+			color: white;
+		}
+		header:after {
+			content: ".";
+			display: block;
+			clear: both;
+			visibility: hidden;
+			height: 0;
+		}
+
+		header h1 {
+			float: left;
+			margin: 0 15px;
+			padding: 0;
+			font-size: 1.7em;
+			line-height: 40px;
+		}
+
+		header nav {
+			float: right;
+			height: 100%;
+		}
+
+		header nav ul {
+			margin: 0 15px;
+			padding: 0;
+			list-style: none;
+			height: 100%;
+		}
+
+		header nav ul li {
+			float: left;
+			padding: 0 10px;
+			line-height: 40px;
+		}
+
+		header nav a {
+			color: white;
+			text-decoration: none;
+		}
+		header nav a:hover, header nav a:focus {
+			text-decoration: underline;
+		}
+
+		header nav ul li.logout {
+			display: none;
+		}
+
+		#main {
+			margin: 10px 15px;
+		}
+
 	</style>
 </head>
 <body>
@@ -23,11 +93,12 @@
 				<li class="logout"><a href="/logout" data-route="logout">Logout</a></li>
 			</ul>
 		</nav>
-
-		<div class="user"></div>
 	</header>
 
-	<div id="main"></div>
+	<div id="main">
+		<div class="user"></div>
+		<div class="content"></div>
+	</div>
 
 
 	<!-- Include Libs -->
@@ -56,14 +127,14 @@
 			this.route("home", {
 				"path": "/",
 				"action": function() {
-					$("#main").html("Current page: Home");
+					$(".content").html("Current page: Home");
 				}
 			});
 
 			this.route("users_list", {
 				"path": "/users",
 				"action": function() {
-					$("#main").html("Current page: Users");
+					$(".content").html("Current page: Users");
 				}
 			});
 
@@ -76,16 +147,17 @@
 				"path": "/users/:id",
 				"authed": true,
 				"action": function(userId) {
-					$("#main").html("Current page: User #" + userId);
+					$(".content").html("Current page: User #" + userId);
 				}
 			});
 
 			this.route("login", {
 				"path": "/login",
 				"authed": false,
+				"before": [
+					"prompt_user"
+				],
 				"action": function() {
-					App.user = prompt("Enter your name :", "JS Ninja");
-
 					if (App.user != null) {
 						$(".user").html("Current user : " + App.user);
 						$("nav .login").hide().siblings(".logout").show();
@@ -149,7 +221,16 @@
 		});
 
 
+		var registerEvents = function() {
+			App.vent.on("prompt_user", function() {
+				App.user = prompt("Enter your name :", "JS Ninja");
+			});
+		};
+
+
 		$(function() {
+			registerEvents();
+
 			App.start();
 			Router.start(App);
 
