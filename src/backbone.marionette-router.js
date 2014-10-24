@@ -43,6 +43,9 @@
 		"authed": false,
 
 
+		"routes": {},
+
+
 		/**
 		 * Print out debug logs to the console
 		 */
@@ -222,15 +225,28 @@
 				// Check if the route should be ignored based on the user being logged in or not
 				// and the route.authed option being set to true or false
 				if (!_.isUndefined(def.authed) && ((def.authed && !self.authed) || (!def.authed && self.authed))) {
-					self.log("[Backbone.MarionetteRouter] Skipping route '" + currentName +
-						"', " + (self.authed ? "" : "not ") + "logged in");
+					// Redirect user to login route if defined, else just skip execution
+					if (_.isObject(self.routes) && _.isString(self.routes.login)) {
+						self.log("[Backbone.MarionetteRouter] Secured page, redirecting to login");
+
+						self.storeCurrentRoute();
+
+						// Redirect to login
+						self.go(self.routes.login);
+					} else {
+						self.log("[Backbone.MarionetteRouter] Skipping route '" + currentName +
+							"', " + (self.authed ? "" : "not ") + "logged in");
+					}
 					return false;
 				}
 
 				// Check if the route is an alias
 				if (_.isString(def.action)) {
 					self.log("[Backbone.MarionetteRouter] Caught alias route: '" + currentName + "' >> '" + def.action + "'");
+
+					// Execute alias route
 					self.processControllers(def.action, arguments);
+
 					return false;
 				} else {
 					self.log("[Backbone.MarionetteRouter] Executing route named '" + currentName + "'");
@@ -394,6 +410,17 @@
 			});
 
 			return newParts.join("/");
+		},
+
+
+		"storeCurrentRoute": function() {
+			var path = window.location.pathname;
+
+			// @todo Store the path for next init after page reload
+		},
+
+		"clearStore": function() {
+
 		}
 
 	};

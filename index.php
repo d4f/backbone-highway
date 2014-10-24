@@ -114,15 +114,17 @@
 	(function() {
 		"use strict";
 
-		var App = new Backbone.Marionette.Application(),
-			Router = Backbone.MarionetteRouter;
+		var App = window.App = new Backbone.Marionette.Application();
 
-		window.App = App;
-		App.Router = Router;
+		App.Router = Backbone.MarionetteRouter;
 
 		App.user = null;
 
-		Router.map(function() {
+		App.Router.routes = {
+			"login": "login"
+		};
+
+		App.Router.map(function() {
 			
 			this.route("home", {
 				"path": "/",
@@ -232,7 +234,7 @@
 			registerEvents();
 
 			App.start();
-			Router.start(App);
+			App.Router.start(App);
 
 			var menu = new App.MenuView({
 				"el": $("header nav")
