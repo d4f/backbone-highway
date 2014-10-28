@@ -169,12 +169,18 @@
 		 * A trigger can be declared in different ways.
 		 * It can be a string which will be passed to the router dispatcher.
 		 * Else, it can be an object so that static arguments can be passed to the trigger.
-		 * The object needs to have a string in the 'name' key and an array of arguments in the 'args' key, for example :
+		 * 
+		 * Trigger object parameters :
+		 *  - name (String): The trigger name
+		 *  - args (Array, Optional): Arguments that will be mapped onto the trigger event listener, default: []
+		 *  - cache (Boolean, Optional): Will only permit the execution of the trigger once
+		 *
+		 * For example :
 		 *
 		 * {
 		 *   "name": "trigger:name",
 		 *   "args": [
-		 *     // List of arguments mapped onto the called trigger callback
+		 *     // List of arguments mapped onto the called trigger event listener
 		 *   ]
 		 * }
 		 *
@@ -315,21 +321,38 @@
 		 */
 		"processTrigger": function(trigger) {
 			if (_.isObject(trigger)) {
+				// Create a dispatcher format object
 				var args = [trigger.name];
 
+				// Check if the trigger is marked for caching
+				if (trigger.cache) {
+					// Has it already been executed ?
+					if (trigger.done) {
+						this.log("[Backbone.MarionetteRouter] Trigger '" + trigger.name + "' has been skipped (cached)");
+						return;
+					}
+
+					// Mark it done
+					trigger.done = true;
+				}
+
+				// Wrap the given parameter in an array
 				if (!_.isArray(trigger.args)) {
 					trigger.args = [trigger.args];
 				}
 
+				// Finish formatting trigger arguments for the dispatcher
 				_.forEach(trigger.args, function(arg) {
 					args.push(arg);
 				});
 
-				this.dispatcher.trigger.apply(self.dispatcher, args);
+				// Dispatch the event
+				this.dispatcher.trigger.apply(this.dispatcher, args);
 			} else if (_.isString(trigger)) {
 				this.dispatcher.trigger.call(this.dispatcher, trigger);
 			} else {
-				this.log("[Backbone.MarionetteRouter.processTrigger] Bad trigger format, needs to be a string or an object");
+				this.log("[Backbone.MarionetteRouter.processTrigger] Bad trigger format, needs to be a string or an object, given :");
+				this.log(trigger);
 			}
 		},
 
