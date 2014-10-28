@@ -126,6 +126,11 @@
 			
 			this.route("home", {
 				"path": "/",
+				"before": [
+					{ "name": "core", "cache": true },
+					"module",
+					"other_module"
+				],
 				"action": function() {
 					$(".content").html("Current page: Home");
 				}
@@ -133,6 +138,9 @@
 
 			this.route("users_list", {
 				"path": "/users",
+				"before": [
+					{ "name": "core", "cache": true }
+				],
 				"action": function() {
 					$(".content").html("Current page: Users");
 				}
@@ -224,6 +232,17 @@
 		var registerEvents = function() {
 			App.vent.on("prompt_user", function() {
 				App.user = prompt("Enter your name :", "JS Ninja");
+			});
+
+
+			App.vent.on("core", function() {
+				console.log("core");
+			});
+			App.vent.on("module", function() {
+				console.log("module");
+			});
+			App.vent.on("other_module", function() {
+				console.log("other module");
 			});
 		};
 
