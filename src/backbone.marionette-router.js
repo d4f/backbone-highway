@@ -15,6 +15,9 @@
 		routes = {};
 
 
+	var cachedTriggers = window.cachedTriggers = [];
+
+
 
 
 
@@ -326,14 +329,23 @@
 
 				// Check if the trigger is marked for caching
 				if (trigger.cache) {
+					// Find cached trigger object
+					var cache = this.findCachedTrigger(trigger.name);
+
+					// If it doesn't exist, create it and retrieve it again
+					if (!cache) {
+						cachedTriggers.push(_.extend({}, trigger));
+						cache = this.findCachedTrigger(trigger.name);
+					}
+
 					// Has it already been executed ?
-					if (trigger.done) {
+					if (cache.done) {
 						this.log("[Backbone.MarionetteRouter] Trigger '" + trigger.name + "' has been skipped (cached)");
 						return;
 					}
 
 					// Mark it done
-					trigger.done = true;
+					cache.done = true;
 				}
 
 				// Wrap the given parameter in an array
@@ -369,6 +381,27 @@
 			_.forEach(extendedController[name], function(callback) {
 				callback.apply(self, args);
 			});
+		},
+
+
+		/**
+		 * Find a cached trigger
+		 * 
+		 * @param  {String} name Trigger name
+		 * @return {Object}      Cached trigger object
+		 */
+		"findCachedTrigger": function(name) {
+			return _.find(cachedTriggers, function(item) {
+				return item.name == name;
+			});
+		},
+
+
+		/**
+		 * Clear all cached triggers
+		 */
+		"clearCache": function() {
+			cachedTriggers = [];
 		},
 
 

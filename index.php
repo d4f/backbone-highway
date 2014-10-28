@@ -138,6 +138,9 @@
 
 			this.route("users_list", {
 				"path": "/users",
+				"before": [
+					{ "name": "core", "cache": true }
+				],
 				"action": function() {
 					$(".content").html("Current page: Users");
 				}
