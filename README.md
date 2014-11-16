@@ -119,6 +119,37 @@ Backbone.MarionetteRouter.start(App);
 
 All the triggers declared in the ```before``` and ```after``` parameters will be executed using the given event aggregator.
 
+## Trigger declaration
+
+Triggers can be declared in different ways.
+
+It can be a simple ```String``` for the simple ones :
+
+```javascript
+{
+  // ...
+  "before": [
+    "core",
+    "module",
+    "submodule"
+  ],
+  // ...
+}
+```
+It can also be declared as an object with different parameters :
+
+```javascript
+{
+  // ...
+  "before": [
+    { "name": "core", "cache": true },
+    { "name": "module", args: [foo, bar] },
+    "submodule"
+  ],
+  // ...
+}
+```
+
 ## Declaring particular routes for logged in/logged out users
 
 Each route can receive an ```authed``` boolean parameter to declare if the route should be interpreted when the user is logged in or not.
