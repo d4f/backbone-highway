@@ -102,7 +102,7 @@ The ```path``` and ```action``` parameters are the base of a route. But a few mo
 
 ## Events distribution (Triggers)
 
-```Backbone.MarionetteRouter``` uses the ```Marionette``` global event aggregator : ```App.vent```
+To distribute the triggers declared in the ```before``` and ```after``` parameters the ```Backbone.MarionetteRouter``` uses the ```Marionette``` global event aggregator : ```App.vent```
 
 This parameter can be overridden using any ```Backbone.Events``` instance.
 
@@ -118,8 +118,6 @@ Backbone.MarionetteRouter.dispatcher = myDispatcher;
 App.start();
 Backbone.MarionetteRouter.start(App);
 ```
-
-All the triggers declared in the ```before``` and ```after``` parameters will be executed using the given event aggregator.
 
 ## Trigger declaration
 
@@ -151,6 +149,8 @@ It can also be declared as an object with different parameters :
   // ...
 }
 ```
+
+Most importantly, Each declared route becomes a trigger itself so that routes can build on each other.
 
 ## Declaring particular routes for logged in/logged out users
 
