@@ -336,13 +336,7 @@
 				// Check if the trigger is marked for caching
 				if (trigger.cache) {
 					// Find cached trigger object
-					var cache = this.findCachedTrigger(trigger.name);
-
-					// If it doesn't exist, create it and retrieve it again
-					if (!cache) {
-						cachedTriggers.push(_.extend({}, trigger));
-						cache = this.findCachedTrigger(trigger.name);
-					}
+					var cache = this.findCachedTrigger(trigger);
 
 					// Has it already been executed ?
 					if (cache.done) {
@@ -399,13 +393,22 @@
 		/**
 		 * Find a cached trigger
 		 * 
-		 * @param  {String} name Trigger name
-		 * @return {Object}      Cached trigger object
+		 * @param  {Object} trigger Trigger object definition
+		 * @return {Object}         Cached trigger object
 		 */
-		"findCachedTrigger": function(name) {
-			return _.find(cachedTriggers, function(item) {
-				return item.name == name;
+		"findCachedTrigger": function(trigger) {
+			var cache = _.find(cachedTriggers, function(item) {
+				return item.name == trigger.name;
 			});
+
+			// If it doesn't exist, create it and retrieve it again
+			if (!cache) {
+				cachedTriggers.push(_.extend({}, trigger));
+
+				return this.findCachedTrigger(trigger);
+			}
+
+			return cache;
 		},
 
 
