@@ -123,21 +123,14 @@
 		App.user = null;
 
 		Router.map(function() {
-
-			// Creating a common routes array to keep it dry
-			var commonRoutes = [
-				{ "name": "core", "cache": true },
-				{ "name": "module", "cache": true }
-			];
-
-			// Extending common routes
-			var homeRoutes = _.clone(commonRoutes);
-			homeRoutes.push("other_module");
 			
 			// Declaring a home route
 			this.route("home", {
 				"path": "/",
-				"before": homeRoutes,
+				"before": [
+					{ "name": "core", "cache": true },
+					{ "name": "module", "cache": true }
+				],
 				"action": function() {
 					$(".content").html("Current page: Home");
 				}
@@ -146,7 +139,10 @@
 			// Declaring a users list route
 			this.route("users_list", {
 				"path": "/users",
-				"before": commonRoutes,
+				"before": [
+					"home",	// Executing the home route as a trigger
+					"other_module"
+				],
 				"action": function() {
 					$(".content").html("Current page: Users");
 				}

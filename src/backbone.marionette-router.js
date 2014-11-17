@@ -327,6 +327,12 @@
 				// Create a dispatcher format object
 				var args = [trigger.name];
 
+				// Check if the trigger is actually a declared route
+				if (extendedController[trigger.name]) {
+					this.processControllers(trigger);
+					return;
+				}
+
 				// Check if the trigger is marked for caching
 				if (trigger.cache) {
 					// Find cached trigger object
@@ -361,7 +367,13 @@
 				// Dispatch the event
 				this.dispatcher.trigger.apply(this.dispatcher, args);
 			} else if (_.isString(trigger)) {
-				this.dispatcher.trigger.call(this.dispatcher, trigger);
+				// Check if the trigger is actually a declared route
+				if (extendedController[trigger]) {
+					this.processControllers(trigger);
+				} else {
+					// Else give to the dispatcher
+					this.dispatcher.trigger.call(this.dispatcher, trigger);
+				}
 			} else {
 				this.log("[Backbone.MarionetteRouter.processTrigger] Bad trigger format, needs to be a string or an object, given :");
 				this.log(trigger);
