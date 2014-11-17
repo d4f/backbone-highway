@@ -123,34 +123,42 @@
 		App.user = null;
 
 		Router.map(function() {
+
+			// Creating a common routes array to keep it dry
+			var commonRoutes = [
+				{ "name": "core", "cache": true },
+				{ "name": "module", "cache": true }
+			];
+
+			// Extending common routes
+			var homeRoutes = _.clone(commonRoutes);
+			homeRoutes.push("other_module");
 			
+			// Declaring a home route
 			this.route("home", {
 				"path": "/",
-				"before": [
-					{ "name": "core", "cache": true },
-					"module",
-					"other_module"
-				],
+				"before": homeRoutes,
 				"action": function() {
 					$(".content").html("Current page: Home");
 				}
 			});
 
+			// Declaring a users list route
 			this.route("users_list", {
 				"path": "/users",
-				"before": [
-					{ "name": "core", "cache": true }
-				],
+				"before": commonRoutes,
 				"action": function() {
 					$(".content").html("Current page: Users");
 				}
 			});
 
+			// Declaring an alias to the users list route
 			this.route("users_alias", {
 				"path": "/some-alias",
 				"action": "users_list"
 			});
 
+			// Declaring a secured route with a parameter
 			this.route("user_show", {
 				"path": "/users/:id",
 				"authed": true,
@@ -159,6 +167,7 @@
 				}
 			});
 
+			// Declaring a login route
 			this.route("login", {
 				"path": "/login",
 				"authed": false,
@@ -179,6 +188,7 @@
 				}
 			});
 
+			// Declaring a logout route
 			this.route("logout", {
 				"path": "/logout",
 				"authed": true,
