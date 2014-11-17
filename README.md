@@ -8,8 +8,10 @@ It's structure and API is inspired by routers in the Node.js frameworks: Meteor 
 Added functionnalities compared to the ```Backbone.Marionette``` router are :
 
  * Multiple controllers for a same path
- * Aliasing a route to another
- * Declaring routes to be executed only when a user is either logged in or not, or in both cases
+ * Before and After triggers
+ * Trigger caching
+ * Aliasing
+ * "Secured" routes
 
 ## Installation
 
