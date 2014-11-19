@@ -132,11 +132,6 @@
 					pushState: options.pushState,
 					root: options.root
 				});
-
-				// Listen for navigate events
-				self.dispatcher.on("navigate", function(route) {
-					Backbone.history.navigate(route);
-				});
 			}
 		},
 
@@ -293,33 +288,27 @@
 		/**
 		 * Route the application to a specific named route
 		 *
-		 * @param  {Mixed} def   String or object defining which route to trigger
+		 * @param  {Mixed} name  Route name
 		 * @param  {Array} args  List of arguments to pass along
 		 */
-		"go": function(def, args) {
-			var path = "",
-				name = "";
-
-			if (_.isString(def)) {
-				name = def;
-			} else if (_.isObject(def)) {
-				name = def.name;
-				path = def.path;
+		"go": function(name, args) {
+			if (!extendedController[name]) {
+				this.log("[Backbone.MarionetteRouter] Inexisting route: " + name);
+				return;
 			}
 
-			if (!_.isEmpty(name)) {
-				path = this.path(name);
-			}
+			// Retrieve route path
+			var path = this.path(name);
 
-			if (_.isArray(args) && !_.isEmpty(args)) {
+			// Inject route arguments if necessary
+			if ((_.isObject(args) || _.isArray(args)) && !_.isEmpty(args)) {
 				path = this.parse(path, args);
 			}
 
+			// Navigate the Marionette.AppRouter
 			router.navigate(path, {
 				trigger: true
 			});
-
-			this.dispatcher.trigger("navigate", path);
 		},
 
 
