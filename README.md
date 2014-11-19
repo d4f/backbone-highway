@@ -60,15 +60,52 @@ $(function() {
 
 **Important:** Routes have to be declared before ```Backbone.Marionette``` and ```Backbone.MarionetteRouter``` are started.
 
-## Redirecting
+## Router go !
 
-Once the app and router are started, the easiest way of redirecting the user to a route is by using the route name :
+To redirect the user to a certain route when, for example, he clicks a link simply use the ```go``` method.
 
 ```javascript
 Backbone.MarionetteRouter.go("home");
 ```
 
-Route parameters can be passed in as an ```Array``` in the second parameter.
+**Parameters**
+
+ - name (String) : The route name to execute.
+ - args (Mixed) : Array of arguments, can also be a functions ```arguments``` object.
+
+Let's define a route that takes a parameter :
+
+```javascript
+Backbone.MarionetteRouter.map(function() {
+  // Declare a user profile page
+  this.route("user_profile", {
+    "path": "/user/:id",
+    "action": function(userId) {
+      // Render user profile page
+    }
+  });
+})
+```
+
+Considering the current page contains a link like this :
+
+```javascript
+<a href="/user/42" class="profile" data-id="42">Your profile!</a>
+```
+
+We could write a script (using jquery) to redirect the user like so :
+
+```javascript
+// Intercept the user click
+$("a.profile").click(function(e) {
+  e.preventDefault();
+
+  var userId = $(this).attr("data-id");
+
+  // Redirecting to route named "user_profile" passing an id
+  Backbone.MarionetteRouter.go("user_profile", [userId]);
+});
+```
 
 ## Route declaration parameters
 
@@ -85,7 +122,8 @@ The ```path``` and ```action``` parameters are the base of a route. But a few mo
 
   // Execute triggers before the 'action' controller
   "before": [
-    "core:display"
+    { "name": "core:display", "cache": true },
+    "users:display"
   ],
 
   // Main controller for the route
