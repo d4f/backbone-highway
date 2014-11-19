@@ -8,21 +8,63 @@
 		_ = window._;
 
 
-	// Define private vars
-	var router = null,
-		controller = {},
-		extendedController = {},
-		routes = {};
+	/**
+	 * Instance holder for the Marionette.AppRouter
+	 * @type {Backbone.Marionette.AppRouter}
+	 */
+	var router = null;
+
+	/**
+	 * Basic Backbone.Marionette routes object
+	 * @type {Object}
+	 */
+	var routes = {};
+
+	/**
+	 * Basic Backbone.Marionette controller object
+	 * @type {Object}
+	 */
+	var controller = {};
+
+	/**
+	 * MarionetteRouter extended controller
+	 * @type {Object}
+	 */
+	var extendedController = {};
+
+	/**
+	 * Trigger cache memory
+	 * @type {Array}
+	 */
+	var cachedTriggers = [];
 
 
-	var cachedTriggers = window.cachedTriggers = [];
+	/**
+	 * Default options that are extended when the MarionetteRouter is started
+	 * @type {Object}
+	 */
+	var defaultOptions = {
+		// Use html5 pushState
+		"pushState": true,
 
+		// Root url
+		"root": "",
 
+		// Print out debug information
+		"debug": false,
+
+		// Override log method
+		"log": function() {
+			if (this.debug && window.console && window.console.log) {
+				window.console.log.apply(window.console, arguments);
+			}
+		}
+	};
 
 
 
 	/**
-	 * CM Router commander
+	 * MarionetteRouter commander
 	 * @type {Object}
 	 */
 	var MarionetteRouter = Backbone.MarionetteRouter = {
@@ -34,7 +76,7 @@
 		 *
 		 * var myEvents = {}
 		 * _.extend(myEvents, Backbone.Events);
-		 * CM.Router.dispatcher = myEvents;
+		 * Backbone.MarionetteRouter.dispatcher = myEvents;
 		 */
 		"dispatcher": null,
 
@@ -47,46 +89,31 @@
 
 
 		/**
-		 * Print out debug logs to the console
-		 */
-		"debug": true,
-
-
-		/**
 		 * Initialize the Backbone Marionette router
 		 */
-		"start": function(app) {
+		"start": function(app, options) {
 			var self = this;
+
+			// Extend default options
+			options = _.extend({}, defaultOptions, options);
 
 			// Retrieve the marionette event aggregator if none have been specified
 			if (_.isNull(this.dispatcher)) {
 				this.dispatcher = app.vent;
 			}
 
-			// Retrieve a debug flag if defined on the marionette instance
-			if (_.isBoolean(app.debug)) {
-				this.debug = app.debug;
-			}
+			// Retrieve a debug flag
+			this.debug = options.debug;
 
-			// Retrieve a log method if defined on the marionette instance
-			if (app.log) {
-				this.log = app.log;
-			} else {
-				// Else create our own log method
-				this.log = function() {
-					if (self.debug && window.console && window.console.log) {
-						window.console.log.apply(window.console, arguments);
-					}
-				};
+			// Retrieve custom log method
+			if (options.log) {
+				this.log = options.log;
 			}
 
 			this.log("[Backbone.MarionetteRouter.start] Starting router");
 
-			/**
-			 * CM Router
-			 * @type {Backbone.Marionette.AppRouter}
-			 */
-			var Router = Backbone.Marionette.AppRouter.extend({
+			// Extend marionette router
+			var Router = Marionette.AppRouter.extend({
 				"appRoutes": routes
 			});
 
@@ -97,13 +124,13 @@
 
 			// Check if Backbone.History is already enabled
 			if (!Backbone.History.started) {
-				self.log("[Backbone.MarionetteRouter.start] Starting Backbone.history with " +
-					(app.root_url ? "root_url=" + app.root_url : "no root_url"));
+				self.log("[Backbone.MarionetteRouter.start] Starting Backbone.history (" +
+					(options.root ? "root: " + options.root : "empty root url") + ")");
 
 				// Init Backbone.history
 				Backbone.history.start({
-					pushState: true,
-					root: app.root_url || ""
+					pushState: options.pushState,
+					root: options.root
 				});
 
 				// Listen for navigate events
@@ -125,7 +152,7 @@
 		 */
 		"map": function(routesDefiner) {
 			if (!_.isFunction(routesDefiner)) {
-				this.log("[CM.Router.map] Missing routes definer method as the first param");
+				this.log("[Backbone.MarionetteRouter.map] Missing routes definer method as the first param");
 			} else {
 				routesDefiner.call(this);
 			}
@@ -158,7 +185,7 @@
 		 * }
 		 *
 		 * A route can be limited to when a user is connected by setting the route.authed option to true.
-		 * For this to work the CM.Router.authed parameter has to be set to true when the server considers the user logged in.
+		 * For this to work the Backbone.MarionetteRouter.authed parameter has to be set to true when the server considers the user logged in.
 		 *
 		 * {
 		 *   "path": "/admin",
@@ -329,7 +356,7 @@
 
 				// Check if the trigger is actually a declared route
 				if (extendedController[trigger.name]) {
-					this.processControllers(trigger);
+					this.processControllers(trigger.name, trigger.args);
 					return;
 				}
 
@@ -383,6 +410,15 @@
 		 */
 		"processControllers": function(name, args) {
 			var self = this;
+
+			// Lets not pass [undefined] as arguments to the controllers
+			if (_.isUndefined(args)) {
+				args = [];
+			}
+			// Ensure args is an array
+			else if (!_.isArray(args)) {
+				args = [args];
+			}
 
 			_.forEach(extendedController[name], function(callback) {
 				callback.apply(self, args);

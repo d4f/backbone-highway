@@ -257,7 +257,9 @@
 			registerEvents();
 
 			App.start();
-			Router.start(App);
+			Router.start(App, {
+				"debug": true
+			});
 
 			var menu = new App.MenuView({
 				"el": $("header nav")
