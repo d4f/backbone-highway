@@ -415,8 +415,8 @@
 			if (_.isUndefined(args)) {
 				args = [];
 			}
-			// Ensure args is an array
-			else if (!_.isArray(args)) {
+			// Ensure args is an array if not an arguments object
+			else if (!_.isObject && !_.isArray(args)) {
 				args = [args];
 			}
 
