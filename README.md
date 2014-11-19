@@ -8,8 +8,10 @@ It's structure and API is inspired by routers in the Node.js frameworks: Meteor 
 Added functionnalities compared to the ```Backbone.Marionette``` router are :
 
  * Multiple controllers for a same path
- * Aliasing a route to another
- * Declaring routes to be executed only when a user is either logged in or not, or in both cases
+ * Before and After triggers
+ * Trigger caching
+ * Aliasing
+ * "Secured" routes
 
 ## Installation
 
@@ -100,7 +102,7 @@ The ```path``` and ```action``` parameters are the base of a route. But a few mo
 
 ## Events distribution (Triggers)
 
-```Backbone.MarionetteRouter``` uses the ```Marionette``` global event aggregator : ```App.vent```
+To distribute the triggers declared in the ```before``` and ```after``` parameters the ```Backbone.MarionetteRouter``` uses the ```Marionette``` global event aggregator : ```App.vent```
 
 This parameter can be overridden using any ```Backbone.Events``` instance.
 
@@ -117,7 +119,38 @@ App.start();
 Backbone.MarionetteRouter.start(App);
 ```
 
-All the triggers declared in the ```before``` and ```after``` parameters will be executed using the given event aggregator.
+## Trigger declaration
+
+Triggers can be declared in different ways.
+
+It can be a simple ```String``` for the simple ones :
+
+```javascript
+{
+  // ...
+  "before": [
+    "core",
+    "module",
+    "submodule"
+  ],
+  // ...
+}
+```
+It can also be declared as an object with different parameters :
+
+```javascript
+{
+  // ...
+  "before": [
+    { "name": "core", "cache": true },
+    { "name": "module", args: [foo, bar] },
+    "submodule"
+  ],
+  // ...
+}
+```
+
+Most importantly, Each declared route becomes a trigger itself so that routes can build on each other.
 
 ## Declaring particular routes for logged in/logged out users
 

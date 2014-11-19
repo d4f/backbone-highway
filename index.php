@@ -126,25 +126,37 @@
 
 		App.Router.map(function() {
 			
+			// Declaring a home route
 			this.route("home", {
 				"path": "/",
+				"before": [
+					{ "name": "core", "cache": true },
+					{ "name": "module", "cache": true }
+				],
 				"action": function() {
 					$(".content").html("Current page: Home");
 				}
 			});
 
+			// Declaring a users list route
 			this.route("users_list", {
 				"path": "/users",
+				"before": [
+					"home",	// Executing the home route as a trigger
+					"other_module"
+				],
 				"action": function() {
 					$(".content").html("Current page: Users");
 				}
 			});
 
+			// Declaring an alias to the users list route
 			this.route("users_alias", {
 				"path": "/some-alias",
 				"action": "users_list"
 			});
 
+			// Declaring a secured route with a parameter
 			this.route("user_show", {
 				"path": "/users/:id",
 				"authed": true,
@@ -153,6 +165,7 @@
 				}
 			});
 
+			// Declaring a login route
 			this.route("login", {
 				"path": "/login",
 				"authed": false,
@@ -173,6 +186,7 @@
 				}
 			});
 
+			// Declaring a logout route
 			this.route("logout", {
 				"path": "/logout",
 				"authed": true,
@@ -227,6 +241,15 @@
 			App.vent.on("prompt_user", function() {
 				App.user = prompt("Enter your name :", "JS Ninja");
 			});
+			App.vent.on("core", function() {
+				console.log("core");
+			});
+			App.vent.on("module", function() {
+				console.log("module");
+			});
+			App.vent.on("other_module", function() {
+				console.log("other module");
+			});
 		};
 
 
@@ -234,7 +257,10 @@
 			registerEvents();
 
 			App.start();
-			App.Router.start(App);
+
+			App.Router.start(App, {
+				"debug": true
+			});
 
 			var menu = new App.MenuView({
 				"el": $("header nav")
