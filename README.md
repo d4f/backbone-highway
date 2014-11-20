@@ -60,6 +60,31 @@ $(function() {
 
 **Important:** Routes have to be declared before ```Backbone.Marionette``` and ```Backbone.MarionetteRouter``` are started.
 
+## Start routing
+
+The MarionetteRouter has to be started via the ```start``` method right after the Marionette application has been started.
+
+The start method needs to receive the Marionette instance as the first parameter, and it can take an object as the second parameter to change the routers behaviour.
+
+Building on the previous script, here is a complete example :
+
+```javascript
+// Start the marionette app
+App.start();
+
+// Start the router passing the marionette app instance and an options object
+Backbone.MarionetteRouter.start(App, {
+  // Root url for all routes, passed to Backbone.history
+  "root": "/admin",
+
+  // Activate html5 pushState or not, true by default
+  "pushState": false,
+
+  // Print out routing debug information to the console
+  "debug": true
+});
+```
+
 ## Router go !
 
 To redirect the user to a certain route when, for example, he clicks a link simply use the ```go``` method.
