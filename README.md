@@ -213,7 +213,7 @@ It can also be declared as an object with different parameters :
 }
 ```
 
-Most importantly, Each declared route becomes a trigger itself so that routes can build on each other.
+**Most importantly :** Each declared route becomes a trigger itself so that routes can build on each other.
 
 ## Declaring particular routes for logged in/logged out users
 
