@@ -131,10 +131,16 @@
 					(options.root ? "root: " + options.root : "empty root url") + ")");
 
 				// Init Backbone.history
-				Backbone.history.start({
+				var existingRoute = Backbone.history.start({
 					pushState: options.pushState,
 					root: options.root
 				});
+
+				// Check if the current route exists else trigger a 404
+				if (!existingRoute) {
+					this.log("[Backbone.MarionetteRouter] Inexisting load route");
+					this.processControllers("404", [window.location.pathname]);
+				}
 			}
 		},
 
@@ -238,16 +244,20 @@
 				// Create a placeholder for the route controllers
 				extendedController[name] = [];
 
-				// Register the route path and controller name
-				routes_extension[def.path] = name;
+				// Register the route path and controller name if a path is given
+				if (_.isString(def.path)) {
+					routes_extension[def.path] = name;
 
-				// Create a wrapping controller method to permit for multiple route/controller binding
+					// Apply the new routes
+					_.extend(routes, routes_extension);
+				}
+
+				// Create a wrapping controller method to permit for multiple route/controller bindings
 				controller_extension[name] = function() {
 					self.processControllers(name, arguments);
 				};
 
-				// Apply the new routes/controllers
-				_.extend(routes, routes_extension);
+				// Apply the new controllers
 				_.extend(controller, controller_extension);
 			}
 
@@ -309,22 +319,24 @@
 		 */
 		"go": function(name, args) {
 			if (!extendedController[name]) {
-				this.log("[Backbone.MarionetteRouter] Inexisting route: " + name);
-				return;
+				this.log("[Backbone.MarionetteRouter] Inexisting route name: " + name);
+				this.processControllers("404", [window.location.pathname]);
+			} else {
+				// Retrieve route path
+				var path = this.path(name);
+
+				// Inject route arguments if necessary
+				if ((_.isObject(args) || _.isArray(args)) && !_.isEmpty(args)) {
+					path = this.parse(path, args);
+				}
+
+				if (path !== false) {
+					// Navigate the Marionette.AppRouter
+					router.navigate(path, {
+						trigger: true
+					});
+				}
 			}
-
-			// Retrieve route path
-			var path = this.path(name);
-
-			// Inject route arguments if necessary
-			if ((_.isObject(args) || _.isArray(args)) && !_.isEmpty(args)) {
-				path = this.parse(path, args);
-			}
-
-			// Navigate the Marionette.AppRouter
-			router.navigate(path, {
-				trigger: true
-			});
 		},
 
 
@@ -471,7 +483,7 @@
 			var result = false;
 
 			_.forEach(routes, function(route, path) {
-				if (route == routeName) {
+				if (route === routeName && !_.isUndefined(path)) {
 					result = path;
 				}
 			});

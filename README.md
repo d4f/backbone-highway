@@ -60,6 +60,31 @@ $(function() {
 
 **Important:** Routes have to be declared before ```Backbone.Marionette``` and ```Backbone.MarionetteRouter``` are started.
 
+## Start routing
+
+The MarionetteRouter has to be started via the ```start``` method right after the Marionette application has been started.
+
+The start method needs to receive the Marionette instance as the first parameter, and it can take an object as the second parameter to change the routers behaviour.
+
+Building on the previous script, here is a complete example :
+
+```javascript
+// Start the marionette app
+App.start();
+
+// Start the router passing the marionette app instance and an options object
+Backbone.MarionetteRouter.start(App, {
+  // Root url for all routes, passed to Backbone.history
+  "root": "/admin",
+
+  // Activate html5 pushState or not, true by default
+  "pushState": false,
+
+  // Print out routing debug information to the console
+  "debug": true
+});
+```
+
 ## Router go !
 
 To redirect the user to a certain route when, for example, he clicks a link simply use the ```go``` method.
@@ -138,6 +163,24 @@ The ```path``` and ```action``` parameters are the base of a route. But a few mo
 }
 ```
 
+### Catching client-side 404
+
+A route named 404 can be declared to catch all inexisting routes :
+
+```javascript
+Backbone.MarionetteRouter.map(function() {
+  // 404 controller
+  this.route("404", {
+    "action": function(path) {
+      // Render a nice 404 page
+    }
+  });
+});
+```
+
+For convenience, the action method will receive the current ```window.location.pathname``` as the first argument.
+The controller will also be executed when an inexisting route is called with the ```go``` method.
+
 ## Events distribution (Triggers)
 
 To distribute the triggers declared in the ```before``` and ```after``` parameters the ```Backbone.MarionetteRouter``` uses the ```Marionette``` global event aggregator : ```App.vent```
@@ -188,7 +231,7 @@ It can also be declared as an object with different parameters :
 }
 ```
 
-Most importantly, Each declared route becomes a trigger itself so that routes can build on each other.
+**Most importantly :** Each declared route becomes a trigger itself so that routes can build on each other.
 
 ## Declaring particular routes for logged in/logged out users
 

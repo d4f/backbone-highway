@@ -125,6 +125,13 @@
 		};
 
 		App.Router.map(function() {
+			// Catching client-side 404s (optional)
+			this.route("404", {
+				"action": function(path) {
+					console.log("Controller action: 404");
+					$(".content").html("<h1>404 ! =(</h1>");
+				}
+			});
 			
 			// Declaring a home route
 			this.route("home", {
@@ -134,6 +141,7 @@
 					{ "name": "module", "cache": true }
 				],
 				"action": function() {
+					console.log("Controller action: home");
 					$(".content").html("Current page: Home");
 				}
 			});
@@ -146,6 +154,7 @@
 					"other_module"
 				],
 				"action": function() {
+					console.log("Controller action: users_list");
 					$(".content").html("Current page: Users");
 				}
 			});
@@ -161,6 +170,7 @@
 				"path": "/users/:id",
 				"authed": true,
 				"action": function(userId) {
+					console.log("Controller action: user_show");
 					$(".content").html("Current page: User #" + userId);
 				}
 			});
@@ -173,6 +183,7 @@
 					"prompt_user"
 				],
 				"action": function() {
+					console.log("Controller action: login");
 					if (App.user != null) {
 						$(".user").html("Current user : " + App.user);
 						$("nav .login").hide().siblings(".logout").show();
@@ -191,6 +202,7 @@
 				"path": "/logout",
 				"authed": true,
 				"action": function() {
+					console.log("Controller action: logout");
 					if (App.user != null) {
 						$(".user").html("");
 						$("nav .logout").hide().siblings(".login").show();
@@ -237,18 +249,25 @@
 		});
 
 
+		/**
+		 * Register to some app events that will be triggered by the router
+		 * Typically where you would orchestrate the render of the application
+		 */
 		var registerEvents = function() {
 			App.vent.on("prompt_user", function() {
 				App.user = prompt("Enter your name :", "JS Ninja");
 			});
+
 			App.vent.on("core", function() {
-				console.log("core");
+				console.log("Got trigger: core");
 			});
+
 			App.vent.on("module", function() {
-				console.log("module");
+				console.log("Got trigger: module");
 			});
+
 			App.vent.on("other_module", function() {
-				console.log("other module");
+				console.log("Got trigger: other module");
 			});
 		};
 
