@@ -163,6 +163,24 @@ The ```path``` and ```action``` parameters are the base of a route. But a few mo
 }
 ```
 
+### Catching client-side 404
+
+A route named 404 can be declared to catch all inexisting routes :
+
+```javascript
+Backbone.MarionetteRouter.map(function() {
+  // 404 controller
+  this.route("404", {
+    "action": function(path) {
+      // Render a nice 404 page
+    }
+  });
+});
+```
+
+For convenience, the action method will receive the current ```window.location.pathname``` as the first argument.
+The controller will also be executed when an inexisting route is called with the ```go``` method.
+
 ## Events distribution (Triggers)
 
 To distribute the triggers declared in the ```before``` and ```after``` parameters the ```Backbone.MarionetteRouter``` uses the ```Marionette``` global event aggregator : ```App.vent```
