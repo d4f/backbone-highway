@@ -80,6 +80,12 @@ Backbone.MarionetteRouter.start(App, {
   // Activate html5 pushState or not, true by default
   "pushState": false,
 
+  // Is the user currently logged in or not
+  "authed": false,
+
+  // If not logged in, redirect the user to a route named "login" (if it exists)
+  "redirectToLogin": false,
+
   // Print out routing debug information to the console
   "debug": true
 });
@@ -233,7 +239,7 @@ It can also be declared as an object with different parameters :
 
 **Most importantly :** Each declared route becomes a trigger itself so that routes can build on each other.
 
-## Declaring particular routes for logged in/logged out users
+## Secured routes
 
 Each route can receive an ```authed``` boolean parameter to declare if the route should be interpreted when the user is logged in or not.
 
@@ -260,7 +266,17 @@ So for this system to actually work, the server has to print out a small piece o
 ```php
 <script type="text/javascript" src="backbone.marionetterouter.js"></script>
 <script type="text/javascript">
-Backbone.MarionetteRouter.authed = <?php if ($_SESSION['logged_in']): ?>true<?php else: ?>false<?php endif; ?>;
+window.logged_in = <?php if ($_SESSION['logged_in']): ?>true<?php else: ?>false<?php endif; ?>;
+
+$(funtion() {
+  // Starting the marionette app
+  App.start();
+
+  // Starting the router telling it if the user is logged in or not
+  Backbone.MarionetteRouter.start(App, {
+    "authed": window.logged_in
+  });
+});
 </script>
 ```
 
