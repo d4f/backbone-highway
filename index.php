@@ -1,6 +1,28 @@
 <?php
 
+// Start a php session
+session_start();
 
+// Create some simple login logic
+$user = isset($_GET['user']) ? $_GET['user'] : null;
+$logout = isset($_GET['logout']) ? $_GET['logout'] : null;
+
+// Handle user login
+if (!empty($user)) {
+	$_SESSION['user'] = $user;
+	$_SESSION['logged_in'] = true;
+	
+	header("Location: /");
+	exit;
+}
+// Handle user logout
+elseif (!empty($logout)) {
+	$_SESSION['user'] = null;
+	$_SESSION['logged_in'] = false;
+	
+	header("Location: /");
+	exit;
+}
 
 ?>
 <!DOCTYPE html>
@@ -68,10 +90,6 @@
 			text-decoration: underline;
 		}
 
-		header nav ul li.logout {
-			display: none;
-		}
-
 		#main {
 			margin: 10px 15px;
 		}
@@ -89,14 +107,21 @@
 				<li class="users"><a href="/users" data-route="users_list">Users</a></li>
 				<li class="users-alias"><a href="/some-alias" data-route="users_alias">Users Alias</a></li>
 				<li class="user_42"><a href="/users/42" data-route="user_show" data-id="42">User #42</a></li>
+				<?php if (!$_SESSION["logged_in"]): ?>
 				<li class="login"><a href="/login" data-route="login">Login</a></li>
+				<?php else: ?>
 				<li class="logout"><a href="/logout" data-route="logout">Logout</a></li>
+				<?php endif; ?>
 			</ul>
 		</nav>
 	</header>
 
 	<div id="main">
-		<div class="user"></div>
+		<div class="user">
+			<?php if ($_SESSION['logged_in']): ?>
+			User: <?php echo $_SESSION['user']; ?>
+			<?php endif; ?>
+		</div>
 		<div class="content"></div>
 	</div>
 
@@ -111,19 +136,20 @@
 	<script type="text/javascript" src="/src/backbone.marionette-router.js"></script>
 
 	<script type="text/javascript">
+	// Tell the router if the user is logged in
+	window.logged_in = <?php echo $_SESSION['logged_in'] ? "true" : "false"; ?>;
+	window.user = "<?php echo $_SESSION['user']; ?>";
+	</script>
+
+	<script type="text/javascript">
 	(function() {
 		"use strict";
 
-		var App = new Backbone.Marionette.Application(),
-			Router = Backbone.MarionetteRouter;
+		var App = window.App = new Backbone.Marionette.Application();
 
-		window.App = App;
-		App.Router = Router;
+		App.Router = Backbone.MarionetteRouter;
 
-		App.user = null;
-
-		Router.map(function() {
-
+		App.Router.map(function() {
 			// Catching client-side 404s (optional)
 			this.route("404", {
 				"action": function(path) {
@@ -178,20 +204,13 @@
 			this.route("login", {
 				"path": "/login",
 				"authed": false,
-				"before": [
-					"prompt_user"
-				],
 				"action": function() {
 					console.log("Controller action: login");
-					if (App.user != null) {
-						$(".user").html("Current user : " + App.user);
-						$("nav .login").hide().siblings(".logout").show();
 
-						App.Router.authed = true;
+					App.user = prompt("Enter your name :", "JS Ninja");
 
-						_.defer(function() {
-							App.Router.go("home");
-						});
+					if (App.user !== null) {
+						window.location.href = "/?user=" + App.user;
 					}
 				}
 			});
@@ -202,18 +221,8 @@
 				"authed": true,
 				"action": function() {
 					console.log("Controller action: logout");
-					if (App.user != null) {
-						$(".user").html("");
-						$("nav .logout").hide().siblings(".login").show();
 
-						App.user = null;
-
-						App.Router.authed = false;
-
-						_.defer(function() {
-							App.Router.go("home");
-						});
-					}
+					window.location.href = "/?logout=true";
 				}
 			});
 
@@ -253,10 +262,6 @@
 		 * Typically where you would orchestrate the render of the application
 		 */
 		var registerEvents = function() {
-			App.vent.on("prompt_user", function() {
-				App.user = prompt("Enter your name :", "JS Ninja");
-			});
-
 			App.vent.on("core", function() {
 				console.log("Got trigger: core");
 			});
@@ -274,9 +279,15 @@
 		$(function() {
 			registerEvents();
 
+			if (window.user) {
+				App.user = window.user;
+			}
+
 			App.start();
-			Router.start(App, {
-				"debug": true
+
+			App.Router.start(App, {
+				"debug": true,
+				"authed": window.logged_in
 			});
 
 			var menu = new App.MenuView({
