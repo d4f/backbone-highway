@@ -3,7 +3,8 @@
 
 
 	// Import globals
-	var Backbone = window.Backbone,
+	var localStorage = window.localStorage,
+		Backbone = window.Backbone,
 		Marionette = Backbone.Marionette,
 		_ = window._;
 
@@ -47,6 +48,12 @@
 		// Use html5 pushState
 		"pushState": true,
 
+		// The current user status, logged in or not
+		"authed": false,
+
+		// Enable automatic execution of a login route when accessing a secured route
+		"redirectToLogin": false,
+
 		// Root url
 		"root": "",
 
@@ -82,38 +89,20 @@
 
 
 		/**
-		 * Tell the router if a user is currently connected or not
-		 * Will permit for routes to declare if they should be interpreted when a user is logged in or not
-		 */
-		"authed": false,
-
-
-		"routes": {},
-
-
-		/**
 		 * Initialize the Backbone Marionette router
 		 */
 		"start": function(app, options) {
 			var self = this;
 
 			// Extend default options
-			options = _.extend({}, defaultOptions, options);
+			this.options = _.extend({}, defaultOptions, options);
 
 			// Retrieve the marionette event aggregator if none have been specified
 			if (_.isNull(this.dispatcher)) {
 				this.dispatcher = app.vent;
 			}
 
-			// Retrieve a debug flag
-			this.debug = options.debug;
-
-			// Retrieve custom log method
-			if (options.log) {
-				this.log = options.log;
-			}
-
-			this.log("[Backbone.MarionetteRouter.start] Starting router");
+			this.options.log("[Backbone.MarionetteRouter.start] Starting router");
 
 			// Extend marionette router
 			var Router = Marionette.AppRouter.extend({
@@ -127,19 +116,29 @@
 
 			// Check if Backbone.History is already enabled
 			if (!Backbone.History.started) {
-				self.log("[Backbone.MarionetteRouter.start] Starting Backbone.history (" +
-					(options.root ? "root: " + options.root : "empty root url") + ")");
+				this.options.log("[Backbone.MarionetteRouter.start] Starting Backbone.history (" +
+					(this.options.root ? "root: " + this.options.root : "empty root url") + ")");
 
 				// Init Backbone.history
 				var existingRoute = Backbone.history.start({
-					pushState: options.pushState,
-					root: options.root
+					pushState: this.options.pushState,
+					root: this.options.root
 				});
 
-				// Check if the current route exists else trigger a 404
+				// Trigger a 404 if the current route doesn't exist
 				if (!existingRoute) {
-					this.log("[Backbone.MarionetteRouter] Inexisting load route");
+					this.options.log("[Backbone.MarionetteRouter] Inexisting load route");
 					this.processControllers("404", [window.location.pathname]);
+				} else {
+					// Check if a route was stored while requiring a user login
+					var storedRoute = this.getStoredRoute();
+
+					if (storedRoute) {
+						// Clear stored route
+						this.clearStore();
+						// Redirect to stored route
+						window.location.href = storedRoute;
+					}
 				}
 			}
 		},
@@ -156,7 +155,7 @@
 		 */
 		"map": function(routesDefiner) {
 			if (!_.isFunction(routesDefiner)) {
-				this.log("[Backbone.MarionetteRouter.map] Missing routes definer method as the first param");
+				this.options.log("[Backbone.MarionetteRouter.map] Missing routes definer method as the first param");
 			} else {
 				routesDefiner.call(this);
 			}
@@ -265,32 +264,32 @@
 			extendedController[name].push(function() {
 				// Check if the route should be ignored based on the user being logged in or not
 				// and the route.authed option being set to true or false
-				if (!_.isUndefined(def.authed) && ((def.authed && !self.authed) || (!def.authed && self.authed))) {
+				if (!_.isUndefined(def.authed) && ((def.authed && !self.options.authed) || (!def.authed && self.options.authed))) {
 					// Redirect user to login route if defined, else just skip execution
-					if (_.isObject(self.routes) && _.isString(self.routes.login)) {
-						self.log("[Backbone.MarionetteRouter] Secured page, redirecting to login");
+					if (self.options.redirectToLogin) {
+						self.options.log("[Backbone.MarionetteRouter] Secured page, redirecting to login");
 
 						self.storeCurrentRoute();
 
 						// Redirect to login
-						self.go(self.routes.login);
+						self.processControllers("login");
 					} else {
-						self.log("[Backbone.MarionetteRouter] Skipping route '" + currentName +
-							"', " + (self.authed ? "" : "not ") + "logged in");
+						self.options.log("[Backbone.MarionetteRouter] Skipping route '" + currentName +
+							"', " + (self.options.authed ? "" : "not ") + "logged in");
 					}
 					return false;
 				}
 
 				// Check if the route is an alias
 				if (_.isString(def.action)) {
-					self.log("[Backbone.MarionetteRouter] Caught alias route: '" + currentName + "' >> '" + def.action + "'");
+					self.options.log("[Backbone.MarionetteRouter] Caught alias route: '" + currentName + "' >> '" + def.action + "'");
 
 					// Execute alias route
 					self.processControllers(def.action, arguments);
 
 					return false;
 				} else {
-					self.log("[Backbone.MarionetteRouter] Executing route named '" + currentName + "'");
+					self.options.log("[Backbone.MarionetteRouter] Executing route named '" + currentName + "'");
 				}
 
 				// Process pre-triggers
@@ -319,7 +318,7 @@
 		 */
 		"go": function(name, args) {
 			if (!extendedController[name]) {
-				this.log("[Backbone.MarionetteRouter] Inexisting route name: " + name);
+				this.options.log("[Backbone.MarionetteRouter] Inexisting route name: " + name);
 				this.processControllers("404", [window.location.pathname]);
 			} else {
 				// Retrieve route path
@@ -355,7 +354,7 @@
 			} else if (_.isString(triggers) || _.isObject(triggers)) {
 				this.processTrigger(triggers);
 			} else {
-				this.log("[Backbone.MarionetteRouter.processTriggers] Bad triggers format, needs to be a string," +
+				this.options.log("[Backbone.MarionetteRouter.processTriggers] Bad triggers format, needs to be a string," +
 					" an object, an array of strings or an array of objects");
 			}
 		},
@@ -384,7 +383,7 @@
 
 					// Has it already been executed ?
 					if (cache.done) {
-						this.log("[Backbone.MarionetteRouter] Trigger '" + trigger.name + "' has been skipped (cached)");
+						this.options.log("[Backbone.MarionetteRouter] Trigger '" + trigger.name + "' has been skipped (cached)");
 						return;
 					}
 
@@ -413,8 +412,8 @@
 					this.dispatcher.trigger.call(this.dispatcher, trigger);
 				}
 			} else {
-				this.log("[Backbone.MarionetteRouter.processTrigger] Bad trigger format, needs to be a string or an object, given :");
-				this.log(trigger);
+				this.options.log("[Backbone.MarionetteRouter.processTrigger] Bad trigger format, needs to be a string or an object, given :");
+				this.options.log(trigger);
 			}
 		},
 
@@ -521,16 +520,38 @@
 		},
 
 
+		/**
+		 * Store the current pathname in the local storage
+		 */
 		"storeCurrentRoute": function() {
 			var path = window.location.pathname;
 
-			this.log("[Backbone.MarionetteRouter] Storing current path: " + path);
+			this.options.log("[Backbone.MarionetteRouter] Storing current path: " + path);
 
 			// @todo Store the path for next init after page reload
+			if (localStorage) {
+				localStorage.setItem("marionette-router:path", path);
+			}
 		},
 
-		"clearStore": function() {
 
+		/**
+		 * Retrieve the stored route if any
+		 * 
+		 * @return {String} The currenlty stored route as a string, null if not existing, false if localStorage doesn't exist
+		 */
+		"getStoredRoute": function() {
+			return localStorage && localStorage.getItem("marionette-router:path");
+		},
+
+
+		/**
+		 * Clear the stored route
+		 */
+		"clearStore": function() {
+			if (localStorage) {
+				localStorage.removeItem("marionette-router:path");
+			}
 		}
 
 	};
