@@ -22,6 +22,12 @@
 	var routes = {};
 
 	/**
+	 * MarionetteRouter extended routes definitions
+	 * @type {Object}
+	 */
+	var extendedRoutes = {};
+
+	/**
 	 * Basic Backbone.Marionette controller object
 	 * @type {Object}
 	 */
@@ -136,7 +142,9 @@
 					if (storedRoute) {
 						// Clear stored route
 						this.clearStore();
+						
 						// Redirect to stored route
+						// @todo redirect with client-side routing
 						window.location.href = storedRoute;
 					}
 				}
@@ -240,6 +248,9 @@
 				// If so, retrieve it's name
 				name = routes[def.path];
 			} else {
+				// Create a placeholder for multiple route names
+				extendedRoutes[def.path] = [];
+
 				// Create a placeholder for the route controllers
 				extendedController[name] = [];
 
@@ -260,8 +271,7 @@
 				_.extend(controller, controller_extension);
 			}
 
-			// Push the new controller to the given route controllers list
-			extendedController[name].push(function() {
+			var controllerWrapper = function() {
 				// Check if the route should be ignored based on the user being logged in or not
 				// and the route.authed option being set to true or false
 				if (!_.isUndefined(def.authed) && ((def.authed && !self.options.authed) || (!def.authed && self.options.authed))) {
@@ -306,7 +316,23 @@
 				if (!_.isEmpty(def.after)) {
 					self.processTriggers(def.after);
 				}
-			});
+			};
+
+			// Push the new controller name to the route name's list
+			extendedRoutes[def.path].push(currentName);
+
+			// Push the new controller to the given route controllers list
+			extendedController[name].push(controllerWrapper);
+
+			// Re-push the controller with the current route name in case it overloads an existing path
+			// This is to permit the go method to work on controllers defined with a same path
+			if (name !== currentName) {
+				// Create a placeholder for the route controllers
+				extendedController[currentName] = [];
+
+				// Push the new controller to the given route controllers list
+				extendedController[currentName].push(controllerWrapper);
+			}
 		},
 
 
@@ -476,15 +502,18 @@
 		 * Retrieve the path of a route by it's name
 		 * 
 		 * @param  {String} routeName The route name
-		 * @return {String}           The route path
+		 * @return {String}           The route path or false if not found
 		 */
 		"path": function(routeName) {
 			var result = false;
 
-			_.forEach(routes, function(route, path) {
-				if (route === routeName && !_.isUndefined(path)) {
-					result = path;
-				}
+			// @todo Re-write this in VanillaJS so that we can break the loop when the result has been found
+			_.forEach(extendedRoutes, function(currentRoutes, path) {
+				_.forEach(currentRoutes, function(route) {
+					if (route === routeName && !_.isUndefined(path)) {
+						result = path;
+					}
+				});
 			});
 
 			return result;
