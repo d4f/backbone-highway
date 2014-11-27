@@ -8,6 +8,8 @@
 		_ = window._;
 
 
+	var BackboneRouter = Backbone.Router;
+
 	/**
 	 * Instance holder for the Backbone.Router
 	 * @type {Backbone.Router}
@@ -79,7 +81,7 @@
 	 * MarionetteRouter commander
 	 * @type {Object}
 	 */
-	var MarionetteRouter = Backbone.MarionetteRouter = {
+	var MarionetteRouter = Backbone.Router = {
 
 		/**
 		 * Which event aggregator to use for the triggers listed in each routes
@@ -110,7 +112,7 @@
 			this.options.log("[Backbone.MarionetteRouter.start] Starting router");
 
 			// Extend Backbone.Router
-			var Router = Backbone.Router.extend(_.extend({}, controller, { "routes": routes }));
+			var Router = BackboneRouter.extend(_.extend({}, controller, { "routes": routes }));
 
 			// Initialize router
 			router = new Router();

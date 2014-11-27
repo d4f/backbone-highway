@@ -147,7 +147,7 @@ elseif (!empty($logout)) {
 
 		var App = window.App = new Backbone.Marionette.Application();
 
-		App.Router = Backbone.MarionetteRouter;
+		App.Router = Backbone.Router;
 
 		App.Router.map(function() {
 			// Catching client-side 404s (optional)
