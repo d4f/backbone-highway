@@ -337,11 +337,14 @@
 		 * @param  {Mixed} name  Route name
 		 * @param  {Array} args  List of arguments to pass along
 		 */
-		"go": function(name, args) {
+		"go": function(name, args, options) {
 			if (!extendedController[name]) {
 				this.options.log("[Backbone.MarionetteRouter] Inexisting route name: " + name);
 				this.processControllers("404", [window.location.pathname]);
 			} else {
+				// Extend default router navigate options
+				options = _.extend({ "trigger": true, "replace": false }, options);
+
 				// Retrieve route path
 				var path = this.path(name);
 
@@ -352,9 +355,7 @@
 
 				if (path !== false) {
 					// Navigate the Backbone.Router
-					router.navigate(path, {
-						trigger: true
-					});
+					router.navigate(path, options);
 				}
 			}
 		},

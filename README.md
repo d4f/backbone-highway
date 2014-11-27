@@ -103,6 +103,7 @@ Backbone.MarionetteRouter.go("home");
 
  - name (String) : The route name to execute.
  - args (Mixed) : Array of arguments, can also be a functions ```arguments``` object.
+ - options (Object) : Passed to the Backbone.Router navigate method. Defaults to ```{ "trigger": true, "replace": false }```
 
 Let's define a route that takes a parameter :
 
