@@ -5,18 +5,17 @@
 	// Import globals
 	var localStorage = window.localStorage,
 		Backbone = window.Backbone,
-		Marionette = Backbone.Marionette,
 		_ = window._;
 
 
 	/**
-	 * Instance holder for the Marionette.AppRouter
-	 * @type {Backbone.Marionette.AppRouter}
+	 * Instance holder for the Backbone.Router
+	 * @type {Backbone.Router}
 	 */
 	var router = null;
 
 	/**
-	 * Basic Backbone.Marionette routes object
+	 * Basic Backbone routes object
 	 * @type {Object}
 	 */
 	var routes = {};
@@ -28,7 +27,7 @@
 	var extendedRoutes = {};
 
 	/**
-	 * Basic Backbone.Marionette controller object
+	 * Basic Backbone controller object
 	 * @type {Object}
 	 */
 	var controller = {};
@@ -110,15 +109,11 @@
 
 			this.options.log("[Backbone.MarionetteRouter.start] Starting router");
 
-			// Extend marionette router
-			var Router = Marionette.AppRouter.extend({
-				"appRoutes": routes
-			});
+			// Extend Backbone.Router
+			var Router = Backbone.Router.extend(_.extend({}, controller, { "routes": routes }));
 
 			// Initialize router
-			router = new Router({
-				"controller": controller
-			});
+			router = new Router();
 
 			// Check if Backbone.History is already enabled
 			if (!Backbone.History.started) {
@@ -356,7 +351,7 @@
 				}
 
 				if (path !== false) {
-					// Navigate the Marionette.AppRouter
+					// Navigate the Backbone.Router
 					router.navigate(path, {
 						trigger: true
 					});
