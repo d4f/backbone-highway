@@ -8,6 +8,10 @@
 		_ = window._;
 
 
+	/**
+	 * Copy the Backbone.Router to that we can override it
+	 * @type {Backbone.Router}
+	 */
 	var BackboneRouter = Backbone.Router;
 
 	/**
@@ -81,7 +85,7 @@
 	 * MarionetteRouter commander
 	 * @type {Object}
 	 */
-	var MarionetteRouter = Backbone.Router = {
+	Backbone.Router = {
 
 		/**
 		 * Which event aggregator to use for the triggers listed in each routes
@@ -105,8 +109,17 @@
 			this.options = _.extend({}, defaultOptions, options);
 
 			// Retrieve the marionette event aggregator if none have been specified
-			if (_.isNull(this.dispatcher)) {
+			if (_.isNull(this.dispatcher) && app.vent) {
 				this.dispatcher = app.vent;
+			}
+			// If a dispatcher is given through the options use it
+			else if (this.options.dispatcher) {
+				this.dispatcher = this.options.dispatcher;
+			}
+			// Else just create one
+			// @todo make this easily accessible to the developer
+			else {
+				this.dispatcher = _.extend({}, Backbone.Events);
 			}
 
 			this.options.log("[Backbone.MarionetteRouter.start] Starting router");
