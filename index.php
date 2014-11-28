@@ -133,7 +133,7 @@ elseif (!empty($logout)) {
 	<script type="text/javascript" src="/libs/backbone/backbone.marionette.min.js"></script>
 
 	<!-- Include MarionetteRouter -->
-	<script type="text/javascript" src="/src/backbone.marionette-router.js"></script>
+	<script type="text/javascript" src="/src/backbone.router.js"></script>
 
 	<script type="text/javascript">
 	// Tell the router if the user is logged in

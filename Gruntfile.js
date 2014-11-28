@@ -17,7 +17,8 @@ module.exports = function(grunt) {
 		 */
 		"jshint": {
 			"all": [
-				"Gruntfile.js"
+				"Gruntfile.js",
+				"src/backbone.router.js"
 			]
 		},
 

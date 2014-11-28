@@ -1,19 +1,18 @@
 {
-  "name": "MarionetteRouter",
+  "name": "Backbone.Router",
   "version": "0.1.5",
   "authors": [
     "Carl OGREN <carl.ogren@citizen-media.fr>"
   ],
-  "description": "Routing Marionette with style \\o/",
-  "main": "src/backbone.marionette-router.js",
+  "description": "Routing Backbone with style \\o/",
+  "main": "src/backbone.router.js",
   "keywords": [
     "backbone",
-    "marionette",
     "router"
   ],
   "repository": {
     "type": "git",
-    "url": "git://github.com/citizen-media/marionette-router.git"
+    "url": "git://github.com/citizen-media/backbone-router.git"
   },
   "license": "MIT",
   "ignore": [

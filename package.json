@@ -1,11 +1,11 @@
 {
-  "name": "MarionetteRouter",
+  "name": "Backbone.Router",
   "version": "0.1.5",
-  "description": "Routing Marionette with style \\o/",
-  "author": "citizen-media",
+  "description": "Routing Backbone with style \\o/",
+  "author": "Carl OGREN <carl.ogren@citizen-media.fr>",
   "repository": {
     "type": "git",
-    "url": "https://gitbub.com/citizen-media/marionette-router.git"
+    "url": "https://gitbub.com/citizen-media/backbone-router.git"
   },
   "devDependencies": {
     "grunt": "^0.4.5",
