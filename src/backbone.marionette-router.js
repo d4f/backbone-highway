@@ -594,6 +594,14 @@
 			if (localStorage) {
 				localStorage.removeItem("marionette-router:path");
 			}
+		},
+
+		"on": function() {
+			router.on.apply(router, arguments);
+		},
+
+		"off": function() {
+			router.off.apply(router, arguments);
 		}
 
 	};
