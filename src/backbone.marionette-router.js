@@ -68,6 +68,9 @@
 		// Root url
 		"root": "",
 
+		// Dispatcher instance
+		"dispatcher": null,
+
 		// Print out debug information
 		"debug": false,
 
