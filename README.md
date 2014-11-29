@@ -1,13 +1,13 @@
 # Routing Backbone with style \o/
 ----
 
-This library wraps the ```Backbone.Router``` to simplify it's use and bring new functionnalities
+This library wraps the ```Backbone.Router``` to simplify its use and bring new functionalities
 
-It's structure and API is inspired by routers in the Node.js frameworks: Meteor and ExpressJS.
+Its structure and API is inspired by routers in the Node.js frameworks: Meteor and ExpressJS.
 
-Added functionnalities compared to the ```Backbone.Router``` are :
+Added functionalities compared to the ```Backbone.Router``` are:
 
- * Multiple controllers for a same path
+ * Multiple controllers for the same path
  * Before and After triggers
  * Trigger caching
  * Aliasing
@@ -15,7 +15,7 @@ Added functionnalities compared to the ```Backbone.Router``` are :
 
 ## Installation
 
-You can install the library via bower :
+You can install the library via bower:
 
 ```
 bower install backbone-router
@@ -25,18 +25,18 @@ bower install backbone-router
 
 The project has been renamed from marionette-router to backbone-router, because the ```Backbone.Marionette``` dependency has been removed. It now overrides the ```Backbone.Router``` namespace for simplicity.
 
-The dependencies left are :
+The dependencies left are:
 
  - Backbone 1.1.4
  - Underscore >= 1.4.4 
 
 ## General use
 
-Declaring routes goes through executing a simple method : ```Backbone.Router.map();```
+Declaring routes goes through executing a simple method: ```Backbone.Router.map();```
 
-This method takes a function as it's only parameter which will be executed in the router's context to access the internal API easily. A route consists of a unique name and an object to describe the route's action.
+This method takes a function as its only parameter which will be executed in the router's context to access the internal API easily. A route consists of a unique name and an object to describe the route's action.
 
-Let's just jump right in with an example :
+Let's just jump right in with an example:
 
 ```javascript
 // Create a marionette app instance
@@ -71,14 +71,14 @@ $(function() {
 
 The router has to be started via the ```start``` method.
 
-Parameters :
+Parameters:
 
- - App (Mixed) - Can be an instance of a ```Backbone.Marionette.Application``` or a copy of ```Backbone.Events```. Will be used to execute triggers declared in routes.
+ - App (Mixed) - Can be an instance of ```Backbone.Marionette.Application``` or a copy of ```Backbone.Events```. Will be used to execute triggers declared in routes.
  - Options (Object) - Override default router configuration
 
 If given a Marionette app instance the router will use the ```vent``` global event aggregator to distribute route triggers.
 
-Building on the previous script, here is an example :
+Building on the previous script, here is an example:
 
 ```javascript
 // Create app
@@ -97,7 +97,7 @@ Backbone.Router.start(App, {
   // Activate html5 pushState or not, true by default
   "pushState": false,
 
-  // Is the user currently logged in or not
+  // Whether the user is currently logged in or not
   "authed": false,
 
   // If not logged in, redirect the user to a route named "login" (if it exists)
@@ -108,7 +108,7 @@ Backbone.Router.start(App, {
 });
 ```
 
-Or passing a ```Backbone.Events``` copy :
+Or passing a ```Backbone.Events``` copy:
 
 ```javascript
 // Copy Backbone.Events
@@ -118,7 +118,7 @@ var dispatcher = _.extend({}, Backbone.Events);
 Backbone.Router.start(dispatcher);
 ```
 
-## Router go !
+## Router go!
 
 To redirect the user to a certain route when, for example, he clicks a link simply use the ```go``` method.
 
@@ -128,11 +128,11 @@ Backbone.Router.go("home");
 
 **Parameters**
 
- - name (String) : The route name to execute.
- - args (Mixed) : Array of arguments, can also be a functions ```arguments``` object.
- - options (Object) : Passed to the Backbone.Router navigate method. Defaults to ```{ "trigger": true, "replace": false }```
+ - name (String): The route name to execute.
+ - args (Mixed): Array of arguments, can also be a function's ```arguments``` object.
+ - options (Object): Passed to the Backbone.Router navigate method. Defaults to ```{ "trigger": true, "replace": false }```
 
-Let's define a route that takes a parameter :
+Let's define a route that takes a parameter:
 
 ```javascript
 Backbone.Router.map(function() {
@@ -146,13 +146,13 @@ Backbone.Router.map(function() {
 })
 ```
 
-Considering the current page contains a link like this :
+Considering the current page contains a link like this:
 
 ```javascript
 <a href="/user/42" class="profile" data-id="42">Your profile!</a>
 ```
 
-We could write a script (using jquery) to redirect the user like so :
+We could write a script (using jquery) to redirect the user like so:
 
 ```javascript
 // Intercept the user click
@@ -199,7 +199,7 @@ The ```path``` and ```action``` parameters are the base of a route. But a few mo
 
 ### Catching client-side 404
 
-A route named 404 can be declared to catch all inexisting routes :
+A route named 404 can be declared to catch all non-existent routes:
 
 ```javascript
 Backbone.Router.map(function() {
@@ -213,11 +213,11 @@ Backbone.Router.map(function() {
 ```
 
 For convenience, the action method will receive the current ```window.location.pathname``` as the first argument.
-The controller will also be executed when an inexisting route is called with the ```go``` method.
+The controller will also be executed when a non-existent route is called with the ```go``` method.
 
 ## Events distribution (Triggers)
 
-To distribute the triggers declared in the ```before``` and ```after``` parameters the ```Backbone.Router``` uses the ```Marionette``` global event aggregator : ```App.vent```
+To distribute the triggers declared in the ```before``` and ```after``` parameters the ```Backbone.Router``` uses the ```Marionette``` global event aggregator: ```App.vent```
 
 This parameter can be overridden using any ```Backbone.Events``` instance.
 
@@ -238,7 +238,7 @@ Backbone.Router.start(App);
 
 Triggers can be declared in different ways.
 
-It can be a simple ```String``` for the simple ones :
+They can be a simple ```String``` for the simple ones:
 
 ```javascript
 {
@@ -251,7 +251,7 @@ It can be a simple ```String``` for the simple ones :
   // ...
 }
 ```
-It can also be declared as an object with different parameters :
+They can also be declared as an object with different parameters:
 
 ```javascript
 {
@@ -265,7 +265,7 @@ It can also be declared as an object with different parameters :
 }
 ```
 
-**Most importantly :** Each declared route becomes a trigger itself so that routes can build on each other.
+**Most importantly:** Each declared route becomes a trigger itself so that routes can build on each other.
 
 ## Secured routes
 
@@ -289,7 +289,7 @@ simply leave out the ```authed``` parameter in the route declaration.
 **Important**
 
 Only the server has the authority to tell if a connected client is a logged in user or not.
-So for this system to actually work, the server has to print out a small piece of JavaScript to tell the router the current client's state :
+So for this system to actually work, the server has to print out a small piece of JavaScript to tell the router the current client's state:
 
 ```php
 <script type="text/javascript" src="backbone.router.js"></script>
@@ -311,7 +311,7 @@ $(funtion() {
 
 ## Example
 
-An implementation example ```index.php``` file is available in the repository. To run it create an apache vhost or using any web server you like.
+An implementation example ```index.php``` file is available in the repository. To run it create an apache vhost or use any web server you like.
 
 So that client-side routing can work, every request sent to the server must be answered with the same code,
-therefore an ```.htaccess``` file activating mod_rewrite and redirecting all the requests to the ```index.php``` file is also available in the repository.
+therefore an ```.htaccess``` file activating mod_rewrite and redirecting all requests to the ```index.php``` file is also available in the repository.
