@@ -1,11 +1,11 @@
-# Routing Marionette with style \o/
+# Routing Backbone with style \o/
 ----
 
-This library wraps the ```Backbone.Marionette``` router to simplify it's use and bring new functionnalities
+This library wraps the ```Backbone.Router``` to simplify it's use and bring new functionnalities
 
 It's structure and API is inspired by routers in the Node.js frameworks: Meteor and ExpressJS.
 
-Added functionnalities compared to the ```Backbone.Marionette``` router are :
+Added functionnalities compared to the ```Backbone.Router``` are :
 
  * Multiple controllers for a same path
  * Before and After triggers
@@ -18,12 +18,21 @@ Added functionnalities compared to the ```Backbone.Marionette``` router are :
 You can install the library via bower :
 
 ```
-bower install marionette-router
+bower install backbone-router
 ```
+
+## Dependencies
+
+The project has been renamed from marionette-router to backbone-router, because the ```Backbone.Marionette``` dependency has been removed. It now overrides the ```Backbone.Router``` namespace for simplicity.
+
+The dependencies left are :
+
+ - Backbone 1.1.4
+ - Underscore >= 1.4.4 
 
 ## General use
 
-Declaring routes goes through executing a simple method : ```Backbone.MarionetteRouter.map();```
+Declaring routes goes through executing a simple method : ```Backbone.Router.map();```
 
 This method takes a function as it's only parameter which will be executed in the router's context to access the internal API easily. A route consists of a unique name and an object to describe the route's action.
 
@@ -34,7 +43,7 @@ Let's just jump right in with an example :
 var App = new Backbone.Marionette.Application();
 
 // Start route declarations
-Backbone.MarionetteRouter.map(function() {
+Backbone.Router.map(function() {
   // Declare a route named 'home'
   this.route("home", {
     // The url to which the route will respond
