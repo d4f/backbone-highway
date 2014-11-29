@@ -3,6 +3,11 @@
   "version": "0.1.6",
   "description": "Routing Backbone with style \\o/",
   "author": "Carl OGREN <carl.ogren@citizen-media.fr>",
+  "keywords": [
+    "backbone",
+    "marionette",
+    "router"
+  ],
   "repository": {
     "type": "git",
     "url": "https://gitbub.com/citizen-media/backbone-router.git"
