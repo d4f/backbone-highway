@@ -63,26 +63,34 @@ $(function() {
   App.start();
 
   // Start the router passing the marionette app instance
-  Backbone.MarionetteRouter.start(App);
+  Backbone.Router.start(App);
 });
 ```
 
-**Important:** Routes have to be declared before ```Backbone.Marionette``` and ```Backbone.MarionetteRouter``` are started.
-
 ## Start routing
 
-The MarionetteRouter has to be started via the ```start``` method right after the Marionette application has been started.
+The router has to be started via the ```start``` method.
 
-The start method needs to receive the Marionette instance as the first parameter, and it can take an object as the second parameter to change the routers behaviour.
+Parameters :
 
-Building on the previous script, here is a complete example :
+ - App (Mixed) - Can be an instance of a ```Backbone.Marionette.Application``` or a copy of ```Backbone.Events```. Will be used to execute triggers declared in routes.
+ - Options (Object) - Override default router configuration
+
+If given a Marionette app instance the router will use the ```vent``` global event aggregator to distribute route triggers.
+
+Building on the previous script, here is an example :
 
 ```javascript
+// Create app
+var App = new Backbone.Marionette.Application();
+
+// Define some routes ...
+
 // Start the marionette app
 App.start();
 
 // Start the router passing the marionette app instance and an options object
-Backbone.MarionetteRouter.start(App, {
+Backbone.Router.start(App, {
   // Root url for all routes, passed to Backbone.history
   "root": "/admin",
 
@@ -100,12 +108,22 @@ Backbone.MarionetteRouter.start(App, {
 });
 ```
 
+Or passing a ```Backbone.Events``` copy :
+
+```javascript
+// Copy Backbone.Events
+var dispatcher = _.extend({}, Backbone.Events);
+
+// Start router
+Backbone.Router.start(dispatcher);
+```
+
 ## Router go !
 
 To redirect the user to a certain route when, for example, he clicks a link simply use the ```go``` method.
 
 ```javascript
-Backbone.MarionetteRouter.go("home");
+Backbone.Router.go("home");
 ```
 
 **Parameters**
@@ -117,7 +135,7 @@ Backbone.MarionetteRouter.go("home");
 Let's define a route that takes a parameter :
 
 ```javascript
-Backbone.MarionetteRouter.map(function() {
+Backbone.Router.map(function() {
   // Declare a user profile page
   this.route("user_profile", {
     "path": "/user/:id",
@@ -144,7 +162,7 @@ $("a.profile").click(function(e) {
   var userId = $(this).attr("data-id");
 
   // Redirecting to route named "user_profile" passing an id
-  Backbone.MarionetteRouter.go("user_profile", [userId]);
+  Backbone.Router.go("user_profile", [userId]);
 });
 ```
 
@@ -184,7 +202,7 @@ The ```path``` and ```action``` parameters are the base of a route. But a few mo
 A route named 404 can be declared to catch all inexisting routes :
 
 ```javascript
-Backbone.MarionetteRouter.map(function() {
+Backbone.Router.map(function() {
   // 404 controller
   this.route("404", {
     "action": function(path) {
@@ -199,7 +217,7 @@ The controller will also be executed when an inexisting route is called with the
 
 ## Events distribution (Triggers)
 
-To distribute the triggers declared in the ```before``` and ```after``` parameters the ```Backbone.MarionetteRouter``` uses the ```Marionette``` global event aggregator : ```App.vent```
+To distribute the triggers declared in the ```before``` and ```after``` parameters the ```Backbone.Router``` uses the ```Marionette``` global event aggregator : ```App.vent```
 
 This parameter can be overridden using any ```Backbone.Events``` instance.
 
@@ -210,10 +228,10 @@ var App = new Backbone.Marionette.Application();
 var myDispatcher = _.extend({}, Backbone.Events);
 
 // Pass the custom object to the Router
-Backbone.MarionetteRouter.dispatcher = myDispatcher;
+Backbone.Router.dispatcher = myDispatcher;
 
 App.start();
-Backbone.MarionetteRouter.start(App);
+Backbone.Router.start(App);
 ```
 
 ## Trigger declaration
@@ -254,7 +272,7 @@ It can also be declared as an object with different parameters :
 Each route can receive an ```authed``` boolean parameter to declare if the route should be interpreted when the user is logged in or not.
 
 ```javascript
-Backbone.MarionetteRouter.map(function() {
+Backbone.Router.map(function() {
   // Declare secure route
   this.route("secure_route", {
     "path": "/admin/users",
@@ -274,7 +292,7 @@ Only the server has the authority to tell if a connected client is a logged in u
 So for this system to actually work, the server has to print out a small piece of JavaScript to tell the router the current client's state :
 
 ```php
-<script type="text/javascript" src="backbone.marionetterouter.js"></script>
+<script type="text/javascript" src="backbone.router.js"></script>
 <script type="text/javascript">
 window.logged_in = <?php if ($_SESSION['logged_in']): ?>true<?php else: ?>false<?php endif; ?>;
 
@@ -283,7 +301,7 @@ $(funtion() {
   App.start();
 
   // Starting the router telling it if the user is logged in or not
-  Backbone.MarionetteRouter.start(App, {
+  Backbone.Router.start(App, {
     "authed": window.logged_in
   });
 });
