@@ -45,6 +45,12 @@
 	var extendedController = {};
 
 	/**
+	 * Collection of routes close event
+	 * @type {Object}
+	 */
+	var closeControllers = {};
+
+	/**
 	 * Trigger cache memory
 	 * @type {Array}
 	 */
@@ -291,7 +297,10 @@
 				_.extend(controller, controller_extension);
 			}
 
+			closeControllers[name] = def.close;
+
 			var controllerWrapper = function() {
+				this.currentRoute = currentName;
 				// Check if the route should be ignored based on the user being logged in or not
 				// and the route.authed option being set to true or false
 				if (!_.isUndefined(def.authed) && ((def.authed && !self.options.authed) || (!def.authed && self.options.authed))) {
@@ -367,6 +376,15 @@
 				this.options.log("[Backbone.Router] Inexisting route name: " + name);
 				this.processControllers("404", [window.location.pathname]);
 			} else {
+
+				if(_.isFunction(closeControllers[this.currentRoute]) && name !== this.currentRoute) {
+					
+					var close = closeControllers[this.currentRoute]();
+					
+					if(!close) {
+						return false;
+					}
+				}
 				// Extend default router navigate options
 				options = _.extend({ "trigger": true, "replace": false }, options);
 
@@ -382,6 +400,8 @@
 					// Navigate the Backbone.Router
 					router.navigate(path, options);
 				}
+
+				return true;
 			}
 		},
 
