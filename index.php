@@ -158,6 +158,14 @@ elseif (!empty($logout)) {
 					$(".content").html("<h1>404 ! =(</h1>");
 				}
 			});
+
+			// Catching client-side 403s (optional)
+			this.route("403", {
+				"action": function(path) {
+					console.log("Controller action: 403");
+					$(".content").html("<h1>403 ! =(</h1>");
+				}
+			});
 			
 			// Declaring a home route
 			this.route("home", {
@@ -179,15 +187,6 @@ elseif (!empty($logout)) {
 				}
 			});
 
-			// Multiple controller for a same route
-			this.route("home_extension", {
-				"path": "/",
-				"authed": true,
-				"action": function() {
-					console.log("Controller action: home_extension");
-				}
-			});
-
 			// Declaring a users list route
 			this.route("users_list", {
 				"path": "/users",
@@ -198,6 +197,14 @@ elseif (!empty($logout)) {
 				"action": function() {
 					console.log("Controller action: users_list");
 					$(".content").html("Current page: Users");
+				}
+			});
+
+			// Multiple controller for a same route
+			this.route("users_list_extension", {
+				"path": "/users",
+				"action": function() {
+					console.log("Controller action: users_list_extension");
 				}
 			});
 

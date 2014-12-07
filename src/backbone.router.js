@@ -328,6 +328,8 @@
 					} else {
 						self.options.log("[Backbone.Router] Skipping route '" + currentName +
 							"', " + (self.options.authed ? "" : "not ") + "logged in");
+
+						this.processControllers("403", [window.location.pathname]);
 					}
 					return false;
 				}
@@ -337,7 +339,7 @@
 					self.options.log("[Backbone.Router] Caught alias route: '" + currentName + "' >> '" + def.action + "'");
 
 					// Execute alias route
-					self.processControllers(def.action, args);
+					self.processControllers(def.action, args, true);
 
 					return false;
 				} else {

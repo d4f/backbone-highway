@@ -203,23 +203,34 @@ The ```path``` and ```action``` parameters are the base of a route. But a few mo
 }
 ```
 
-### Catching client-side 404
+### Catching client-side 404 and 403
 
-A route named 404 can be declared to catch all non-existent routes:
+A route named 404 can be declared to catch all non-existent routes.
+In the same way a route can be named 403 to catch accessing restricted routes.
 
 ```javascript
 Backbone.Router.map(function() {
   // 404 controller
   this.route("404", {
     "action": function(path) {
-      // Render a nice 404 page
+      // Couldn't find what you're looking for =/
+    }
+  });
+
+  // 403 controller
+  this.route("403", {
+    "action": function(path) {
+      // Sorry you can't access this content =(
     }
   });
 });
 ```
 
-For convenience, the action method will receive the current ```window.location.pathname``` as the first argument.
-The controller will also be executed when a non-existent route is called with the ```go``` method.
+For convenience, the action methods will receive the current ```window.location.pathname``` as the first argument.
+
+The 404 controller will also be executed when a non-existent route is called with the ```go``` method.
+
+The 403 controller will only be executed if the ```redirectToLogin``` option is set to ```false```.
 
 ## Events distribution (Triggers)
 
