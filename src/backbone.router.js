@@ -109,6 +109,12 @@
 
 
 		/**
+		 * Store routes that were executed last
+		 */
+		"currentRoutes": [],
+
+
+		/**
 		 * Initialize the Backbone Marionette router
 		 */
 		"start": function(app, options) {
@@ -297,10 +303,17 @@
 				_.extend(controller, controller_extension);
 			}
 
-			closeControllers[name] = def.close;
+			// Store the close controller
+			if (def.close) {
+				closeControllers[currentName] = def.close;
+			}
 
-			var controllerWrapper = function() {
-				this.currentRoute = currentName;
+			var controllerWrapper = function(args, trigger) {
+				// Store the current route name if it is not a trigger
+				if (!trigger) {
+					self.currentRoutes.push(currentName);
+				}
+
 				// Check if the route should be ignored based on the user being logged in or not
 				// and the route.authed option being set to true or false
 				if (!_.isUndefined(def.authed) && ((def.authed && !self.options.authed) || (!def.authed && self.options.authed))) {
@@ -324,7 +337,7 @@
 					self.options.log("[Backbone.Router] Caught alias route: '" + currentName + "' >> '" + def.action + "'");
 
 					// Execute alias route
-					self.processControllers(def.action, arguments);
+					self.processControllers(def.action, args);
 
 					return false;
 				} else {
@@ -338,7 +351,7 @@
 
 				// Execute route main action
 				if (_.isFunction(def.action)) {
-					def.action.apply(self, arguments);
+					def.action.apply(self, args);
 				}
 
 				// Process post-triggers
@@ -370,21 +383,31 @@
 		 *
 		 * @param  {Mixed} name  Route name
 		 * @param  {Array} args  List of arguments to pass along
+		 * @return {Boolean}     Will return false if the routing was cancelled, else true
 		 */
 		"go": function(name, args, options) {
 			if (!extendedController[name]) {
 				this.options.log("[Backbone.Router] Inexisting route name: " + name);
 				this.processControllers("404", [window.location.pathname]);
 			} else {
+				var continueProcess = true;
 
-				if(_.isFunction(closeControllers[this.currentRoute]) && name !== this.currentRoute) {
-					
-					var close = closeControllers[this.currentRoute]();
-					
-					if(!close) {
-						return false;
+				_.forEach(this.currentRoutes, function(route) {
+					// Check if the previous route has a close controller
+					if (_.isFunction(closeControllers[route]) && name !== route) {
+						// Execute close controller passing current route data and retrieve result
+						continueProcess = closeControllers[route].call(self, name, args, options);
 					}
+				});
+
+				// If controller returned false, cancel go process
+				if (!continueProcess) {
+					return false;
 				}
+
+				// Re-initialize currentRoutes storage
+				this.currentRoutes = [];
+
 				// Extend default router navigate options
 				options = _.extend({ "trigger": true, "replace": false }, options);
 
@@ -437,12 +460,6 @@
 				// Create a dispatcher format object
 				var args = [trigger.name];
 
-				// Check if the trigger is actually a declared route
-				if (extendedController[trigger.name]) {
-					this.processControllers(trigger.name, trigger.args);
-					return;
-				}
-
 				// Check if the trigger is marked for caching
 				if (trigger.cache) {
 					// Find cached trigger object
@@ -456,6 +473,12 @@
 
 					// Mark it done
 					cache.done = true;
+				}
+
+				// Check if the trigger is actually a declared route
+				if (extendedController[trigger.name]) {
+					this.processControllers(trigger.name, trigger.args || null, true);
+					return;
 				}
 
 				// Wrap the given parameter in an array
@@ -473,7 +496,7 @@
 			} else if (_.isString(trigger)) {
 				// Check if the trigger is actually a declared route
 				if (extendedController[trigger]) {
-					this.processControllers(trigger);
+					this.processControllers(trigger, null, true);
 				} else {
 					// Else give to the dispatcher
 					this.dispatcher.trigger.call(this.dispatcher, trigger);
@@ -491,11 +514,13 @@
 		 * @param  {String} name The name of the route
 		 * @param  {Array}  args JavaScript arguments array
 		 */
-		"processControllers": function(name, args) {
+		"processControllers": function(name, args, trigger) {
 			var self = this;
 
-			// Lets not pass [undefined] as arguments to the controllers
-			if (_.isUndefined(args)) {
+			trigger = trigger || false;
+
+			// Lets not pass [undefined] or [null] as arguments to the controllers
+			if (_.isUndefined(args) || _.isNull(args)) {
 				args = [];
 			}
 			// Ensure args is an array if not an arguments object
@@ -504,7 +529,7 @@
 			}
 
 			_.forEach(extendedController[name], function(callback) {
-				callback.apply(self, args);
+				callback.call(self, args, trigger);
 			});
 		},
 

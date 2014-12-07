@@ -106,7 +106,8 @@ elseif (!empty($logout)) {
 				<li class="home"><a href="/" data-route="home">Home</a></li>
 				<li class="users"><a href="/users" data-route="users_list">Users</a></li>
 				<li class="users-alias"><a href="/some-alias" data-route="users_alias">Users Alias</a></li>
-				<li class="user_42"><a href="/users/42" data-route="user_show" data-id="42">User #42</a></li>
+				<li class="user_42"><a href="/users/42" data-route="user_show" data-id="42">Secured: User #42</a></li>
+				<li><a href="/some-random-inexisting-route" data-route="some_random_inexisting_route">Testing 404</a></li>
 				<?php if (!$_SESSION["logged_in"]): ?>
 				<li class="login"><a href="/login" data-route="login">Login</a></li>
 				<?php else: ?>
@@ -168,6 +169,22 @@ elseif (!empty($logout)) {
 				"action": function() {
 					console.log("Controller action: home");
 					$(".content").html("Current page: Home");
+				},
+				"close": function() {
+					if (App.user) {
+						return confirm("Do you really want to quit the page?");
+					}
+
+					return true;
+				}
+			});
+
+			// Multiple controller for a same route
+			this.route("home_extension", {
+				"path": "/",
+				"authed": true,
+				"action": function() {
+					console.log("Controller action: home_extension");
 				}
 			});
 
