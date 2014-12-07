@@ -193,7 +193,13 @@ The ```path``` and ```action``` parameters are the base of a route. But a few mo
   // Execute triggers after the 'action' controller
   "after": [
     "core:post_triggers"
-  ]
+  ],
+
+  // Executed when user is routed away from this route
+  "close": function() {
+    // Return false to cancel the routing
+    return confirm("Are you sure you want to leave this page?");
+  }
 }
 ```
 
