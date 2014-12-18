@@ -152,6 +152,14 @@
 			// Initialize router
 			router = new Router();
 
+			// Determine the path regex of each route and store it
+			_.forEach(routes, function(name, path) {
+				if (self.exists({ "name": name })) {
+					// Store the regexp format of the path using Backbone.Router internal method _routeToRegExp
+					extendedController[name].re = router._routeToRegExp(path);
+				}
+			});
+
 			// Check if Backbone.History is already enabled
 			if (!Backbone.History.started) {
 				this.options.log("[Backbone.Router.start] Starting Backbone.history (" +
@@ -262,10 +270,11 @@
 		 */
 		"route": function(name, def) {
 			var self = this,
-				routes_extension = {},
-				controller_extension = {},
+				routesExtension = {},
+				controllerExtension = {},
 				currentName = name;
 
+			// @todo Probably throw an exception here. If def is an empty object, nothing will work
 			if (!_.isObject(def)) {
 				def = {};
 			}
@@ -284,23 +293,26 @@
 				extendedRoutes[def.path] = [];
 
 				// Create a placeholder for the route controllers
-				extendedController[name] = [];
+				extendedController[name] = {
+					"re": null,
+					"wrappers": []
+				};
 
 				// Register the route path and controller name if a path is given
 				if (_.isString(def.path)) {
-					routes_extension[def.path] = name;
+					routesExtension[def.path] = name;
 
 					// Apply the new routes
-					_.extend(routes, routes_extension);
+					_.extend(routes, routesExtension);
 				}
 
 				// Create a wrapping controller method to permit for multiple route/controller bindings
-				controller_extension[name] = function() {
+				controllerExtension[name] = function() {
 					self.processControllers(name, arguments);
 				};
 
 				// Apply the new controllers
-				_.extend(controller, controller_extension);
+				_.extend(controller, controllerExtension);
 			}
 
 			// Store the close controller
@@ -366,16 +378,17 @@
 			extendedRoutes[def.path].push(currentName);
 
 			// Push the new controller to the given route controllers list
-			extendedController[name].push(controllerWrapper);
+			extendedController[name].wrappers.push(controllerWrapper);
 
 			// Re-push the controller with the current route name in case it overloads an existing path
 			// This is to permit the go method to work on controllers defined with a same path
 			if (name !== currentName) {
 				// Create a placeholder for the route controllers
-				extendedController[currentName] = [];
-
-				// Push the new controller to the given route controllers list
-				extendedController[currentName].push(controllerWrapper);
+				// Adding the new controller to the given route controllers list
+				extendedController[currentName] = {
+					"re": null,
+					"wrappers": [controllerWrapper]
+				};
 			}
 		},
 
@@ -388,7 +401,25 @@
 		 * @return {Boolean}     Will return false if the routing was cancelled, else true
 		 */
 		"go": function(name, args, options) {
-			if (!extendedController[name]) {
+			var route = null,
+				path = null;
+
+			// Check if an object is given instead of a string
+			if (_.isObject(name)) {
+				// Rename object
+				route = name;
+
+				// Transfer route name
+				name = route.name;
+
+				// Transfer route path and remove first slash
+				path = _.isString(route.path) && route.path.charAt(0) == "/" ? route.path.substring(1) : route.path;
+
+				// Transfer args
+				args = route.args || args;
+			}
+
+			if ((name && !this.exists({ "name": name })) || (path && !this.exists({ "path": path }))) {
 				this.options.log("[Backbone.Router] Inexisting route name: " + name);
 				this.processControllers("404", [window.location.pathname]);
 			} else {
@@ -413,12 +444,14 @@
 				// Extend default router navigate options
 				options = _.extend({ "trigger": true, "replace": false }, options);
 
-				// Retrieve route path
-				var path = this.path(name);
+				if (!path) {
+					// Retrieve route path
+					path = this.path(name);
 
-				// Inject route arguments if necessary
-				if ((_.isObject(args) || _.isArray(args)) && !_.isEmpty(args)) {
-					path = this.parse(path, args);
+					// Inject route arguments if necessary
+					if ((_.isObject(args) || _.isArray(args)) && !_.isEmpty(args)) {
+						path = this.parse(path, args);
+					}
 				}
 
 				if (path !== false) {
@@ -478,7 +511,7 @@
 				}
 
 				// Check if the trigger is actually a declared route
-				if (extendedController[trigger.name]) {
+				if (this.exists({ "name": trigger.name })) {
 					this.processControllers(trigger.name, trigger.args || null, true);
 					return;
 				}
@@ -497,7 +530,7 @@
 				this.dispatcher.trigger.apply(this.dispatcher, args);
 			} else if (_.isString(trigger)) {
 				// Check if the trigger is actually a declared route
-				if (extendedController[trigger]) {
+				if (this.exists({ "name": trigger })) {
 					this.processControllers(trigger, null, true);
 				} else {
 					// Else give to the dispatcher
@@ -530,7 +563,7 @@
 				args = [args];
 			}
 
-			_.forEach(extendedController[name], function(callback) {
+			_.forEach(extendedController[name].wrappers, function(callback) {
 				callback.call(self, args, trigger);
 			});
 		},
@@ -585,6 +618,35 @@
 			});
 
 			return result;
+		},
+
+
+		/**
+		 * Check if a route exists by its name or its path
+		 *
+		 * @param  {Object}  params Object with a name or path key
+		 * @return {Boolean}        True if route exists else false
+		 */
+		"exists": function(params) {
+			if (!_.isObject(params)) {
+				return false;
+			}
+
+			if (params.name) {
+				return !! extendedController[params.name];
+			} else if (params.path) {
+				var found = false,
+					name = null;
+
+				// Loop through all the controllers
+				for (name in extendedController) {
+					if (extendedController[name].re && extendedController[name].re.test(params.path)) {
+						return true;
+					}
+				}
+			}
+
+			return false;
 		},
 
 

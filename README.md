@@ -128,7 +128,7 @@ Backbone.Router.go("home");
 
 **Parameters**
 
- - name (String): The route name to execute.
+ - name (Mixed): The route name to execute or an object describing the route.
  - args (Mixed): Array of arguments, can also be a function's ```arguments``` object.
  - options (Object): Passed to the Backbone.Router navigate method. Defaults to ```{ "trigger": true, "replace": false }```
 
@@ -165,6 +165,19 @@ $("a.profile").click(function(e) {
   Backbone.Router.go("user_profile", [userId]);
 });
 ```
+
+As the first parameter to the ```go``` method can be an object, we could also write the previous script in this manner:
+
+```javascript
+// Intercept the user click
+$("a.profile").click(function(e) {
+  e.preventDefault();
+
+  // Redirecting to route using the path defined in the href attribute
+  Backbone.Router.go({ "path": this.href });
+});
+```
+
 
 ## Route declaration parameters
 
