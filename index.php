@@ -311,7 +311,9 @@ elseif (!empty($logout)) {
 
 			App.Router.start(App, {
 				"debug": true,
-				"authed": window.logged_in
+				"authed": window.logged_in,
+				"redirectToLogin": true,
+				// "pushState": false
 			});
 
 			var menu = new App.MenuView({

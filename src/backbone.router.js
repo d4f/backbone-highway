@@ -174,18 +174,21 @@
 				// Trigger a 404 if the current route doesn't exist
 				if (!existingRoute) {
 					this.options.log("[Backbone.Router] Inexisting load route");
-					this.processControllers("404", [window.location.pathname]);
+
+					this.processControllers("404", [self.options.pushState ?
+							window.location.pathname.substring(1) : window.location.hash.substring(1)]);
 				} else {
 					// Check if a route was stored while requiring a user login
 					var storedRoute = this.getStoredRoute();
 
 					if (storedRoute) {
+						this.options.log("[Backbone.Router] Loaded stored route: " + storedRoute);
+
 						// Clear stored route
 						this.clearStore();
 						
 						// Redirect to stored route
-						// @todo redirect with client-side routing
-						window.location.href = storedRoute;
+						this.go({ "path": storedRoute });
 					}
 				}
 			}
@@ -329,10 +332,11 @@
 				// Check if the route should be ignored based on the user being logged in or not
 				// and the route.authed option being set to true or false
 				if (!_.isUndefined(def.authed) && ((def.authed && !self.options.authed) || (!def.authed && self.options.authed))) {
-					// Redirect user to login route if defined, else just skip execution
-					if (self.options.redirectToLogin) {
+					// Redirect user to login route if defined, else try to execute 403 controller
+					if (self.options.redirectToLogin && !self.options.authed) {
 						self.options.log("[Backbone.Router] Secured page, redirecting to login");
 
+						// Store current route in case login reloads the page
 						self.storeCurrentRoute();
 
 						// Redirect to login
@@ -341,7 +345,9 @@
 						self.options.log("[Backbone.Router] Skipping route '" + currentName +
 							"', " + (self.options.authed ? "" : "not ") + "logged in");
 
-						this.processControllers("403", [window.location.pathname]);
+						// Execute 403 controller
+						this.processControllers("403", [self.options.pushState ?
+							window.location.pathname.substring(1) : window.location.hash.substring(1)]);
 					}
 					return false;
 				}
@@ -419,9 +425,18 @@
 				args = route.args || args;
 			}
 
+			if (!name && !path) {
+				this.options.log("[Backbone.Router.go] Missing parameters, name or path is necessary");
+				return false;
+			}
+
+			// Check if route exists
 			if ((name && !this.exists({ "name": name })) || (path && !this.exists({ "path": path }))) {
 				this.options.log("[Backbone.Router] Inexisting route name: " + name);
-				this.processControllers("404", [window.location.pathname]);
+
+				// Execute 404 controller
+				this.processControllers("404", [this.options.pushState ?
+					window.location.pathname.substring(1) : window.location.hash.substring(1)]);
 			} else {
 				var continueProcess = true;
 
@@ -537,8 +552,8 @@
 					this.dispatcher.trigger.call(this.dispatcher, trigger);
 				}
 			} else {
-				this.options.log("[Backbone.Router.processTrigger] Bad trigger format, needs to be a string or an object, given :");
-				this.options.log(trigger);
+				this.options.log("[Backbone.Router.processTrigger] Bad trigger format, " +
+					"needs to be a string or an object, given: " + typeof trigger);
 			}
 		},
 
@@ -683,7 +698,11 @@
 		 * Store the current pathname in the local storage
 		 */
 		"storeCurrentRoute": function() {
-			var path = window.location.pathname;
+			// Retrieve current path
+			var path = this.options.pushState ? window.location.pathname : window.location.hash;
+
+			// Remove first / or #
+			path = path.substring(1);
 
 			this.options.log("[Backbone.Router] Storing current path: " + path);
 
