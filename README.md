@@ -118,6 +118,12 @@ var dispatcher = _.extend({}, Backbone.Events);
 Backbone.Router.start(dispatcher);
 ```
 
+The dispatcher can also be overridden before the router is started in this way:
+
+```javascript
+Backbone.Router.dispatcher = _.extend({}, Backbone.Events);
+```
+
 ## Router go!
 
 To redirect the user to a certain route when, for example, he clicks a link simply use the ```go``` method.

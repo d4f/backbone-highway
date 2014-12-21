@@ -74,9 +74,6 @@
 		// Root url
 		"root": "",
 
-		// Dispatcher instance
-		"dispatcher": null,
-
 		// Print out debug information
 		"debug": false,
 
@@ -133,15 +130,9 @@
 				else {
 					this.dispatcher = app;
 				}
-			}
-			// If a dispatcher is given through the options use it
-			else if (this.options.dispatcher) {
-				this.dispatcher = this.options.dispatcher;
-			}
-			// Else just create one
-			// @todo make this easily accessible to the developer
-			else {
-				this.dispatcher = _.extend({}, Backbone.Events);
+			} else {
+				this.log("[Backbone.Router] Could not start router, missing dispatcher instance");
+				return false;
 			}
 
 			this.options.log("[Backbone.Router.start] Starting router");
