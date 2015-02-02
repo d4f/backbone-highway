@@ -130,9 +130,16 @@
 				else {
 					this.dispatcher = app;
 				}
-			} else {
-				this.log("[Backbone.Router] Could not start router, missing dispatcher instance");
-				return false;
+			}
+
+			// Ensure that the dispatcher has the expected method
+			// i.e. The method "trigger" of Backbone.Events
+			var methods = _.filter(["trigger"], function(method) {
+				return _.isFunction(self.dispatcher[method]);
+			});
+
+			if (_.isEmpty(methods)) {
+				throw "[Backbone.Router.start] Missing a correct dispatcher object, needs to be an instance of Backbone.Events";
 			}
 
 			this.options.log("[Backbone.Router.start] Starting router");
