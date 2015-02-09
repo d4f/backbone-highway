@@ -341,9 +341,10 @@
 						self.processControllers("login");
 					} else {
 						self.options.log("[Backbone.Router] Skipping route '" + currentName +
-							"', " + (self.options.authed ? "" : "not ") + "logged in");
+							"', " + (self.options.authed ? "already " : "not ") + "logged in");
 
 						// Execute 403 controller
+						// @todo Apply better/finer logic for when the 403 controller should be executed
 						this.processControllers("403", [self.options.pushState ?
 							window.location.pathname.substring(1) : window.location.hash.substring(1)]);
 					}
@@ -576,9 +577,14 @@
 				args = [args];
 			}
 
-			_.forEach(extendedController[name].wrappers, function(callback) {
-				callback.call(self, args, trigger);
-			});
+			// Check if the given controller actually exists
+			if (extendedController[name]) {
+				_.forEach(extendedController[name].wrappers, function(callback) {
+					callback.call(self, args, trigger);
+				});
+			} else {
+				this.options.log("[Backbone.Router.processControllers] Inexisting controller: " + name);
+			}
 		},
 
 
