@@ -469,13 +469,8 @@
 				options = _.extend({ "trigger": true, "replace": false }, options);
 
 				if (!path) {
-					// Retrieve route path
-					path = this.path(name);
-
-					// Inject route arguments if necessary
-					if ((_.isObject(args) || _.isArray(args)) && !_.isEmpty(args)) {
-						path = this.parse(path, args);
-					}
+					// Retrieve route path passing arguments
+					path = this.path(name, args);
 				}
 
 				if (path !== false) {
@@ -629,24 +624,23 @@
 
 
 		/**
-		 * Retrieve the path of a route by it's name
+		 * Retrieve the path of a route by it's name.
+		 * Pass in optional arguments to be parsed into the path.
 		 * 
-		 * @param  {String} routeName The route name
-		 * @return {String}           The route path or false if not found
+		 * @param  {String} routeName  The route name
+		 * @param  {Array}  args       The arguments that need to be injected into the path
+		 * @return {String}            The route path or false if the route doesn't exist
 		 */
-		"path": function(routeName) {
-			var result = false;
+		"path": function(routeName, args) {
+			var path;
 
-			// @todo Re-write this in VanillaJS so that we can break the loop when the result has been found
-			_.forEach(extendedRoutes, function(currentRoutes, path) {
-				_.forEach(currentRoutes, function(route) {
-					if (route === routeName && !_.isUndefined(path)) {
-						result = path;
-					}
-				});
-			});
+			for (path in routes) {
+				if (routes[path] === routeName) {
+					return this.parse(path, args);
+				}
+			}
 
-			return result;
+			return false;
 		},
 
 
