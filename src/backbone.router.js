@@ -1,21 +1,21 @@
 // Allowing backbone-router to work with AMD and browser globals.
 (function (window, factory) {
-    if (typeof define === 'function' && define.amd) {
-        // AMD. Register as an anonymous module.
-        define(['backbone', 'underscore'], function (Backbone, _) {
-            // Use globals variables in case that
-            // they are undefined locally
-            return factory(window, Backbone || window.Backbone, _ || window._);
-        });
-    } else {
-        // Browser globals
-        factory(window, window.Backbone, window._);
-    }
+	if (typeof define === 'function' && define.amd) {
+		// AMD. Register as an anonymous module.
+		define(['backbone', 'underscore'], function (Backbone, _) {
+			// Use globals variables in case that
+			// they are undefined locally
+			return factory(window, Backbone || window.Backbone, _ || window._);
+		});
+	} else {
+		// Browser globals
+		factory(window, window.Backbone, window._);
+	}
 }(this, function (window, Backbone, _) {
 	"use strict";
 
 	// Import globals
-	var localStorage = window.localStorage,
+	var localStorage = window.localStorage;
 
 
 	/**
@@ -757,5 +757,5 @@
 	};
 
 
-    return Backbone.Router;
+	return Backbone.Router;
 }));
