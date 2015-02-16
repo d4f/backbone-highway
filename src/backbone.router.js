@@ -674,7 +674,7 @@
 
 
 		/**
-		 * Parse a path to inject a list of arguments into the path
+		 * Parse a path to inject a list of arguments into the path.
 		 * 
 		 * @param  {String} path The path to parse containing argument declarations starting with colons
 		 * @param  {Array}  args List of arguments to inject into the path
@@ -685,20 +685,21 @@
 				return path;
 			}
 
-			var parts = path.split("/"),
-				argIndex = 0;
+			var argIndex = 0;
 
-			var newParts = _.map(parts, function(part) {
+			// Inject arguments
+			return _.map(path.split("/"), function(part) {
 				if (part.charAt(0) == ":") {
-					var arg = args[argIndex];
-					argIndex++;
-
-					return arg;
+					return args[argIndex++];
 				}
 				return part;
-			});
-
-			return newParts.join("/");
+			})
+			// Join the parts with slashes
+			.join("/")
+			// Remove opening parentheses in case of optional parameters
+			.replace("(", "")
+			// Remove trailing slash
+			.replace(/\/$/, "");
 		},
 
 
