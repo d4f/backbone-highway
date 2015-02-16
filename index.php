@@ -313,6 +313,7 @@ elseif (!empty($logout)) {
 				"debug": true,
 				"authed": window.logged_in,
 				"redirectToLogin": true,
+				// "root": "/admin",
 				// "pushState": false
 			});
 
