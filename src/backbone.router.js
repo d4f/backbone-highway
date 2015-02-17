@@ -7,6 +7,11 @@
 			// they are undefined locally
 			return factory(window, Backbone || window.Backbone, _ || window._);
 		});
+	} else if (typeof exports === 'object') {
+		// Note. Does not work with strict CommonJS, but
+		// only CommonJS-like environments that support module.exports,
+		// like Node.
+		module.exports = factory(window, require('Backbone'), require('underscore'));
 	} else {
 		// Browser globals
 		factory(window, window.Backbone, window._);
