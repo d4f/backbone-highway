@@ -320,6 +320,14 @@ elseif (!empty($logout)) {
 			var menu = new App.MenuView({
 				"el": $("header nav")
 			});
+
+
+			App.Router.route("test_route", {
+				"path": "/test",
+				"action": function() {
+					console.log("meh \\o/");
+				}
+			});
 		});
 	})();
 	</script>
