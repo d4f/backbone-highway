@@ -24,7 +24,7 @@
 
 
 	/**
-	 * Copy the actual Backbone.Router so that we can override it
+	 * Copy the original Backbone.Router so that we can override it
 	 * @type {Backbone.Router}
 	 */
 	var BackboneRouter = Backbone.Router;
@@ -77,17 +77,28 @@
 	 * @type {Object}
 	 */
 	var defaultOptions = {
+		// --- Backbone History options ---
+		// Docs: http://backbonejs.org/#History
+
 		// Use html5 pushState
 		"pushState": true,
+
+		// Root url
+		"root": "",
+
+		// Set to false to force page reloads for old browsers
+		"hashChange": true,
+
+		// Don't trigger the initial route
+		"silent": false,
+
+		// --------------------------------
 
 		// The current user status, logged in or not
 		"authed": false,
 
 		// Enable automatic execution of a login route when accessing a secured route
 		"redirectToLogin": false,
-
-		// Root url
-		"root": "",
 
 		// Print out debug information
 		"debug": false,
@@ -172,12 +183,15 @@
 
 				// Init Backbone.history
 				var existingRoute = Backbone.history.start({
-					pushState: this.options.pushState,
-					root: this.options.root
+					"pushState": this.options.pushState,
+					"root": this.options.root,
+					"hashChange": this.options.hashChange,
+					"silent": this.options.silent
 				});
 
 				// Trigger a 404 if the current route doesn't exist
-				if (!existingRoute) {
+				// Ensure the 'silent' options isn't activated
+				if (!existingRoute && !this.options.silent) {
 					this.options.log("[Backbone.Router] Inexisting load route");
 
 					this.processControllers("404", [self.options.pushState ?
@@ -311,7 +325,6 @@
 
 				// Create a wrapping controller method to permit for multiple route/controller bindings
 				controllerExtension[name] = function() {
-					console.log("Process " + name);
 					self.processControllers(name, arguments);
 				};
 
@@ -322,10 +335,7 @@
 				_.extend(controller, controllerExtension);
 
 				if (router !== null) {
-					console.log("Creating route after Router start: ", name, def.path, controllerExtension[name]);
-
-					// extendedController[name].re = router._routeToRegExp(def.path);
-
+					// Add route dynamically since the router has already been started
 					router.route(def.path, name, controllerExtension[name]);
 				}
 			}
