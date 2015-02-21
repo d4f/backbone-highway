@@ -174,7 +174,7 @@
 			var Router = BackboneRouter.extend(_.extend({}, controller, { "routes": routes }));
 
 			// Initialize router
-			router = window.router = new Router();
+			router = new Router();
 
 			// Check if Backbone.History is already enabled
 			if (!Backbone.History.started) {
