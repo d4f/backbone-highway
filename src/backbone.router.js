@@ -24,7 +24,7 @@
 
 
 	/**
-	 * Copy the actual Backbone.Router so that we can override it
+	 * Copy the original Backbone.Router so that we can override it
 	 * @type {Backbone.Router}
 	 */
 	var BackboneRouter = Backbone.Router;
@@ -77,17 +77,28 @@
 	 * @type {Object}
 	 */
 	var defaultOptions = {
+		// --- Backbone History options ---
+		// Docs: http://backbonejs.org/#History
+
 		// Use html5 pushState
 		"pushState": true,
+
+		// Root url
+		"root": "",
+
+		// Set to false to force page reloads for old browsers
+		"hashChange": true,
+
+		// Don't trigger the initial route
+		"silent": false,
+
+		// --------------------------------
 
 		// The current user status, logged in or not
 		"authed": false,
 
 		// Enable automatic execution of a login route when accessing a secured route
 		"redirectToLogin": false,
-
-		// Root url
-		"root": "",
 
 		// Print out debug information
 		"debug": false,
@@ -165,14 +176,6 @@
 			// Initialize router
 			router = new Router();
 
-			// Determine the path regex of each route and store it
-			_.forEach(routes, function(name, path) {
-				if (self.exists({ "name": name })) {
-					// Store the regexp format of the path using Backbone.Router internal method _routeToRegExp
-					extendedController[name].re = router._routeToRegExp(path);
-				}
-			});
-
 			// Check if Backbone.History is already enabled
 			if (!Backbone.History.started) {
 				this.options.log("[Backbone.Router.start] Starting Backbone.history (" +
@@ -180,12 +183,15 @@
 
 				// Init Backbone.history
 				var existingRoute = Backbone.history.start({
-					pushState: this.options.pushState,
-					root: this.options.root
+					"pushState": this.options.pushState,
+					"root": this.options.root,
+					"hashChange": this.options.hashChange,
+					"silent": this.options.silent
 				});
 
 				// Trigger a 404 if the current route doesn't exist
-				if (!existingRoute) {
+				// Ensure the 'silent' options isn't activated
+				if (!existingRoute && !this.options.silent) {
 					this.options.log("[Backbone.Router] Inexisting load route");
 
 					this.processControllers("404", [self.options.pushState ?
@@ -290,9 +296,9 @@
 				controllerExtension = {},
 				currentName = name;
 
-			// @todo Probably throw an exception here. If def is an empty object, nothing will work
+			// Throw an exception if def is an empty object, nothing will work
 			if (!_.isObject(def)) {
-				def = {};
+				throw "[Backbone.Router.route] Route definition needs to be an object";
 			}
 
 			// Remove the first slash in the path for the Backbone router
@@ -301,7 +307,7 @@
 			}
 
 			// Check if a controller has already registered this path
-			if (routes[def.path]) {
+			if (def.path && routes[def.path]) {
 				// If so, retrieve it's name
 				name = routes[def.path];
 			} else {
@@ -310,25 +316,28 @@
 
 				// Create a placeholder for the route controllers
 				extendedController[name] = {
-					"re": null,
+					"re": def.path ? BackboneRouter.prototype._routeToRegExp(def.path) : null,
 					"wrappers": []
 				};
 
-				// Register the route path and controller name if a path is given
-				if (_.isString(def.path)) {
-					routesExtension[def.path] = name;
-
-					// Apply the new routes
-					_.extend(routes, routesExtension);
-				}
+				// Register the route path and controller name
+				routesExtension[def.path] = name;
 
 				// Create a wrapping controller method to permit for multiple route/controller bindings
 				controllerExtension[name] = function() {
 					self.processControllers(name, arguments);
 				};
 
+				// Apply the new routes
+				_.extend(routes, routesExtension);
+
 				// Apply the new controllers
 				_.extend(controller, controllerExtension);
+
+				if (router !== null) {
+					// Add route dynamically since the router has already been started
+					router.route(def.path, name, controllerExtension[name]);
+				}
 			}
 
 			// Store the close controller
