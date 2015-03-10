@@ -12,6 +12,7 @@ Added functionalities compared to the ```Backbone.Router``` are:
  * Trigger caching
  * Aliasing
  * "Secured" routes
+ * Close action (similar to onbeforeunload)
 
 ## Installation
 
@@ -215,6 +216,7 @@ The ```path``` and ```action``` parameters are the base of a route. But a few mo
   ],
 
   // Executed when user is routed away from this route
+  // similar to an "onbeforeunload" event
   "close": function() {
     // Return false to cancel the routing
     return confirm("Are you sure you want to leave this page?");
@@ -255,7 +257,7 @@ The 403 controller will only be executed if the ```redirectToLogin``` option is 
 
 To distribute the triggers declared in the ```before``` and ```after``` parameters the ```Backbone.Router``` uses the ```Marionette``` global event aggregator: ```App.vent```
 
-This parameter can be overridden using any ```Backbone.Events``` instance.
+This parameter can be overridden using any ```Backbone.Events``` instance or any object with a ```trigger``` method.
 
 ```javascript
 var App = new Backbone.Marionette.Application();
