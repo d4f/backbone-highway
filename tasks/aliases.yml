@@ -1,0 +1,14 @@
+default:
+    - lint
+lint:
+    - jshint
+    - jscs
+    - lintspaces
+lint:code:
+    - jshint:code
+    - jscs:code
+    - lintspaces:code
+lint:grunt:
+    - jshint:grunt
+    - jscs:grunt
+    - lintspaces:grunt

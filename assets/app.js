@@ -163,7 +163,7 @@
 
     App.Router.start(App, {
       debug: true,
-      authed: window.loggedIn,
+      authenticated: window.loggedIn,
       redirectToLogin: true,
       // silent: true,
       // "root": "/admin",

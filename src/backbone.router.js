@@ -1,4 +1,3 @@
-// Allowing backbone-router to work with AMD and browser globals.
 (function (window, factory) {
   'use strict';
 
@@ -25,7 +24,6 @@
 
   // Import globals
   var localStorage = window.localStorage;
-
 
   /**
    * Copy the original Backbone.Router so that we can override it
@@ -75,7 +73,6 @@
    */
   var cachedTriggers = [];
 
-
   /**
    * Default options that are extended when the router is started
    * @type {Object}
@@ -99,7 +96,7 @@
     // --------------------------------
 
     // The current user status, logged in or not
-    authed: false,
+    authenticated: false,
 
     // Enable automatic execution of a login route when accessing a secured route
     redirectToLogin: false,
@@ -114,8 +111,6 @@
       }
     }
   };
-
-
 
   /**
    * Backbone.Router commander
@@ -134,12 +129,10 @@
      */
     dispatcher: null,
 
-
     /**
      * Store routes that were executed last
      */
     currentRoutes: [],
-
 
     /**
      * Initialize the Backbone Marionette router
@@ -175,7 +168,9 @@
       this.options.log('[Backbone.Router.start] Starting router');
 
       // Extend Backbone.Router
-      var Router = BackboneRouter.extend(_.extend({}, controller, {routes: routes}));
+      var Router = BackboneRouter.extend(_.extend({}, controller, {
+        routes: routes
+      }));
 
       // Initialize router
       router = new Router();
@@ -199,7 +194,8 @@
           this.options.log('[Backbone.Router] Inexisting load route');
 
           this.processControllers('404', [self.options.pushState ?
-              window.location.pathname.substring(1) : window.location.hash.substring(1)]);
+            window.location.pathname.substring(1) : window.location.hash.substring(1)
+          ]);
         }
         else {
           // Check if a route was stored while requiring a user login
@@ -212,12 +208,13 @@
             this.clearStore();
 
             // Redirect to stored route
-            this.go({path: storedRoute});
+            this.go({
+              path: storedRoute
+            });
           }
         }
       }
     },
-
 
     /**
      * Map a list of routes.
@@ -236,7 +233,6 @@
         routesDefiner.call(this);
       }
     },
-
 
     /**
      * Declare a route and its actions to the Router.
@@ -361,8 +357,7 @@
 
         // Check if the route should be ignored based on the user being logged in or not
         // and the route.authed option being set to true or false
-        if (
-          !_.isUndefined(def.authed) &&
+        if (!_.isUndefined(def.authed) &&
           ((def.authed && !self.options.authed) || (!def.authed && self.options.authed))
         ) {
           // Redirect user to login route if defined, else try to execute 403 controller
@@ -382,7 +377,8 @@
             // Execute 403 controller
             // @todo Apply better/finer logic for when the 403 controller should be executed
             this.processControllers('403', [self.options.pushState ?
-              window.location.pathname.substring(1) : window.location.hash.substring(1)]);
+              window.location.pathname.substring(1) : window.location.hash.substring(1)
+            ]);
           }
           return false;
         }
@@ -434,7 +430,6 @@
       }
     },
 
-
     /**
      * Route the application to a specific named route
      *
@@ -467,16 +462,21 @@
       }
 
       // Check if route exists
-      if ((name && !this.exists({name: name})) || (path && !this.exists({path: path}))) {
+      if ((name && !this.exists({
+          name: name
+        })) || (path && !this.exists({
+          path: path
+        }))) {
         this.options.log('[Backbone.Router] Inexisting route name: ' + name);
 
         // Execute 404 controller
         this.processControllers('404', [this.options.pushState ?
-          window.location.pathname.substring(1) : window.location.hash.substring(1)]);
+          window.location.pathname.substring(1) : window.location.hash.substring(1)
+        ]);
       }
       else {
         var continueProcess = true,
-            self = this;
+          self = this;
 
         _.forEach(this.currentRoutes, function (route) {
           // Check if the previous route has a close controller
@@ -495,7 +495,10 @@
         this.currentRoutes = [];
 
         // Extend default router navigate options
-        options = _.extend({trigger: true, replace: false}, options);
+        options = _.extend({
+          trigger: true,
+          replace: false
+        }, options);
 
         if (!path) {
           // Retrieve route path passing arguments
@@ -510,7 +513,6 @@
         return true;
       }
     },
-
 
     /**
      * Process a list of triggers that can be declared as a simple string or an object
@@ -533,7 +535,6 @@
           ' an object, an array of strings or an array of objects');
       }
     },
-
 
     /**
      * Process a single trigger
@@ -561,7 +562,9 @@
         }
 
         // Check if the trigger is actually a declared route
-        if (this.exists({name: trigger.name})) {
+        if (this.exists({
+            name: trigger.name
+          })) {
           this.processControllers(trigger.name, trigger.args || null, true);
           return;
         }
@@ -581,7 +584,9 @@
       }
       else if (_.isString(trigger)) {
         // Check if the trigger is actually a declared route
-        if (this.exists({name: trigger})) {
+        if (this.exists({
+            name: trigger
+          })) {
           this.processControllers(trigger, null, true);
         }
         else {
@@ -594,7 +599,6 @@
           'needs to be a string or an object, given: ' + typeof trigger);
       }
     },
-
 
     /**
      * Process a list of controllers
@@ -627,7 +631,6 @@
       }
     },
 
-
     /**
      * Find a cached trigger
      *
@@ -649,14 +652,12 @@
       return cache;
     },
 
-
     /**
      * Clear all cached triggers
      */
     clearCache: function () {
       cachedTriggers = [];
     },
-
 
     /**
      * Retrieve the path of a route by it's name.
@@ -677,7 +678,6 @@
 
       return false;
     },
-
 
     /**
      * Check if a route exists by its name or its path
@@ -707,7 +707,6 @@
       return false;
     },
 
-
     /**
      * Parse a path to inject a list of arguments into the path.
      *
@@ -724,21 +723,20 @@
 
       // Inject arguments
       return _.map(path.split('/'), function (part) {
-        if (part.charAt(0) === ':') {
-          var arg = args[argIndex];
-          argIndex += 1;
-          return arg;
-        }
-        return part;
-      })
-      // Join the parts with slashes
-      .join('/')
-      // Remove opening parentheses in case of optional parameters
-      .replace('(', '')
-      // Remove trailing slash
-      .replace(/\/$/, '');
+          if (part.charAt(0) === ':') {
+            var arg = args[argIndex];
+            argIndex += 1;
+            return arg;
+          }
+          return part;
+        })
+        // Join the parts with slashes
+        .join('/')
+        // Remove opening parentheses in case of optional parameters
+        .replace('(', '')
+        // Remove trailing slash
+        .replace(/\/$/, '');
     },
-
 
     /**
      * Store the current pathname in the local storage
@@ -758,7 +756,6 @@
       }
     },
 
-
     /**
      * Retrieve the stored route if any
      *
@@ -768,7 +765,6 @@
     getStoredRoute: function () {
       return localStorage && localStorage.getItem('backbone-router:path');
     },
-
 
     /**
      * Clear the stored route
