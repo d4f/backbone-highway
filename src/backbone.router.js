@@ -259,13 +259,13 @@
      *   "action": "user_login"
      * }
      *
-     * A route can be limited to when a user is connected by setting the route.authed option to true.
-     * For this to work the Backbone.Router.authed parameter has to be set to true
+     * A route can be limited to when a user is connected by setting the route.authenticated option to true.
+     * For this to work the Backbone.Router.authenticated parameter has to be set to true
      * when the server considers the user logged in.
      *
      * {
      *   "path": "/admin",
-     *   "authed": true,
+     *   "authenticated": true,
      *   "action": function() {
      *     // Render admin template
      *   }
@@ -356,12 +356,12 @@
         }
 
         // Check if the route should be ignored based on the user being logged in or not
-        // and the route.authed option being set to true or false
-        if (!_.isUndefined(def.authed) &&
-          ((def.authed && !self.options.authed) || (!def.authed && self.options.authed))
+        // and the route.authenticated option being set to true or false
+        if (!_.isUndefined(def.authenticated) &&
+          ((def.authenticated && !self.options.authenticated) || (!def.authenticated && self.options.authenticated))
         ) {
           // Redirect user to login route if defined, else try to execute 403 controller
-          if (self.options.redirectToLogin && !self.options.authed) {
+          if (self.options.redirectToLogin && !self.options.authenticated) {
             self.options.log('[Backbone.Router] Secured page, redirecting to login');
 
             // Store current route in case login reloads the page
@@ -372,7 +372,7 @@
           }
           else {
             self.options.log('[Backbone.Router] Skipping route "' + currentName +
-              '", ' + (self.options.authed ? 'already ' : 'not ') + 'logged in');
+              '", ' + (self.options.authenticated ? 'already ' : 'not ') + 'logged in');
 
             // Execute 403 controller
             // @todo Apply better/finer logic for when the 403 controller should be executed
