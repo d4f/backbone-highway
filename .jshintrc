@@ -27,20 +27,10 @@
     "globals": {
         "require": true,
         "define": true,
-        "describe": true,
-        "it": true,
-        "before": true,
-        "after": true,
-        "beforeEach": true,
-        "afterEach": true,
         "Backbone": true,
         "app": true,
         "_": true,
-        "Thorax": true,
-        "Jwt": true,
-        "Handlebars": true,
-        "moment": true,
-        "JST": true,
-        "Chartist": true
+        "confirm": true,
+        "prompt": true
     }
 }

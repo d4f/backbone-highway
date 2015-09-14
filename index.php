@@ -76,7 +76,7 @@ elseif (!empty($logout)) {
 
 	<script type="text/javascript">
 	// Tell the router if the user is logged in
-	window.logged_in = <?php echo $_SESSION['logged_in'] ? "true" : "false"; ?>;
+	window.loggedIn = <?php echo $_SESSION['logged_in'] ? "true" : "false"; ?>;
 	window.user = "<?php echo $_SESSION['user']; ?>";
 	</script>
 </body>

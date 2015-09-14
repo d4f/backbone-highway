@@ -121,7 +121,7 @@
    * Backbone.Router commander
    * @type {Object}
    */
-  Backbone.Router = {
+  Backbone.ExtendedRouter = {
 
     /**
      * Which event aggregator to use for the triggers listed in each routes
@@ -332,7 +332,7 @@
         routesExtension[def.path] = name;
 
         // Create a wrapping controller method to permit for multiple route/controller bindings
-        controllerExtension[name] = function() {
+        controllerExtension[name] = function () {
           self.processControllers(name, arguments);
         };
 
@@ -552,7 +552,7 @@
 
           // Has it already been executed ?
           if (cache.done) {
-            this.options.log("[Backbone.Router] Trigger '" + trigger.name + "' has been skipped (cached)");
+            this.options.log('[Backbone.Router] Trigger [ ' + trigger.name + ' ] has been skipped (cached)');
             return;
           }
 
@@ -789,5 +789,5 @@
 
   };
 
-  return Backbone.Router;
+  return Backbone.ExtendedRouter;
 }));
