@@ -142,6 +142,6 @@
 
   "requireSpaceAfterLineComment": true,
 
-  "excludeFiles": ["node_modules/**", "app/bower_components/**" ]
+  "excludeFiles": ["node_modules/**", "app/bower_components/**", "**/*.html" ]
 
 }

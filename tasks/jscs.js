@@ -4,7 +4,8 @@ module.exports = {
     verbose: true
   },
   code: [
-    '<%= config.srcFiles %>'
+    '<%= config.src %>',
+    'assets/**/*.js'
   ],
   grunt: {
     src: ['Gruntfile.js', 'tasks/**/*.js'],

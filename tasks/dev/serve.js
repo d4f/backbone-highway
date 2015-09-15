@@ -7,7 +7,7 @@ module.exports = function (grunt) {
       // 'clean:server',
       // 'config',
       // 'handlebars',
-      // 'browserSync',
+      'browserSync',
       'watch'
     ]);
   });

@@ -10,7 +10,8 @@ module.exports = {
   },
   code: {
     src: [
-      '<%= config.srcFiles %>',
+      '<%= config.src %>',
+      'assets/**/*.js'
     ]
   }
 };

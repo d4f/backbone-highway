@@ -6,11 +6,11 @@ module.exports = function (grunt) {
 
   // configurable paths
   var configPath = {
-    app: 'app',
+    demo: 'demo',
     tmp: '.tmp',
     dist: 'dist',
     css: 'css/**/*.css',
-    srcFiles: 'src/**/*.js',
+    src: 'src/**/*.js',
     // testFiles: 'test/**/**/*.js',
     // img: 'img/**/*.{png,jpg,jpeg,gif,webp}',
     // tplDir: 'js/templates/',

@@ -4,23 +4,21 @@ module.exports = {
   server: {
     options: {
       watchTask: true,
-      logLevel: 'debug',
+      logLevel: 'info',
       logConnections: true,
       server: {
-        baseDir: ['<%= config.app %>', '<%= config.tmp %>'],
+        baseDir: ['<%= config.demo %>', '<%= config.src %>'],
         routes: {
           '/scripts/templates.js': '<%= config.tmp %>/scripts/templates.js'
         }
       },
-      browser: ['google chrome'],
+      // browser: ['google chrome'],
       middleware: [require('connect-logger')(), historyApiFallback()]
     },
     bsFiles: {
       src: [
-        '<%= config.app %>/*.html',
-        '<%= config.app %>/scripts/*.js',
-        '<%= config.tmp %>/scripts/*.js',
-        '<%= config.app %>/styles/*.css'
+        '<%= config.demo %>/*.html',
+        '<%= config.src %>'
       ]
     }
   }

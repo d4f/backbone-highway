@@ -26,9 +26,14 @@
     this.route('home', {
       path: '/',
       before: [
-        {name: 'core', cache: true},
-        {name: 'module', cache: true}
-      ],
+      {
+        name: 'core',
+        cache: true
+      },
+      {
+        name: 'module',
+        cache: true
+      }],
       action: function () {
         console.log('Controller action: home');
         $('.content').html('Current page: Home');
@@ -132,7 +137,6 @@
       }
     }
   });
-
 
   /**
    * Register to some app events that will be triggered by the router
