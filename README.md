@@ -8,9 +8,9 @@ Its structure and API is inspired by routers in the Node.js frameworks: Meteor a
 Added functionalities compared to the ```Backbone.Router``` are:
 
  * Multiple controllers for the same path
- * Before and After triggers
- * Trigger caching
- * Aliasing
+ * Before and After triggers distributed using an event aggregator
+ * Simple trigger cache managing
+ * Aliasing between routes
  * "Secured" routes
  * Close action (similar to onbeforeunload)
 
@@ -22,14 +22,16 @@ You can install the library via bower:
 bower install backbone-router
 ```
 
-## Dependencies
+## Dependencies and structure
 
-The project has been renamed from marionette-router to backbone-router, because the ```Backbone.Marionette``` dependency has been removed. It now overrides the ```Backbone.Router``` namespace for simplicity.
+The project has been renamed from marionette-router to backbone-router, because the ```Backbone.Marionette``` dependency has been removed.
 
 The dependencies left are:
 
- - Backbone 1.1.4
+ - Backbone >= 1.1.4
  - Underscore >= 1.4.4 
+
+Until now the library was overriding the ```Backbone.Router``` namespace. I now understand that this was a huge mistake as it was breaking the dependencies of other Backbone libraries by replacing the core API.
 
 ## General use
 

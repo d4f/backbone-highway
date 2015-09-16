@@ -7,9 +7,9 @@ module.exports = {
       logLevel: 'info',
       logConnections: true,
       server: {
-        baseDir: ['<%= config.demo %>', '<%= config.src %>'],
+        baseDir: ['<%= config.demo %>'],
         routes: {
-          '/scripts/templates.js': '<%= config.tmp %>/scripts/templates.js'
+          '/scripts/backbone.router.js': 'src/backbone.router.js'
         }
       },
       // browser: ['google chrome'],

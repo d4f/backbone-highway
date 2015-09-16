@@ -51,6 +51,11 @@ header nav a:hover, header nav a:focus {
 	text-decoration: underline;
 }
 
+header nav .logout,
+#main .user {
+	display: none;
+}
+
 #main {
 	margin: 10px 15px;
 }

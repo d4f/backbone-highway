@@ -25,12 +25,10 @@
     // Declaring a home route
     this.route('home', {
       path: '/',
-      before: [
-      {
+      before: [{
         name: 'core',
         cache: true
-      },
-      {
+      }, {
         name: 'module',
         cache: true
       }],
@@ -38,13 +36,13 @@
         console.log('Controller action: home');
         $('.content').html('Current page: Home');
       },
-      close: function () {
-        if (App.user) {
-          return confirm('Do you really want to quit the page?');
-        }
+      // close: function () {
+      //   if (App.user) {
+      //     return confirm('Do you really want to quit the page?');
+      //   }
 
-        return true;
-      }
+      //   return true;
+      // }
     });
 
     // Declaring a users list route
@@ -91,11 +89,7 @@
       action: function () {
         console.log('Controller action: login');
 
-        App.user = prompt('Enter your name :', 'JS Ninja');
-
-        if (App.user !== null) {
-          window.location.href = '/?user=' + App.user;
-        }
+        loginUser();
       }
     });
 
@@ -106,7 +100,7 @@
       action: function () {
         console.log('Controller action: logout');
 
-        window.location.href = '/?logout=true';
+        logoutUser();
       }
     });
 
@@ -138,6 +132,23 @@
     }
   });
 
+  var loginUser = function () {
+    App.user = prompt('Enter your name :', 'JS Ninja');
+
+    if (App.user !== null) {
+      sessionStorage.setItem('user', App.user);
+      location.href = '/';
+    }
+    else {
+      console.log('Login canceled');
+    }
+  };
+
+  var logoutUser = function () {
+    sessionStorage.removeItem('user');
+    location.href = '/';
+  };
+
   /**
    * Register to some app events that will be triggered by the router
    * Typically where you would orchestrate the render of the application
@@ -159,15 +170,19 @@
   $(function () {
     registerEvents();
 
-    if (window.user) {
-      App.user = window.user;
+    App.user = sessionStorage.getItem('user');
+
+    if (App.user) {
+      $('#main .username').html(App.user);
+      $('#main .user, nav .logout').show();
+      $('nav .login').hide();
     }
 
     App.start();
 
     App.Router.start(App, {
       debug: true,
-      authenticated: window.loggedIn,
+      authenticated: App.user ? true : false,
       redirectToLogin: true,
       // silent: true,
       // "root": "/admin",
