@@ -95,6 +95,9 @@
 
     // --------------------------------
 
+    // Event aggregator used to dispatch triggers
+    dispatcher: null,
+
     // The current user status, logged in or not
     authenticated: false,
 
@@ -137,23 +140,14 @@
     /**
      * Initialize the Backbone Marionette router
      */
-    start: function (app, options) {
+    start: function (options) {
       var self = this;
 
       // Extend default options
       this.options = _.extend({}, defaultOptions, options);
 
-      // Find an event dispatcher
-      if (_.isNull(this.dispatcher) && _.isObject(app)) {
-        // Check if object is a marionette app and retrieve it
-        if (app.vent) {
-          this.dispatcher = app.vent;
-        }
-        // Or assume that it is a copy of Backbone.Events
-        else {
-          this.dispatcher = app;
-        }
-      }
+      // Store the event aggregator more conveniently
+      this.dispatcher = this.options.dispatcher;
 
       // Ensure that the dispatcher has the expected method
       // i.e. The method "trigger" of Backbone.Events

@@ -75,7 +75,7 @@
     // Declaring a secured route with a parameter
     this.route('user_show', {
       path: '/users/:id',
-      authed: true,
+      authenticated: true,
       action: function (userId) {
         console.log('Controller action: user_show');
         $('.content').html('Current page: User #' + userId);
@@ -85,7 +85,7 @@
     // Declaring a login route
     this.route('login', {
       path: '/login',
-      authed: false,
+      authenticated: false,
       action: function () {
         console.log('Controller action: login');
 
@@ -96,7 +96,7 @@
     // Declaring a logout route
     this.route('logout', {
       path: '/logout',
-      authed: true,
+      authenticated: true,
       action: function () {
         console.log('Controller action: logout');
 
@@ -180,10 +180,11 @@
 
     App.start();
 
-    App.Router.start(App, {
-      debug: true,
+    App.Router.start({
+      dispatcher: App.vent,
       authenticated: App.user ? true : false,
       redirectToLogin: true,
+      debug: true,
       // silent: true,
       // "root": "/admin",
       // "pushState": false
