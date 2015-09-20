@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-dark.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print">
+
+    <title>Backbone-highway by d4f</title>
+  </head>
+
+  <body>
+
+    <header>
+      <div class="container">
+        <h1>Backbone-highway</h1>
+        <h2>Routing Backbone with style \o/</h2>
+
+        <section id="downloads">
+          <a href="https://github.com/d4f/backbone-highway/zipball/master" class="btn">Download as .zip</a>
+          <a href="https://github.com/d4f/backbone-highway/tarball/master" class="btn">Download as .tar.gz</a>
+          <a href="https://github.com/d4f/backbone-highway" class="btn btn-github"><span class="icon"></span>View on GitHub</a>
+        </section>
+      </div>
+    </header>
+
+    <div class="container">
+      <section id="main_content">
+        <p><code>Backbone.Highway</code> wraps the <code>Backbone.Router</code> to simplify its use and bring new functionalities</p>
+
+<p>Its structure and API is inspired by routers in the Node.js frameworks: Meteor and ExpressJS.</p>
+
+<p>Added functionalities compared to the <code>Backbone.Router</code> are:</p>
+
+<ul>
+<li>Multiple controllers for the same path</li>
+<li>Before and After triggers distributed using an event aggregator</li>
+<li>Simple trigger cache managing</li>
+<li>Aliasing between routes</li>
+<li>"Secured" routes</li>
+<li>Close action (similar to onbeforeunload)</li>
+</ul>
+
+<h2>
+<a id="installation" class="anchor" href="#installation" aria-hidden="true"><span class="octicon octicon-link"></span></a>Installation</h2>
+
+<p>You can install the library via bower:</p>
+
+<pre><code>bower install backbone-highway
+</code></pre>
+
+<h2>
+<a id="dependencies-and-structure" class="anchor" href="#dependencies-and-structure" aria-hidden="true"><span class="octicon octicon-link"></span></a>Dependencies and structure</h2>
+
+<p>The dependencies are:</p>
+
+<ul>
+<li>Backbone &gt;= 1.1.4</li>
+<li>Underscore &gt;= 1.4.4</li>
+</ul>
+
+<p>Until now the library was overriding the <code>Backbone.Router</code> namespace. I now understand that this was a huge mistake as it was breaking the dependencies of other Backbone libraries by replacing the core API. Thus the new name <code>Backbone.Highway</code></p>
+
+<h2>
+<a id="general-use" class="anchor" href="#general-use" aria-hidden="true"><span class="octicon octicon-link"></span></a>General use</h2>
+
+<p>Declaring routes goes through executing a simple method: <code>Backbone.Highway.map();</code></p>
+
+<p>This method takes a function as its only parameter which will be executed in the router's context to access the internal API easily. A route consists of a unique name and an object to describe the route's action.</p>
+
+<p>Let's just jump right in with an example:</p>
+
+<div class="highlight highlight-source-js"><pre><span class="pl-c">// Create an app object containing an</span>
+<span class="pl-c">// instance of Backbone.Events</span>
+<span class="pl-k">var</span> App <span class="pl-k">=</span> {
+  events<span class="pl-k">:</span> _.extend({}, Backbone.Events)
+};
+
+<span class="pl-c">// Start route declarations</span>
+Backbone.Highway.map(<span class="pl-k">function</span> () {
+  <span class="pl-c">// Declare a route named 'home'</span>
+  <span class="pl-v">this</span>.route(<span class="pl-s"><span class="pl-pds">'</span>home<span class="pl-pds">'</span></span>, {
+    <span class="pl-c">// The url to which the route will respond</span>
+    path<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>/<span class="pl-pds">'</span></span>,
+
+    <span class="pl-c">// Method to be executed when the given path is intercepted</span>
+    <span class="pl-en">action</span><span class="pl-k">:</span> <span class="pl-k">function</span> () {
+      <span class="pl-c">// Do something fantastic \o/</span>
+    }
+  });
+
+  <span class="pl-c">// Declare other routes...</span>
+});
+
+<span class="pl-c">// Wait for document ready event</span>
+$(<span class="pl-k">function</span> () {
+  <span class="pl-c">// Start the router passing a global event aggregator</span>
+  Backbone.Highway.<span class="pl-c1">start</span>({
+    dispatcher<span class="pl-k">:</span> App.events
+  });
+});</pre></div>
+
+<h2>
+<a id="start-routing" class="anchor" href="#start-routing" aria-hidden="true"><span class="octicon octicon-link"></span></a>Start routing</h2>
+
+<p>The router has to be started via the <code>start</code> method.
+It receives an <code>options</code> object containing at least a <code>dispatcher</code> </p>
+
+<p>Parameters:</p>
+
+<ul>
+<li>Options (Object) - Override default router configuration</li>
+</ul>
+
+<p>These are the default options :</p>
+
+<div class="highlight highlight-source-js"><pre><span class="pl-c">/**</span>
+<span class="pl-c"> * Default options that are extended when the router is started</span>
+<span class="pl-c"> * <span class="pl-k">@type</span> {Object}</span>
+<span class="pl-c"> */</span>
+<span class="pl-k">var</span> defaultOptions <span class="pl-k">=</span> {
+  <span class="pl-c">// --- Backbone History options ---</span>
+  <span class="pl-c">// Docs: http://backbonejs.org/#History</span>
+
+  <span class="pl-c">// Use html5 pushState</span>
+  pushState<span class="pl-k">:</span> <span class="pl-c1">true</span>,
+
+  <span class="pl-c">// Root url</span>
+  root<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span><span class="pl-pds">'</span></span>,
+
+  <span class="pl-c">// Set to false to force page reloads for old browsers</span>
+  hashChange<span class="pl-k">:</span> <span class="pl-c1">true</span>,
+
+  <span class="pl-c">// Don't trigger the initial route</span>
+  silent<span class="pl-k">:</span> <span class="pl-c1">false</span>,
+
+  <span class="pl-c">// --------------------------------</span>
+
+  <span class="pl-c">// Event aggregator used to dispatch triggers.</span>
+  <span class="pl-c">// Highway will not work without at least an instance of Backbone.Events</span>
+  <span class="pl-c">// Also accepts an instance of Backbone.Wreqr or any object containing a 'trigger' method.</span>
+  dispatcher<span class="pl-k">:</span> <span class="pl-c1">null</span>,
+
+  <span class="pl-c">// The current user status, logged in or not</span>
+  authenticated<span class="pl-k">:</span> <span class="pl-c1">false</span>,
+
+  <span class="pl-c">// Enable automatic execution of a login route when accessing a secured routes</span>
+  redirectToLogin<span class="pl-k">:</span> <span class="pl-c1">false</span>,
+
+  <span class="pl-c">// Names of automatically executed routes</span>
+  routes<span class="pl-k">:</span> {
+    login<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>login<span class="pl-pds">'</span></span>,
+    error404<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>404<span class="pl-pds">'</span></span>,
+    error403<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>403<span class="pl-pds">'</span></span>
+  }
+
+  <span class="pl-c">// Print out debug information</span>
+  debug<span class="pl-k">:</span> <span class="pl-c1">false</span>,
+
+  <span class="pl-c">// Override log method</span>
+  <span class="pl-en">log</span><span class="pl-k">:</span> <span class="pl-k">function</span> () {
+    <span class="pl-k">if</span> (<span class="pl-v">this</span>.debug <span class="pl-k">&amp;&amp;</span> <span class="pl-c1">window</span>.<span class="pl-en">console</span> <span class="pl-k">&amp;&amp;</span> <span class="pl-c1">window</span>.<span class="pl-en">console</span><span class="pl-c1">.log</span>) {
+      <span class="pl-c1">window</span>.<span class="pl-en">console</span><span class="pl-c1">.log</span>.<span class="pl-c1">apply</span>(<span class="pl-c1">window</span>.<span class="pl-en">console</span>, arguments);
+    }
+  }
+};</pre></div>
+
+<p>Example of overriding the default options :</p>
+
+<div class="highlight highlight-source-js"><pre><span class="pl-c">// Create app</span>
+<span class="pl-k">var</span> App <span class="pl-k">=</span> {
+  events<span class="pl-k">:</span> _.extend({}, Backbone.Events)
+};
+
+<span class="pl-c">// Define some routes ...</span>
+
+<span class="pl-c">// Start the router passing an options object</span>
+Backbone.Highgway.<span class="pl-c1">start</span>({
+  dispatcher<span class="pl-k">:</span> App.events,
+
+  <span class="pl-c">// Root url for all routes, passed to Backbone.history</span>
+  root<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>/admin<span class="pl-pds">'</span></span>,
+
+  <span class="pl-c">// Activate html5 pushState or not, true by default</span>
+  pushState<span class="pl-k">:</span> <span class="pl-c1">false</span>,
+
+  <span class="pl-c">// Whether the user is currently logged in or not</span>
+  authenticated<span class="pl-k">:</span> <span class="pl-c1">true</span>,
+
+  <span class="pl-c">// If not logged in, redirect the user to a route named "login"</span>
+  redirectToLogin<span class="pl-k">:</span> <span class="pl-c1">true</span>,
+
+  <span class="pl-c">// Print out routing debug information to the console</span>
+  debug<span class="pl-k">:</span> <span class="pl-c1">true</span>
+});</pre></div>
+
+<h2>
+<a id="router-go" class="anchor" href="#router-go" aria-hidden="true"><span class="octicon octicon-link"></span></a>Router go!</h2>
+
+<p>To redirect the user to a certain route when, for example, he clicks a link simply use the <code>go</code> method.</p>
+
+<div class="highlight highlight-source-js"><pre>Backbone.Highway.<span class="pl-c1">go</span>(<span class="pl-s"><span class="pl-pds">'</span>home<span class="pl-pds">'</span></span>);</pre></div>
+
+<p><strong>Parameters</strong></p>
+
+<ul>
+<li>name (Mixed): The route name to execute or an object describing the route.</li>
+<li>args (Mixed): Array of arguments, can also be a function's <code>arguments</code> object.</li>
+<li>options (Object): Passed to the Backbone.Router navigate method. Defaults to <code>{ trigger: true, replace: false }</code>
+</li>
+</ul>
+
+<p>Let's define a route that takes a parameter:</p>
+
+<div class="highlight highlight-source-js"><pre>Backbone.Highway.map(<span class="pl-k">function</span> () {
+  <span class="pl-c">// Declare a user profile page</span>
+  <span class="pl-v">this</span>.route(<span class="pl-s"><span class="pl-pds">'</span>user.profile<span class="pl-pds">'</span></span>, {
+    path<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>/user/:id<span class="pl-pds">'</span></span>,
+    <span class="pl-en">action</span><span class="pl-k">:</span> <span class="pl-k">function</span>(<span class="pl-smi">userId</span>) {
+      <span class="pl-c">// Render user profile page</span>
+    }
+  });
+})</pre></div>
+
+<p>Considering the current page contains a link like this:</p>
+
+<div class="highlight highlight-source-js"><pre><span class="pl-k">&lt;</span>a href<span class="pl-k">=</span><span class="pl-s"><span class="pl-pds">"</span>/user/42<span class="pl-pds">"</span></span> <span class="pl-k">class</span><span class="pl-k">=</span><span class="pl-s"><span class="pl-pds">"</span>profile<span class="pl-pds">"</span></span> data<span class="pl-k">-</span>id<span class="pl-k">=</span><span class="pl-s"><span class="pl-pds">"</span>42<span class="pl-pds">"</span></span><span class="pl-k">&gt;</span>Your profile<span class="pl-k">!&lt;/</span>a<span class="pl-k">&gt;</span></pre></div>
+
+<p>We could write a script (using jquery) to redirect the user like so:</p>
+
+<div class="highlight highlight-source-js"><pre><span class="pl-c">// Intercept the user click</span>
+$(<span class="pl-s"><span class="pl-pds">'</span>a.profile<span class="pl-pds">'</span></span>).<span class="pl-c1">click</span>(<span class="pl-k">function</span> (<span class="pl-smi">e</span>) {
+  e.preventDefault();
+
+  <span class="pl-k">var</span> userId <span class="pl-k">=</span> $(<span class="pl-v">this</span>).attr(<span class="pl-s"><span class="pl-pds">'</span>data-id<span class="pl-pds">'</span></span>);
+
+  <span class="pl-c">// Redirecting to route named 'user.profile' passing an id</span>
+  Backbone.Highway.<span class="pl-c1">go</span>(<span class="pl-s"><span class="pl-pds">'</span>user.profile<span class="pl-pds">'</span></span>, [userId]);
+});</pre></div>
+
+<p>As the first parameter to the <code>go</code> method can be an object, we could also write the previous script in this manner:</p>
+
+<div class="highlight highlight-source-js"><pre><span class="pl-c">// Intercept the user click</span>
+$(<span class="pl-s"><span class="pl-pds">'</span>a.profile<span class="pl-pds">'</span></span>).<span class="pl-c1">click</span>(<span class="pl-k">function</span> (<span class="pl-smi">e</span>) {
+  e.preventDefault();
+
+  <span class="pl-c">// Redirecting to route using the path defined in the href attribute</span>
+  Backbone.Highway.<span class="pl-c1">go</span>({
+    path<span class="pl-k">:</span> $(<span class="pl-v">this</span>).attr(<span class="pl-s"><span class="pl-pds">'</span>href<span class="pl-pds">'</span></span>)
+  });
+});</pre></div>
+
+<h2>
+<a id="route-declaration-parameters" class="anchor" href="#route-declaration-parameters" aria-hidden="true"><span class="octicon octicon-link"></span></a>Route declaration parameters</h2>
+
+<p>The <code>path</code> and <code>action</code> parameters are the base of a route. But a few more parameters exist to extend the control of the route.</p>
+
+<div class="highlight highlight-source-js"><pre><span class="pl-c">// Definition object for a route named 'user.edit'</span>
+{
+  <span class="pl-c">// Path with an 'id' parameter</span>
+  path<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>/user/:id/edit<span class="pl-pds">'</span></span>,
+
+  <span class="pl-c">// Route will only be executed if the user is logged in</span>
+  authenticated<span class="pl-k">:</span> <span class="pl-c1">true</span>,
+
+  <span class="pl-c">// Execute triggers before the 'action' controller</span>
+  before<span class="pl-k">:</span> [
+    { name<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>core.display<span class="pl-pds">'</span></span>, cache<span class="pl-k">:</span> <span class="pl-c1">true</span> },
+    <span class="pl-s"><span class="pl-pds">'</span>users:display<span class="pl-pds">'</span></span>
+  ],
+
+  <span class="pl-c">// Main controller for the route</span>
+  <span class="pl-en">action</span><span class="pl-k">:</span> <span class="pl-k">function</span> (<span class="pl-smi">userId</span>) {
+    <span class="pl-c">// Render a user edit form</span>
+  },
+
+  <span class="pl-c">// Execute triggers after the 'action' controller</span>
+  after<span class="pl-k">:</span> [
+    <span class="pl-s"><span class="pl-pds">'</span>core.postTriggers<span class="pl-pds">'</span></span>
+  ],
+
+  <span class="pl-c">// Executed when user is routed away from this route</span>
+  <span class="pl-c">// similar to an 'onbeforeunload' event</span>
+  <span class="pl-en">close</span><span class="pl-k">:</span> <span class="pl-k">function</span> () {
+    <span class="pl-c">// Return false to cancel the routing</span>
+    <span class="pl-k">return</span> <span class="pl-c1">confirm</span>(<span class="pl-s"><span class="pl-pds">'</span>Are you sure you want to leave this page?<span class="pl-pds">'</span></span>);
+  }
+}</pre></div>
+
+<h3>
+<a id="catching-client-side-404-and-403" class="anchor" href="#catching-client-side-404-and-403" aria-hidden="true"><span class="octicon octicon-link"></span></a>Catching client-side 404 and 403</h3>
+
+<p>A route named 404 can be declared to catch all non-existent routes.
+In the same way a route can be named 403 to catch accessing restricted routes.</p>
+
+<div class="highlight highlight-source-js"><pre>Backbone.Highway.map(<span class="pl-k">function</span> () {
+  <span class="pl-c">// 404 controller</span>
+  <span class="pl-v">this</span>.route(<span class="pl-s"><span class="pl-pds">'</span>404<span class="pl-pds">'</span></span>, {
+    <span class="pl-en">action</span><span class="pl-k">:</span> <span class="pl-k">function</span> (<span class="pl-smi">path</span>) {
+      <span class="pl-c">// Couldn't find what you're looking for =/</span>
+    }
+  });
+
+  <span class="pl-c">// 403 controller</span>
+  <span class="pl-v">this</span>.route(<span class="pl-s"><span class="pl-pds">'</span>403<span class="pl-pds">'</span></span>, {
+    <span class="pl-en">action</span><span class="pl-k">:</span> <span class="pl-k">function</span> (<span class="pl-smi">path</span>) {
+      <span class="pl-c">// Sorry you can't access this content =(</span>
+    }
+  });
+});</pre></div>
+
+<p>For convenience, the action methods will receive the current <code>window.location.pathname</code> as the first argument.</p>
+
+<p>The 404 controller will also be executed when a non-existent route is called with the <code>go</code> method.</p>
+
+<p>The 403 controller will only be executed if the <code>redirectToLogin</code> option is set to <code>false</code>.</p>
+
+<h2>
+<a id="events-distribution-triggers" class="anchor" href="#events-distribution-triggers" aria-hidden="true"><span class="octicon octicon-link"></span></a>Events distribution (Triggers)</h2>
+
+<p>To distribute the triggers declared in the <code>before</code> and <code>after</code> parameters <code>Backbone.Highway</code> uses an instance of any Backbone like event aggregator. It has only been tested with <code>Backbone.Events</code> and <code>Backbone.Wreqr</code>.</p>
+
+<p><code>Backbone.Highway</code> only tests if the passed object has a <code>trigger</code> method. So it could be anything you like.</p>
+
+<div class="highlight highlight-source-js"><pre><span class="pl-c">// Create app with instace of Backbone.Events</span>
+<span class="pl-k">var</span> App <span class="pl-k">=</span> {
+  events<span class="pl-k">:</span> _.extend({}, Backbone.Events)
+};
+
+<span class="pl-c">// Start the router</span>
+Backbone.Highway.<span class="pl-c1">start</span>({
+  dispatcher<span class="pl-k">:</span> App.events
+});</pre></div>
+
+<h2>
+<a id="trigger-declaration" class="anchor" href="#trigger-declaration" aria-hidden="true"><span class="octicon octicon-link"></span></a>Trigger declaration</h2>
+
+<p>Triggers can be declared in different ways.</p>
+
+<p>They can be a simple <code>String</code> for the simple ones:</p>
+
+<div class="highlight highlight-source-js"><pre>{
+  <span class="pl-c">// ...</span>
+  before<span class="pl-k">:</span> [
+    <span class="pl-s"><span class="pl-pds">'</span>core<span class="pl-pds">'</span></span>,
+    <span class="pl-s"><span class="pl-pds">'</span>module<span class="pl-pds">'</span></span>,
+    <span class="pl-s"><span class="pl-pds">'</span>submodule<span class="pl-pds">'</span></span>
+  ],
+  <span class="pl-c">// ...</span>
+}</pre></div>
+
+<p>They can also be declared as an <code>Object</code> with different parameters:</p>
+
+<div class="highlight highlight-source-js"><pre>{
+  <span class="pl-c">// ...</span>
+  before<span class="pl-k">:</span> [
+    { name<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>core<span class="pl-pds">'</span></span>, cache<span class="pl-k">:</span> <span class="pl-c1">true</span> },
+    { name<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>module<span class="pl-pds">'</span></span>, args<span class="pl-k">:</span> [<span class="pl-s"><span class="pl-pds">'</span>foo<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>bar<span class="pl-pds">'</span></span>] },
+    <span class="pl-s"><span class="pl-pds">'</span>submodule<span class="pl-pds">'</span></span>
+  ],
+  <span class="pl-c">// ...</span>
+}</pre></div>
+
+<p><strong>Most importantly:</strong> Each declared route becomes a trigger itself so that routes can build on each other.</p>
+
+<h2>
+<a id="secured-routes" class="anchor" href="#secured-routes" aria-hidden="true"><span class="octicon octicon-link"></span></a>Secured routes</h2>
+
+<p>Each route can receive an <code>authenticated</code> boolean parameter to declare if the route should be interpreted when the user is logged in or not.</p>
+
+<div class="highlight highlight-source-js"><pre>Backbone.Highway.map(<span class="pl-k">function</span>() {
+  <span class="pl-c">// Declare secure route</span>
+  <span class="pl-v">this</span>.route(<span class="pl-s"><span class="pl-pds">'</span>admin.users<span class="pl-pds">'</span></span>, {
+    path<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>/admin/users<span class="pl-pds">'</span></span>,
+    authenticated<span class="pl-k">:</span> <span class="pl-c1">true</span>,
+    <span class="pl-en">action</span><span class="pl-k">:</span> <span class="pl-k">function</span> () {
+      <span class="pl-c">// Display list of users</span>
+    }
+  });
+});</pre></div>
+
+<p>To make a route be interpreted in both cases (i.e. when the user is logged in or logged out),
+simply leave out the <code>authenticated</code> parameter in the route declaration.</p>
+
+<p><strong>Important</strong></p>
+
+<p>Only the server has the authority to tell if a connected client is a logged in user or not.
+So for this system to actually work, the server has to print out a small piece of JavaScript to tell the router the current client's state:</p>
+
+<div class="highlight highlight-text-html-php"><pre><span class="pl-s1"><span class="pl-k">&lt;</span><span class="pl-c1">script</span> <span class="pl-c1">type</span><span class="pl-k">=</span><span class="pl-s"><span class="pl-pds">"</span>text/javascript<span class="pl-pds">"</span></span> <span class="pl-c1">src</span><span class="pl-k">=</span><span class="pl-s"><span class="pl-pds">"</span>backbone.highway.js<span class="pl-pds">"</span></span><span class="pl-k">&gt;&lt;</span><span class="pl-k">/</span><span class="pl-c1">script</span><span class="pl-k">&gt;</span></span>
+<span class="pl-s1"><span class="pl-k">&lt;</span><span class="pl-c1">script</span> <span class="pl-c1">type</span><span class="pl-k">=</span><span class="pl-s"><span class="pl-pds">"</span>text/javascript<span class="pl-pds">"</span></span><span class="pl-k">&gt;</span></span>
+<span class="pl-s1"><span class="pl-c1">window</span><span class="pl-k">.</span><span class="pl-c1">LOGGED_IN</span> <span class="pl-k">=</span> <span class="pl-k">&lt;</span>?<span class="pl-c1">php</span> <span class="pl-k">if</span> (<span class="pl-smi">$_SESSION</span>[<span class="pl-s"><span class="pl-pds">'</span>logged_in<span class="pl-pds">'</span></span>]): </span><span class="pl-pse"><span class="pl-s1">?</span>&gt;</span>true<span class="pl-pse">&lt;?php</span><span class="pl-s1"> <span class="pl-k">else</span>: </span><span class="pl-pse"><span class="pl-s1">?</span>&gt;</span>false<span class="pl-pse">&lt;?php</span><span class="pl-s1"> <span class="pl-k">endif</span>; </span><span class="pl-pse"><span class="pl-s1">?</span>&gt;</span>;
+
+$(funtion() {
+  // Starting the router telling it if the user is logged in or not
+  Backbone.Highway.start(App, {
+    authenticated: window.LOGGED_IN
+  });
+});
+&lt;/<span class="pl-ent">script</span>&gt;</pre></div>
+
+<h2>
+<a id="demo--example" class="anchor" href="#demo--example" aria-hidden="true"><span class="octicon octicon-link"></span></a>Demo / Example</h2>
+
+<p>A demo is available in the <code>demo</code> folder.</p>
+
+<p>Use npm and bower to install dependencies and grunt to launch the demo server.</p>
+
+<pre><code>~/backbone-highway$ npm install &amp;&amp; bower install
+~/backbone-highway$ grunt serve
+</code></pre>
+
+<h2>
+<a id="license" class="anchor" href="#license" aria-hidden="true"><span class="octicon octicon-link"></span></a>License</h2>
+
+<p>The MIT License (MIT)</p>
+
+<p>Copyright (c) 2015 d4f</p>
+
+<p>Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:</p>
+
+<p>The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.</p>
+
+<p>THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.</p>
+      </section>
+    </div>
+
+    
+  </body>
+</html>
