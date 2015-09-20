@@ -780,5 +780,5 @@
 
   };
 
-  return Backbone.ExtendedRouter;
+  return Backbone.Highway;
 }));
