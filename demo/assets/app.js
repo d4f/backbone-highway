@@ -1,11 +1,11 @@
 (function () {
   'use strict';
 
-  var App = window.App = new Backbone.Marionette.Application();
+  var App = {
+    events: _.extend({}, Backbone.Events)
+  };
 
-  App.Router = Backbone.ExtendedRouter;
-
-  App.Router.map(function () {
+  Backbone.Highway.map(function () {
     // Catching client-side 404s (optional)
     this.route('404', {
       action: function (path) {
@@ -83,11 +83,11 @@
     });
 
     // Declaring a login route
-    this.route('login', {
-      path: '/login',
+    this.route('signin', {
+      path: '/signin',
       authenticated: false,
       action: function () {
-        console.log('Controller action: login');
+        console.log('Controller action: signin');
 
         loginUser();
       }
@@ -124,10 +124,10 @@
         id = $el.attr('data-id');
 
       if (id !== undefined) {
-        App.Router.go(route, [id]);
+        Backbone.Highway.go(route, [id]);
       }
       else {
-        App.Router.go(route);
+        Backbone.Highway.go(route);
       }
     }
   });
@@ -141,6 +141,7 @@
     }
     else {
       console.log('Login canceled');
+      Backbone.Highway.clearStore();
     }
   };
 
@@ -154,15 +155,15 @@
    * Typically where you would orchestrate the render of the application
    */
   var registerEvents = function () {
-    App.vent.on('core', function () {
+    App.events.on('core', function () {
       console.log('Got trigger: core');
     });
 
-    App.vent.on('module', function () {
+    App.events.on('module', function () {
       console.log('Got trigger: module');
     });
 
-    App.vent.on('other_module', function () {
+    App.events.on('other_module', function () {
       console.log('Got trigger: other module');
     });
   };
@@ -178,13 +179,14 @@
       $('nav .login').hide();
     }
 
-    App.start();
-
-    App.Router.start({
-      dispatcher: App.vent,
+    Backbone.Highway.start({
+      dispatcher: App.events,
       authenticated: App.user ? true : false,
       redirectToLogin: true,
       debug: true,
+      routes: {
+        login: 'signin'
+      },
       // silent: true,
       // "root": "/admin",
       // "pushState": false
@@ -194,7 +196,7 @@
       el: $('header nav')
     });
 
-    App.Router.route('test_route', {
+    Backbone.Highway.route('test_route', {
       path: '/test',
       action: function () {
         console.log('meh \\o/');

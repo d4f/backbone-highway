@@ -1,16 +1,16 @@
 {
-  "name": "backbone-router",
-  "version": "0.3.0",
+  "name": "backbone-highway",
+  "version": "0.4.0",
   "description": "Routing Backbone with style \\o/",
-  "author": "Carl OGREN <carl.ogren@citizen-media.fr>",
+  "author": "Carl OGREN <rascarlito@gmail.com>",
   "keywords": [
     "backbone",
-    "marionette",
-    "router"
+    "router",
+    "marionette"
   ],
   "repository": {
     "type": "git",
-    "url": "https://gitbub.com/d4f/backbone-router.git"
+    "url": "https://gitbub.com/d4f/backbone-highway.git"
   },
   "devDependencies": {
     "connect-history-api-fallback": "^1.1.0",

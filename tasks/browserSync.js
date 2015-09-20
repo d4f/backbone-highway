@@ -9,7 +9,7 @@ module.exports = {
       server: {
         baseDir: ['<%= config.demo %>'],
         routes: {
-          '/scripts/backbone.router.js': 'src/backbone.router.js'
+          '/scripts/backbone.highway.js': 'src/backbone.highway.js'
         }
       },
       // browser: ['google chrome'],

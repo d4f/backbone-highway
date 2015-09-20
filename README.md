@@ -1,7 +1,7 @@
 # Routing Backbone with style \o/
 ----
 
-This library wraps the ```Backbone.Router``` to simplify its use and bring new functionalities
+```Backbone.Highway``` wraps the ```Backbone.Router``` to simplify its use and bring new functionalities
 
 Its structure and API is inspired by routers in the Node.js frameworks: Meteor and ExpressJS.
 
@@ -19,40 +19,42 @@ Added functionalities compared to the ```Backbone.Router``` are:
 You can install the library via bower:
 
 ```
-bower install backbone-router
+bower install backbone-highway
 ```
 
 ## Dependencies and structure
 
-The project has been renamed from marionette-router to backbone-router, because the ```Backbone.Marionette``` dependency has been removed.
-
-The dependencies left are:
+The dependencies are:
 
  - Backbone >= 1.1.4
- - Underscore >= 1.4.4 
+ - Underscore >= 1.4.4
 
-Until now the library was overriding the ```Backbone.Router``` namespace. I now understand that this was a huge mistake as it was breaking the dependencies of other Backbone libraries by replacing the core API.
+Until now the library was overriding the ```Backbone.Router``` namespace. I now understand that this was a huge mistake as it was breaking the dependencies of other Backbone libraries by replacing the core API. Thus the new name ```Backbone.Highway```
 
 ## General use
 
-Declaring routes goes through executing a simple method: ```Backbone.Router.map();```
+Declaring routes goes through executing a simple method: ```Backbone.Highway.map();```
 
 This method takes a function as its only parameter which will be executed in the router's context to access the internal API easily. A route consists of a unique name and an object to describe the route's action.
 
 Let's just jump right in with an example:
 
 ```javascript
-// Create a marionette app instance
-var App = new Backbone.Marionette.Application();
+// Create an app object containing an
+// instance of Backbone.Events
+var App = {
+  events: _.extend({}, Backbone.Events)
+};
 
 // Start route declarations
-Backbone.Router.map(function() {
+Backbone.Highway.map(function () {
   // Declare a route named 'home'
-  this.route("home", {
+  this.route('home', {
     // The url to which the route will respond
-    "path": "/",
+    path: '/',
+
     // Method to be executed when the given path is intercepted
-    "action": function() {
+    action: function () {
       // Do something fantastic \o/
     }
   });
@@ -61,70 +63,108 @@ Backbone.Router.map(function() {
 });
 
 // Wait for document ready event
-$(function() {
-  // Start the marionette app
-  App.start();
-
-  // Start the router passing the marionette app instance
-  Backbone.Router.start(App);
+$(function () {
+  // Start the router passing a global event aggregator
+  Backbone.Highway.start({
+    dispatcher: App.events
+  });
 });
 ```
 
 ## Start routing
 
 The router has to be started via the ```start``` method.
+It receives an ```options``` object containing at least a ```dispatcher``` 
 
 Parameters:
 
- - App (Mixed) - Can be an instance of ```Backbone.Marionette.Application``` or a copy of ```Backbone.Events```. Will be used to execute triggers declared in routes.
  - Options (Object) - Override default router configuration
 
-If given a Marionette app instance the router will use the ```vent``` global event aggregator to distribute route triggers.
+These are the default options :
 
-Building on the previous script, here is an example:
+```javascript
+/**
+ * Default options that are extended when the router is started
+ * @type {Object}
+ */
+var defaultOptions = {
+  // --- Backbone History options ---
+  // Docs: http://backbonejs.org/#History
+
+  // Use html5 pushState
+  pushState: true,
+
+  // Root url
+  root: '',
+
+  // Set to false to force page reloads for old browsers
+  hashChange: true,
+
+  // Don't trigger the initial route
+  silent: false,
+
+  // --------------------------------
+
+  // Event aggregator used to dispatch triggers.
+  // Highway will not work without at least an instance of Backbone.Events
+  // Also accepts an instance of Backbone.Wreqr or any object containing a 'trigger' method.
+  dispatcher: null,
+
+  // The current user status, logged in or not
+  authenticated: false,
+
+  // Enable automatic execution of a login route when accessing a secured routes
+  redirectToLogin: false,
+
+  // Names of automatically executed routes
+  routes: {
+    login: 'login',
+    error404: '404',
+    error403: '403'
+  }
+
+  // Print out debug information
+  debug: false,
+
+  // Override log method
+  log: function () {
+    if (this.debug && window.console && window.console.log) {
+      window.console.log.apply(window.console, arguments);
+    }
+  }
+};
+```
+
+Example of overriding the default options :
+
 
 ```javascript
 // Create app
-var App = new Backbone.Marionette.Application();
+var App = {
+  events: _.extend({}, Backbone.Events)
+};
 
 // Define some routes ...
 
-// Start the marionette app
-App.start();
+// Start the router passing an options object
+Backbone.Highgway.start({
+  dispatcher: App.events,
 
-// Start the router passing the marionette app instance and an options object
-Backbone.Router.start(App, {
   // Root url for all routes, passed to Backbone.history
-  "root": "/admin",
+  root: '/admin',
 
   // Activate html5 pushState or not, true by default
-  "pushState": false,
+  pushState: false,
 
   // Whether the user is currently logged in or not
-  "authed": false,
+  authenticated: true,
 
-  // If not logged in, redirect the user to a route named "login" (if it exists)
-  "redirectToLogin": false,
+  // If not logged in, redirect the user to a route named "login"
+  redirectToLogin: true,
 
   // Print out routing debug information to the console
-  "debug": true
+  debug: true
 });
-```
-
-Or passing a ```Backbone.Events``` copy:
-
-```javascript
-// Copy Backbone.Events
-var dispatcher = _.extend({}, Backbone.Events);
-
-// Start router
-Backbone.Router.start(dispatcher);
-```
-
-The dispatcher can also be overridden before the router is started in this way:
-
-```javascript
-Backbone.Router.dispatcher = _.extend({}, Backbone.Events);
 ```
 
 ## Router go!
@@ -132,23 +172,23 @@ Backbone.Router.dispatcher = _.extend({}, Backbone.Events);
 To redirect the user to a certain route when, for example, he clicks a link simply use the ```go``` method.
 
 ```javascript
-Backbone.Router.go("home");
+Backbone.Highway.go('home');
 ```
 
 **Parameters**
 
  - name (Mixed): The route name to execute or an object describing the route.
  - args (Mixed): Array of arguments, can also be a function's ```arguments``` object.
- - options (Object): Passed to the Backbone.Router navigate method. Defaults to ```{ "trigger": true, "replace": false }```
+ - options (Object): Passed to the Backbone.Router navigate method. Defaults to ```{ trigger: true, replace: false }```
 
 Let's define a route that takes a parameter:
 
 ```javascript
-Backbone.Router.map(function() {
+Backbone.Highway.map(function () {
   // Declare a user profile page
-  this.route("user_profile", {
-    "path": "/user/:id",
-    "action": function(userId) {
+  this.route('user.profile', {
+    path: '/user/:id',
+    action: function(userId) {
       // Render user profile page
     }
   });
@@ -165,13 +205,13 @@ We could write a script (using jquery) to redirect the user like so:
 
 ```javascript
 // Intercept the user click
-$("a.profile").click(function(e) {
+$('a.profile').click(function (e) {
   e.preventDefault();
 
-  var userId = $(this).attr("data-id");
+  var userId = $(this).attr('data-id');
 
-  // Redirecting to route named "user_profile" passing an id
-  Backbone.Router.go("user_profile", [userId]);
+  // Redirecting to route named 'user.profile' passing an id
+  Backbone.Highway.go('user.profile', [userId]);
 });
 ```
 
@@ -179,11 +219,13 @@ As the first parameter to the ```go``` method can be an object, we could also wr
 
 ```javascript
 // Intercept the user click
-$("a.profile").click(function(e) {
+$('a.profile').click(function (e) {
   e.preventDefault();
 
   // Redirecting to route using the path defined in the href attribute
-  Backbone.Router.go({ "path": this.href });
+  Backbone.Highway.go({
+    path: $(this).attr('href')
+  });
 });
 ```
 
@@ -193,35 +235,35 @@ $("a.profile").click(function(e) {
 The ```path``` and ```action``` parameters are the base of a route. But a few more parameters exist to extend the control of the route.
 
 ```javascript
-// Definition object for a route named 'user_edit'
+// Definition object for a route named 'user.edit'
 {
   // Path with an 'id' parameter
-  "path": "/user/:id/edit",
+  path: '/user/:id/edit',
 
   // Route will only be executed if the user is logged in
-  "authed": true,
+  authenticated: true,
 
   // Execute triggers before the 'action' controller
-  "before": [
-    { "name": "core:display", "cache": true },
-    "users:display"
+  before: [
+    { name: 'core.display', cache: true },
+    'users:display'
   ],
 
   // Main controller for the route
-  "action": function(userId) {
+  action: function (userId) {
     // Render a user edit form
   },
 
   // Execute triggers after the 'action' controller
-  "after": [
-    "core:post_triggers"
+  after: [
+    'core.postTriggers'
   ],
 
   // Executed when user is routed away from this route
-  // similar to an "onbeforeunload" event
-  "close": function() {
+  // similar to an 'onbeforeunload' event
+  close: function () {
     // Return false to cancel the routing
-    return confirm("Are you sure you want to leave this page?");
+    return confirm('Are you sure you want to leave this page?');
   }
 }
 ```
@@ -232,17 +274,17 @@ A route named 404 can be declared to catch all non-existent routes.
 In the same way a route can be named 403 to catch accessing restricted routes.
 
 ```javascript
-Backbone.Router.map(function() {
+Backbone.Highway.map(function () {
   // 404 controller
-  this.route("404", {
-    "action": function(path) {
+  this.route('404', {
+    action: function (path) {
       // Couldn't find what you're looking for =/
     }
   });
 
   // 403 controller
-  this.route("403", {
-    "action": function(path) {
+  this.route('403', {
+    action: function (path) {
       // Sorry you can't access this content =(
     }
   });
@@ -257,21 +299,20 @@ The 403 controller will only be executed if the ```redirectToLogin``` option is 
 
 ## Events distribution (Triggers)
 
-To distribute the triggers declared in the ```before``` and ```after``` parameters the ```Backbone.Router``` uses the ```Marionette``` global event aggregator: ```App.vent```
+To distribute the triggers declared in the ```before``` and ```after``` parameters ```Backbone.Highway``` uses an instance of any Backbone like event aggregator. It has only been tested with ```Backbone.Events``` and ```Backbone.Wreqr```.
 
-This parameter can be overridden using any ```Backbone.Events``` instance or any object with a ```trigger``` method.
+```Backbone.Highway``` only tests if the passed object has a ```trigger``` method. So it could be anything you like.
 
 ```javascript
-var App = new Backbone.Marionette.Application();
+// Create app with instace of Backbone.Events
+var App = {
+  events: _.extend({}, Backbone.Events)
+};
 
-// Create a custom event aggregator
-var myDispatcher = _.extend({}, Backbone.Events);
-
-// Pass the custom object to the Router
-Backbone.Router.dispatcher = myDispatcher;
-
-App.start();
-Backbone.Router.start(App);
+// Start the router
+Backbone.Highway.start({
+  dispatcher: App.events
+});
 ```
 
 ## Trigger declaration
@@ -283,23 +324,23 @@ They can be a simple ```String``` for the simple ones:
 ```javascript
 {
   // ...
-  "before": [
-    "core",
-    "module",
-    "submodule"
+  before: [
+    'core',
+    'module',
+    'submodule'
   ],
   // ...
 }
 ```
-They can also be declared as an object with different parameters:
+They can also be declared as an ```Object``` with different parameters:
 
 ```javascript
 {
   // ...
-  "before": [
-    { "name": "core", "cache": true },
-    { "name": "module", args: [foo, bar] },
-    "submodule"
+  before: [
+    { name: 'core', cache: true },
+    { name: 'module', args: ['foo', 'bar'] },
+    'submodule'
   ],
   // ...
 }
@@ -309,22 +350,22 @@ They can also be declared as an object with different parameters:
 
 ## Secured routes
 
-Each route can receive an ```authed``` boolean parameter to declare if the route should be interpreted when the user is logged in or not.
+Each route can receive an ```authenticated``` boolean parameter to declare if the route should be interpreted when the user is logged in or not.
 
 ```javascript
-Backbone.Router.map(function() {
+Backbone.Highway.map(function() {
   // Declare secure route
-  this.route("secure_route", {
-    "path": "/admin/users",
-    "authed": true,
-    "action": function() {
+  this.route('admin.users', {
+    path: '/admin/users',
+    authenticated: true,
+    action: function () {
       // Display list of users
     }
   });
 });
 ```
 To make a route be interpreted in both cases (i.e. when the user is logged in or logged out),
-simply leave out the ```authed``` parameter in the route declaration.
+simply leave out the ```authenticated``` parameter in the route declaration.
 
 **Important**
 
@@ -332,30 +373,31 @@ Only the server has the authority to tell if a connected client is a logged in u
 So for this system to actually work, the server has to print out a small piece of JavaScript to tell the router the current client's state:
 
 ```php
-<script type="text/javascript" src="backbone.router.js"></script>
+<script type="text/javascript" src="backbone.highway.js"></script>
 <script type="text/javascript">
-window.logged_in = <?php if ($_SESSION['logged_in']): ?>true<?php else: ?>false<?php endif; ?>;
+window.LOGGED_IN = <?php if ($_SESSION['logged_in']): ?>true<?php else: ?>false<?php endif; ?>;
 
 $(funtion() {
-  // Starting the marionette app
-  App.start();
-
   // Starting the router telling it if the user is logged in or not
-  Backbone.Router.start(App, {
-    "authed": window.logged_in
+  Backbone.Highway.start(App, {
+    authenticated: window.LOGGED_IN
   });
 });
 </script>
 ```
 
 
-## Example
+## Demo / Example
 
-An implementation example ```index.php``` file is available in the repository. To run it create an apache vhost or use any web server you like.
+A demo is available in the ```demo``` folder.
 
-So that client-side routing can work, every request sent to the server must be answered with the same code,
-therefore an ```.htaccess``` file activating mod_rewrite and redirecting all requests to the ```index.php``` file is also available in the repository.
+Use npm and bower to install dependencies and grunt to launch the demo server.
 
+
+```
+~/backbone-highway$ npm install && bower install
+~/backbone-highway$ grunt serve
+```
 
 ## License
 
