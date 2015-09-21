@@ -6,6 +6,10 @@
   ],
   "description": "Routing Backbone with style \\o/",
   "main": "src/backbone.highway.js",
+  "moduleType": [
+    "amd",
+    "global"
+  ],
   "keywords": [
     "backbone",
     "router",
@@ -19,16 +23,15 @@
   "ignore": [
     "**/.*",
     "node_modules",
-    "demo/assets/vendor",
-    "test",
-    "tests"
+    "demo/assets/vendor"
   ],
   "dependencies": {
-    "backbone.marionette": "~2.4.2",
-    "backbone": "~1.2.2",
-    "underscore": "~1.8.3"
+    "backbone": ">=1.1.4",
+    "underscore": ">=1.4.4"
   },
   "devDependencies": {
+    "jquery": "~2.1.4",
+    "backbone.marionette": "~2.4.2",
     "requirejs": "~2.1.20",
     "requirejs-plugins": "~1.0.3"
   }
