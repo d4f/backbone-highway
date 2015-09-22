@@ -10,7 +10,7 @@ module.exports = {
   },
   code: {
     files: [
-      '<%= config.src %>',
+      '<%= config.src %>/**/*.js',
       'assets/**/*.js'
     ],
     tasks: ['lint:code']

@@ -13,7 +13,7 @@
     // Note. Does not work with strict CommonJS, but
     // only CommonJS-like environments that support module.exports,
     // like Node.
-    module.exports = factory(window, require('Backbone'), require('underscore'));
+    module.exports = factory(window, require('backbone'), require('underscore'));
   }
   else {
     // Browser globals

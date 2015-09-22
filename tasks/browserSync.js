@@ -7,11 +7,11 @@ module.exports = {
       logLevel: 'info',
       logConnections: true,
       server: {
-        baseDir: ['<%= config.demo %>'],
-        routes: {
-          '/scripts/backbone.highway.js': 'src/backbone.highway.js',
-          '/scripts/backbone.highway.min.js': 'dist/backbone.highway.min.js'
-        }
+        baseDir: [
+          '<%= config.demo %>',
+          '<%= config.src %>',
+          '<%= config.dist %>'
+        ]
       },
       // browser: ['google chrome'],
       middleware: [require('connect-logger')(), historyApiFallback()]

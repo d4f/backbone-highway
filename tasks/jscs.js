@@ -4,7 +4,7 @@ module.exports = {
     verbose: true
   },
   code: [
-    '<%= config.src %>',
+    '<%= config.src %>/**/*.js',
     'assets/**/*.js'
   ],
   grunt: {

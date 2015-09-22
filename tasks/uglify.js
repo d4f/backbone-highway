@@ -1,6 +1,8 @@
 module.exports = {
   options: {
-    mangle: false
+    mangle: true,
+    sourceMap: true,
+    sourceMapName: 'dist/backbone.highway.min.map'
   },
   code: {
     files: {
