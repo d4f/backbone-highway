@@ -9,7 +9,8 @@ module.exports = {
       server: {
         baseDir: ['<%= config.demo %>'],
         routes: {
-          '/scripts/backbone.highway.js': 'src/backbone.highway.js'
+          '/scripts/backbone.highway.js': 'src/backbone.highway.js',
+          '/scripts/backbone.highway.min.js': 'dist/backbone.highway.min.js'
         }
       },
       // browser: ['google chrome'],
@@ -18,7 +19,8 @@ module.exports = {
     bsFiles: {
       src: [
         '<%= config.demo %>/*.html',
-        '<%= config.src %>'
+        '<%= config.src %>',
+        '<%= config.dist %>'
       ]
     }
   }

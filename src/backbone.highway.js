@@ -105,6 +105,8 @@
       error403: '403'
     },
 
+    storePrefix: 'backbone-highway',
+
     // Print out debug information
     debug: false,
 
