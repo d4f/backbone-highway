@@ -459,11 +459,10 @@
       }
 
       // Check if route exists
-      if ((name && !this.exists({
-          name: name
-        })) || (path && !this.exists({
-          path: path
-        }))) {
+      if (
+        (name && !this.exists({name: name})) ||
+        (path && !this.exists({path: path}))
+      ) {
         this.options.log('[Backbone.Highway] Inexisting route name: ' + name);
 
         // Execute 404 controller
@@ -550,7 +549,8 @@
 
           // Has it already been executed ?
           if (cache.done) {
-            this.options.log('[Backbone.Highway] Trigger [ ' + trigger.name + ' ] has been skipped (cached)');
+            this.options.log('[Backbone.Highway] Trigger [ ' +
+              (trigger.name || trigger.path) + ' ] has been skipped (cached)');
             return;
           }
 
@@ -559,11 +559,12 @@
         }
 
         // Check if the trigger is actually a declared route
-        if (this.exists({
-            name: trigger.name
-          })) {
+        if (this.exists({name: trigger.name})) {
           this.processControllers(trigger.name, trigger.args || null, true);
           return;
+        }
+        else if (this.exists({path: trigger.path})) {
+          this.processControllers(trigger.path, trigger.args || null, true);
         }
 
         // Wrap the given parameter in an array
@@ -581,9 +582,7 @@
       }
       else if (_.isString(trigger)) {
         // Check if the trigger is actually a declared route
-        if (this.exists({
-            name: trigger
-          })) {
+        if (this.exists({name: trigger})) {
           this.processControllers(trigger, null, true);
         }
         else {
