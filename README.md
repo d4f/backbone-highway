@@ -16,7 +16,13 @@ Added functionalities compared to the ```Backbone.Router``` are:
 
 ## Installation
 
-You can install the library via bower:
+You can install the library via npm:
+
+```
+npm install backbone-highway
+```
+
+Or bower:
 
 ```
 bower install backbone-highway
