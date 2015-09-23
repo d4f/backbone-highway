@@ -25,54 +25,39 @@
   // Import globals
   var localStorage = window.localStorage;
 
-  /**
-   * Instance holder for the actual Backbone.Router
-   * @type {Backbone.Router}
-   */
+  // Instance holder for the actual Backbone.Router  
+  // *@type {Backbone.Router}*
   var router = null;
 
-  /**
-   * Basic Backbone routes object
-   * @type {Object}
-   */
+  // Basic Backbone routes object  
+  // *@type {Object}*
   var routes = {};
 
-  /**
-   * Extended routes definitions
-   * @type {Object}
-   */
+  // Extended routes definitions  
+  // *@type {Object}*
   var extendedRoutes = {};
 
-  /**
-   * Basic Backbone controller object
-   * @type {Object}
-   */
+  // Basic Backbone controller object  
+  // *@type {Object}*
   var controller = {};
 
-  /**
-   * Extended controller
-   * @type {Object}
-   */
+  // Extended controller  
+  // *@type {Object}*
   var extendedController = {};
 
-  /**
-   * Collection of routes close event
-   * @type {Object}
-   */
+  // Collection of routes close event  
+  // *@type {Object}*
   var closeControllers = {};
 
-  /**
-   * Trigger cache memory
-   * @type {Array}
-   */
+  // Trigger cache memory  
+  // *@type {Array}*
   var cachedTriggers = [];
 
-  /**
-   * Default options that are extended when the router is started
-   * @type {Object}
-   */
+  // Default options that are extended when the router is started  
+  // *@type {Object}*
   var defaultOptions = {
-    // --- Backbone History options ---
+    // --------------------------------
+    // ### Backbone History options  
     // Docs: http://backbonejs.org/#History
 
     // Use html5 pushState
@@ -118,25 +103,18 @@
     }
   };
 
-  /**
-   * Backbone.Highway commander
-   * @type {Object}
-   */
+  // **Backbone.Highway commander**  
+  // @type {Object}
   Backbone.Highway = {
 
-    /**
-     * Which event aggregator to use for the triggers listed in each routes (mandatory)
-     */
+    // Which event aggregator to use for the triggers listed in each routes (mandatory)
     dispatcher: null,
 
-    /**
-     * Store routes that were executed last
-     */
+    // Store routes that were executed last
     currentRoutes: [],
 
-    /**
-     * Initialize the Backbone Marionette router
-     */
+    // --------------------------------
+    // **Initialize the Backbone.Highway router**
     start: function (options) {
       var self = this;
 
@@ -150,12 +128,13 @@
       // Store the event aggregator more conveniently
       this.dispatcher = this.options.dispatcher;
 
-      // Ensure that the dispatcher has the expected method
+      // Ensure that the dispatcher has the expected method.
       // i.e. The method "trigger" of Backbone.Events
       var methods = _.filter(['trigger'], function (method) {
         return _.isFunction(self.dispatcher[method]);
       });
 
+      // Throw an error if the given event aggregator does not seem to be compliant
       if (_.isEmpty(methods)) {
         throw '[Backbone.Highway.start] Missing a correct' +
           'dispatcher object, needs to be an instance of Backbone.Events';
@@ -184,7 +163,7 @@
           silent: this.options.silent
         });
 
-        // Trigger a 404 if the current route doesn't exist
+        // Trigger a 404 if the current route doesn't exist.
         // Ensure the 'silent' options isn't activated
         if (!existingRoute && !this.options.silent) {
           this.options.log('[Backbone.Highway] Inexisting load route');
@@ -197,6 +176,7 @@
           // Check if a route was stored while requiring a user login
           var storedRoute = this.getStoredRoute();
 
+          // If a route is stored, use it!
           if (storedRoute) {
             this.options.log('[Backbone.Highway] Loaded stored route: ' + storedRoute);
 
@@ -212,15 +192,14 @@
       }
     },
 
-    /**
-     * Map a list of routes.
-     *
-     * This method gets as the only parameter a function which will be executed in the router context,
-     * therefore, any methods of the router can be called from 'this' inside that function.
-     * Typically, only the 'route' method will be used.
-     *
-     * @param  {Function} routesDefiner A method that receives the router as context
-     */
+    // --------------------------------
+    // **Map a list of routes.**
+    //
+    // This method gets as the only parameter a function which will be executed in the router context,
+    // therefore, any methods of the router can be called from 'this' inside that function.
+    // Typically, only the 'route' method will be used.
+    //
+    // @param {Function} routesDefiner A method that receives the router as context
     map: function (routesDefiner) {
       if (!_.isFunction(routesDefiner)) {
         this.options.log('[Backbone.Highway.map] Missing routes definer method as the first param');
@@ -230,66 +209,65 @@
       }
     },
 
-    /**
-     * Declare a route and its actions to the Router.
-     * A route is composed of a unique name and an object definition of its actions.
-     * The object can be composed in a few different ways, here is an example for a route named 'user_edit' :
-     *
-     * {
-     *   path: '/user/:id/edit',
-     *   before: [
-     *     // Triggers to be executed before the action
-     *   ],
-     *   action: function(userId) {
-     *     // Custom display generation using the given userId
-     *   }
-     *   after: [
-     *     // Triggers to be executed after the action
-     *   ]
-     * }
-     *
-     * The action can be the name of another route definition to create aliases like so :
-     *
-     * {
-     *   path: '/',
-     *   action: 'user_login'
-     * }
-     *
-     * A route can be limited to when a user is connected by setting the route.authenticated option to true.
-     * For this to work the Backbone.Highway 'authenticated' option has to be true aswell
-     * when the server considers the user logged in.
-     *
-     * {
-     *   path: '/admin',
-     *   authenticated: true,
-     *   action: function() {
-     *     // Render admin template
-     *   }
-     * }
-     *
-     *
-     * A trigger can be declared in different ways.
-     * It can be a string which will be passed to the router dispatcher.
-     * Else, it can be an object so that static arguments can be passed to the trigger.
-     *
-     * Trigger object parameters :
-     *  - name (String): The trigger name
-     *  - args (Array, Optional): Arguments that will be mapped onto the trigger event listener, default: []
-     *  - cache (Boolean, Optional): Will only permit the execution of the trigger once
-     *
-     * For example :
-     *
-     * {
-     *   name: 'core:display',
-     *   args: [
-     *     // List of arguments applied onto the called trigger event listener
-     *   ],
-     *   cache: true
-     * }
-     *
-     * @param  {String} name The name of the route, needs to be unique (i.e. 'user.add')
-     * @param  {Object} def  The route definition object
-     */
+    // --------------------------------
+    // **Declare a route and its actions to the Router.**
+    // 
+    // A route is composed of a unique name and an object definition of its actions.
+    // The object can be composed in a few different ways, here is an example for a route named 'user_edit' :
+    //
+    // {
+    //   path: '/user/:id/edit',
+    //   before: [
+    //     // Triggers to be executed before the action
+    //   ],
+    //   action: function(userId) {
+    //     // Custom display generation using the given userId
+    //   }
+    //   after: [
+    //     // Triggers to be executed after the action
+    //   ]
+    // }
+    //
+    // The action can be the name of another route definition to create aliases like so :
+    //
+    // {
+    //   path: '/',
+    //   action: 'user_login'
+    // }
+    //
+    // A route can be limited to when a user is connected by setting the route.authenticated option to true.
+    // For this to work the Backbone.Highway 'authenticated' option has to be true aswell
+    // when the server considers the user logged in.
+    //
+    // {
+    //   path: '/admin',
+    //   authenticated: true,
+    //   action: function() {
+    //     // Render admin template
+    //   }
+    // }
+    //
+    // A trigger can be declared in different ways.
+    // It can be a string which will be passed to the router dispatcher.
+    // Else, it can be an object so that static arguments can be passed to the trigger.
+    //
+    // Trigger object parameters :
+    //  - name (String): The trigger name
+    //  - args (Array, Optional): Arguments that will be mapped onto the trigger event listener, default: []
+    //  - cache (Boolean, Optional): Will only permit the execution of the trigger once
+    //
+    // For example :
+    //
+    // {
+    //   name: 'core:display',
+    //   args: [
+    //     // List of arguments applied onto the called trigger event listener
+    //   ],
+    //   cache: true
+    // }
+    //
+    // @param  {String} name The name of the route, needs to be unique (i.e. 'user.add')
+    // @param  {Object} def  The route definition object
     route: function (name, def) {
       var self = this,
         routesExtension = {},
@@ -427,13 +405,12 @@
       }
     },
 
-    /**
-     * Route the application to a specific named route
-     *
-     * @param  {Mixed} name  Route name
-     * @param  {Array} args  List of arguments to pass along
-     * @return {Boolean}     Will return false if the routing was cancelled, else true
-     */
+    // --------------------------------
+
+    // **Route the application to a specific named route**
+    // - @param  {Mixed} name  Route name
+    // - @param  {Array} args  List of arguments to pass along
+    // - @return {Boolean}     Will return false if the routing was cancelled, else true
     go: function (name, args, options) {
       var route = null,
         path = null;
