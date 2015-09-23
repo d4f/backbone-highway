@@ -29,5 +29,9 @@
   },
   "engines": {
     "node": ">= 0.10.x"
+  },
+  "dependencies": {
+    "backbone": "^1.2.3",
+    "underscore": "^1.8.3"
   }
 }
