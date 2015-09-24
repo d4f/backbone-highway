@@ -2628,16 +2628,6 @@ null if not existing, false if localStorage doesn’t exist</em></li>
               
             </div>
             
-            <div class="content"><div class='highlight'><pre>
-    <span class="hljs-comment">/**
-     * Clear the stored route
-     */</span>
-    clearStore: <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
-      <span class="hljs-keyword">if</span> (localStorage) {
-        localStorage.removeItem(<span class="hljs-string">'backbone-router:path'</span>);
-      }
-    },</pre></div></div>
-            
         </li>
         
         
@@ -2647,9 +2637,15 @@ null if not existing, false if localStorage doesn’t exist</em></li>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-155">&#182;</a>
               </div>
-              <hr>
+              <p><strong>Clear the stored route</strong></p>
 
             </div>
+            
+            <div class="content"><div class='highlight'><pre>    clearStore: <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
+      <span class="hljs-keyword">if</span> (localStorage) {
+        localStorage.removeItem(<span class="hljs-string">'backbone-router:path'</span>);
+      }
+    },</pre></div></div>
             
         </li>
         
@@ -2660,13 +2656,9 @@ null if not existing, false if localStorage doesn’t exist</em></li>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-156">&#182;</a>
               </div>
-              
+              <hr>
+
             </div>
-            
-            <div class="content"><div class='highlight'><pre>
-    on: <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
-      router.on.apply(router, <span class="hljs-built_in">arguments</span>);
-    },</pre></div></div>
             
         </li>
         
@@ -2677,8 +2669,7 @@ null if not existing, false if localStorage doesn’t exist</em></li>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-157">&#182;</a>
               </div>
-              <hr>
-
+              
             </div>
             
         </li>
@@ -2690,11 +2681,41 @@ null if not existing, false if localStorage doesn’t exist</em></li>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-158">&#182;</a>
               </div>
-              
+              <p><strong>Original Backbone.Router Methods</strong></p>
+
             </div>
             
-            <div class="content"><div class='highlight'><pre>
-    off: <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
+        </li>
+        
+        
+        <li id="section-159">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-159">&#182;</a>
+              </div>
+              <p>Listen to original Backbone.Router events</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    on: <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
+      router.on.apply(router, <span class="hljs-built_in">arguments</span>);
+    },</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-160">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-160">&#182;</a>
+              </div>
+              <p>Stop listening to original Backbone.Router events</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    off: <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
       router.off.apply(router, <span class="hljs-built_in">arguments</span>);
     }
 

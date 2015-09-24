@@ -745,9 +745,7 @@
 
     // --------------------------------
 
-    /**
-     * Clear the stored route
-     */
+    // **Clear the stored route**
     clearStore: function () {
       if (localStorage) {
         localStorage.removeItem('backbone-router:path');
@@ -756,12 +754,14 @@
 
     // --------------------------------
 
+    // **Original Backbone.Router Methods**
+
+    // Listen to original Backbone.Router events
     on: function () {
       router.on.apply(router, arguments);
     },
 
-    // --------------------------------
-
+    // Stop listening to original Backbone.Router events
     off: function () {
       router.off.apply(router, arguments);
     }
