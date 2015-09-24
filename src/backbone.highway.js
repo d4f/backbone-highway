@@ -115,6 +115,7 @@
 
     // --------------------------------
     // **Initialize the Backbone.Highway router**
+    // - *@param {Object} **options** - Object to override default router configuration*
     start: function (options) {
       var self = this;
 
@@ -129,7 +130,7 @@
       this.dispatcher = this.options.dispatcher;
 
       // Ensure that the dispatcher has the expected method.
-      // i.e. The method "trigger" of Backbone.Events
+      // e.g. The method "trigger" of Backbone.Events
       var methods = _.filter(['trigger'], function (method) {
         return _.isFunction(self.dispatcher[method]);
       });
@@ -194,12 +195,11 @@
 
     // --------------------------------
     // **Map a list of routes.**
+    // - *@param {Function} **routesDefiner** - A method that receives the router as context*
     //
     // This method gets as the only parameter a function which will be executed in the router context,
     // therefore, any methods of the router can be called from 'this' inside that function.
     // Typically, only the 'route' method will be used.
-    //
-    // @param {Function} routesDefiner A method that receives the router as context
     map: function (routesDefiner) {
       if (!_.isFunction(routesDefiner)) {
         this.options.log('[Backbone.Highway.map] Missing routes definer method as the first param');
@@ -211,10 +211,13 @@
 
     // --------------------------------
     // **Declare a route and its actions to the Router.**
+    // - *@param  {String} **name** The name of the route, needs to be unique (e.g. 'user.add')*
+    // - *@param  {Object} **def**  The route definition object*
     // 
     // A route is composed of a unique name and an object definition of its actions.
     // The object can be composed in a few different ways, here is an example for a route named 'user_edit' :
     //
+    // ```javascript
     // {
     //   path: '/user/:id/edit',
     //   before: [
@@ -227,18 +230,22 @@
     //     // Triggers to be executed after the action
     //   ]
     // }
+    // ```
     //
     // The action can be the name of another route definition to create aliases like so :
     //
+    // ```javascript
     // {
     //   path: '/',
     //   action: 'user_login'
     // }
+    // ```
     //
     // A route can be limited to when a user is connected by setting the route.authenticated option to true.
     // For this to work the Backbone.Highway 'authenticated' option has to be true aswell
     // when the server considers the user logged in.
     //
+    // ```javascript
     // {
     //   path: '/admin',
     //   authenticated: true,
@@ -246,18 +253,21 @@
     //     // Render admin template
     //   }
     // }
+    // ```
     //
     // A trigger can be declared in different ways.
     // It can be a string which will be passed to the router dispatcher.
     // Else, it can be an object so that static arguments can be passed to the trigger.
     //
     // Trigger object parameters :
-    //  - name (String): The trigger name
-    //  - args (Array, Optional): Arguments that will be mapped onto the trigger event listener, default: []
-    //  - cache (Boolean, Optional): Will only permit the execution of the trigger once
+    // - name (String): The trigger name
+    // - path (String): Trigger name can be replaced by a route path
+    // - args (Array, Optional): Arguments that will be mapped onto the trigger event listener, default: []
+    // - cache (Boolean, Optional): Will only permit the execution of the trigger once
     //
     // For example :
     //
+    // ```javascript
     // {
     //   name: 'core:display',
     //   args: [
@@ -265,16 +275,14 @@
     //   ],
     //   cache: true
     // }
-    //
-    // @param  {String} name The name of the route, needs to be unique (i.e. 'user.add')
-    // @param  {Object} def  The route definition object
+    // ```
     route: function (name, def) {
       var self = this,
         routesExtension = {},
         controllerExtension = {},
         currentName = name;
 
-      // Throw an exception if def is an empty object, nothing will work
+      // Throw an exception, if def is an empty object nothing will work
       if (!_.isObject(def)) {
         throw '[Backbone.Highway.route] Route definition needs to be an object';
       }
@@ -349,7 +357,7 @@
             self.options.log('[Backbone.Highway] Skipping route "' + currentName +
               '", ' + (self.options.authenticated ? 'already ' : 'not ') + 'logged in');
 
-            // Execute 403 controller
+            // Execute 403 controller  
             // @todo Apply better/finer logic for when the 403 controller should be executed
             this.processControllers(self.options.routes.error403, [self.options.pushState ?
               window.location.pathname.substring(1) : window.location.hash.substring(1)
@@ -408,9 +416,9 @@
     // --------------------------------
 
     // **Route the application to a specific named route**
-    // - @param  {Mixed} name  Route name
-    // - @param  {Array} args  List of arguments to pass along
-    // - @return {Boolean}     Will return false if the routing was cancelled, else true
+    // - @param  {Mixed} **name** - Route name
+    // - @param  {Array} **args** - List of arguments to pass along
+    // - @return {Boolean} Will return false if the routing was cancelled, else true
     go: function (name, args, options) {
       var route = null,
         path = null;
@@ -487,11 +495,10 @@
       }
     },
 
-    /**
-     * Process a list of triggers that can be declared as a simple string or an object
-     *
-     * @param  {Array} triggers The list of triggers to process
-     */
+    // --------------------------------
+
+    // **Process a list of triggers that can be declared as a simple string or an object**
+    // - @param {Array} **triggers** The list of triggers to process*
     processTriggers: function (triggers) {
       var self = this;
 
@@ -509,11 +516,10 @@
       }
     },
 
-    /**
-     * Process a single trigger
-     *
-     * @param  {Mixed} trigger String or Object describing the trigger
-     */
+    // --------------------------------
+
+    // **Process a single trigger**
+    // - @param {Mixed} **trigger** String or Object describing the trigger*
     processTrigger: function (trigger) {
       if (_.isObject(trigger)) {
         // Create a dispatcher format object
@@ -573,29 +579,31 @@
       }
     },
 
-    /**
-     * Process a list of controllers
-     *
-     * @param  {String} name The name of the route
-     * @param  {Array}  args JavaScript arguments array
-     */
+    // --------------------------------
+
+    // **Process a list of controllers**
+    // - @param {String} **name** The name of the route*
+    // - @param {Array} **args** JavaScript arguments array*
     processControllers: function (name, args, trigger) {
       var self = this;
 
+      // Do not interpret control as a trigger by default
       trigger = trigger || false;
 
       // Lets not pass [undefined] or [null] as arguments to the controllers
       if (_.isUndefined(args) || _.isNull(args)) {
         args = [];
       }
-      // Ensure args is an array if not an arguments object
+      // Ensure args is an array or an arguments object
       else if (!_.isObject && !_.isArray(args)) {
         args = [args];
       }
 
       // Check if the given controller actually exists
       if (extendedController[name]) {
+        // Loop through each defined route controller
         _.forEach(extendedController[name].wrappers, function (callback) {
+          // Execute controller wrapper
           callback.call(self, args, trigger);
         });
       }
@@ -604,42 +612,41 @@
       }
     },
 
-    /**
-     * Find a cached trigger
-     *
-     * @param  {Object} trigger Trigger object definition
-     * @return {Object}         Cached trigger object
-     */
+    // --------------------------------
+
+    // **Find a cached trigger**
+    // - *@param  {Object} **trigger** Trigger object definition*
+    // - *@return {Object} Cached trigger object*
     findCachedTrigger: function (trigger) {
+      // Try to check if it already exists
       var cache = _.find(cachedTriggers, function (item) {
         return item.name === trigger.name;
       });
 
-      // If it doesn't exist, create it and retrieve it again
+      // If it doesn't, create it and retrieve it again
       if (!cache) {
         cachedTriggers.push(_.extend({}, trigger));
-
         return this.findCachedTrigger(trigger);
       }
 
       return cache;
     },
 
-    /**
-     * Clear all cached triggers
-     */
+    // --------------------------------
+
+    // **Clear all cached triggers**
     clearCache: function () {
       cachedTriggers = [];
     },
 
-    /**
-     * Retrieve the path of a route by it's name.
-     * Pass in optional arguments to be parsed into the path.
-     *
-     * @param  {String} routeName  The route name
-     * @param  {Array}  args       The arguments that need to be injected into the path
-     * @return {String}            The route path or false if the route doesn't exist
-     */
+    // --------------------------------
+
+    // **Retrieve the path of a route by it's name.**
+    // - *@param  {String} **routeName**  The route name*
+    // - *@param  {Array}  **args**       The arguments that need to be injected into the path*
+    // - *@return {String} The route path or false if the route doesn't exist*
+    // 
+    // Pass in optional arguments to be parsed into the path.
     path: function (routeName, args) {
       var path;
 
@@ -652,12 +659,11 @@
       return false;
     },
 
-    /**
-     * Check if a route exists by its name or its path
-     *
-     * @param  {Object}  params Object with a name or path key
-     * @return {Boolean}        True if route exists else false
-     */
+    // --------------------------------
+
+    // **Check if a route exists by its name or its path**
+    // - *@param  {Object}  **params** Object with a name or path key*
+    // - *@return {Boolean} True if route exists else false*
     exists: function (params) {
       if (!_.isObject(params)) {
         return false;
@@ -680,13 +686,12 @@
       return false;
     },
 
-    /**
-     * Parse a path to inject a list of arguments into the path.
-     *
-     * @param  {String} path The path to parse containing argument declarations starting with colons
-     * @param  {Array}  args List of arguments to inject into the path
-     * @return {String}      The path with the arguments injected
-     */
+    // --------------------------------
+
+    // **Parse a path to inject a list of arguments into the path.**
+    // - *@param  {String} **path** The path to parse containing argument declarations starting with colons*
+    // - *@param  {Array}  **args** List of arguments to inject into the path*
+    // - *@return {String}      The path with the arguments injected*
     parse: function (path, args) {
       if (!_.isArray(args) || _.isEmpty(args)) {
         return path;
@@ -694,7 +699,7 @@
 
       var argIndex = 0;
 
-      // Inject arguments
+      // Inject passed arguments
       return _.map(path.split('/'), function (part) {
           if (part.charAt(0) === ':') {
             var arg = args[argIndex];
@@ -711,9 +716,9 @@
         .replace(/\/$/, '');
     },
 
-    /**
-     * Store the current pathname in the local storage
-     */
+    // --------------------------------
+
+    // **Store the current pathname in the local storage**
     storeCurrentRoute: function () {
       // Retrieve current path
       var path = this.options.pushState ? window.location.pathname : window.location.hash;
@@ -729,15 +734,16 @@
       }
     },
 
-    /**
-     * Retrieve the stored route if any
-     *
-     * @return {String} The currenlty stored route as a string,
-     *                  null if not existing, false if localStorage doesn't exist
-     */
+    // --------------------------------
+
+    // **Retrieve the stored route if any**
+    // - *@return {String} The currenlty stored route as a string,
+    //   null if not existing, false if localStorage doesn't exist*
     getStoredRoute: function () {
       return localStorage && localStorage.getItem('backbone-router:path');
     },
+
+    // --------------------------------
 
     /**
      * Clear the stored route
@@ -748,9 +754,13 @@
       }
     },
 
+    // --------------------------------
+
     on: function () {
       router.on.apply(router, arguments);
     },
+
+    // --------------------------------
 
     off: function () {
       router.off.apply(router, arguments);
