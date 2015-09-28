@@ -20,7 +20,7 @@
     "unused": true,
     "strict": true,
     "maxdepth": 3,
-    "trailing": false,
+    "trailing": true,
     "smarttabs": true,
     "onevar": false,
     "jquery": true,

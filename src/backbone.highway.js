@@ -25,39 +25,39 @@
   // Import globals
   var localStorage = window.localStorage;
 
-  // Instance holder for the actual Backbone.Router  
-  // *@type {Backbone.Router}*
+  // Instance holder for the actual Backbone.Router
+  // - *@type {Backbone.Router}*
   var router = null;
 
-  // Basic Backbone routes object  
-  // *@type {Object}*
+  // Basic Backbone routes object
+  // - *@type {Object}*
   var routes = {};
 
-  // Extended routes definitions  
-  // *@type {Object}*
+  // Extended routes definitions
+  // - *@type {Object}*
   var extendedRoutes = {};
 
-  // Basic Backbone controller object  
-  // *@type {Object}*
+  // Basic Backbone controller object
+  // - *@type {Object}*
   var controller = {};
 
-  // Extended controller  
-  // *@type {Object}*
+  // Extended controller
+  // - *@type {Object}*
   var extendedController = {};
 
-  // Collection of routes close event  
-  // *@type {Object}*
+  // Collection of routes close event
+  // - *@type {Object}*
   var closeControllers = {};
 
-  // Trigger cache memory  
-  // *@type {Array}*
+  // Trigger cache memory
+  // - *@type {Array}*
   var cachedTriggers = [];
 
-  // Default options that are extended when the router is started  
-  // *@type {Object}*
+  // Default options that are extended when the router is started
+  // - *@type {Object}*
   var defaultOptions = {
     // --------------------------------
-    // ### Backbone History options  
+    // ### Backbone History options
     // Docs: http://backbonejs.org/#History
 
     // Use html5 pushState
@@ -103,8 +103,8 @@
     }
   };
 
-  // **Backbone.Highway commander**  
-  // @type {Object}
+  // **Backbone.Highway commander**
+  // - @type {Object}
   Backbone.Highway = {
 
     // Which event aggregator to use for the triggers listed in each routes (mandatory)
@@ -213,7 +213,7 @@
     // **Declare a route and its actions to the Router.**
     // - *@param  {String} **name** The name of the route, needs to be unique (e.g. 'user.add')*
     // - *@param  {Object} **def**  The route definition object*
-    // 
+    //
     // A route is composed of a unique name and an object definition of its actions.
     // The object can be composed in a few different ways, here is an example for a route named 'user_edit' :
     //
@@ -303,7 +303,7 @@
 
         // Create a placeholder for the route controllers
         extendedController[name] = {
-          re: def.path ? Backbone.Router.prototype._routeToRegExp(def.path) : null,
+          re: _.isString(def.path) ? Backbone.Router.prototype._routeToRegExp(def.path) : null,
           wrappers: []
         };
 
@@ -357,7 +357,8 @@
             self.options.log('[Backbone.Highway] Skipping route "' + currentName +
               '", ' + (self.options.authenticated ? 'already ' : 'not ') + 'logged in');
 
-            // Execute 403 controller  
+            // Execute 403 controller
+            //
             // @todo Apply better/finer logic for when the 403 controller should be executed
             this.processControllers(self.options.routes.error403, [self.options.pushState ?
               window.location.pathname.substring(1) : window.location.hash.substring(1)
@@ -541,13 +542,15 @@
           cache.done = true;
         }
 
+        debugger;
+
         // Check if the trigger is actually a declared route
         if (this.exists({name: trigger.name})) {
           this.processControllers(trigger.name, trigger.args || null, true);
           return;
         }
         else if (this.exists({path: trigger.path})) {
-          this.processControllers(trigger.path, trigger.args || null, true);
+          this.processControllers(this.name(trigger.path), trigger.args || null, true);
         }
 
         // Wrap the given parameter in an array
@@ -645,7 +648,7 @@
     // - *@param  {String} **routeName**  The route name*
     // - *@param  {Array}  **args**       The arguments that need to be injected into the path*
     // - *@return {String} The route path or false if the route doesn't exist*
-    // 
+    //
     // Pass in optional arguments to be parsed into the path.
     path: function (routeName, args) {
       var path;
@@ -653,6 +656,20 @@
       for (path in routes) {
         if (routes[path] === routeName) {
           return this.parse(path, args);
+        }
+      }
+
+      return false;
+    },
+
+    name: function (path) {
+      var name;
+
+      // Loop through all the controllers
+      for (name in extendedController) {
+        // debugger;
+        if (extendedController[name].re && extendedController[name].re.test(path)) {
+          return name;
         }
       }
 
@@ -672,15 +689,8 @@
       if (params.name) {
         return !_.isUndefined(extendedController[params.name]);
       }
-      else if (params.path) {
-        var name = null;
-
-        // Loop through all the controllers
-        for (name in extendedController) {
-          if (extendedController[name].re && extendedController[name].re.test(params.path)) {
-            return true;
-          }
-        }
+      else if (_.isString(params.path)) {
+        return this.name(params.path);
       }
 
       return false;

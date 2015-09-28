@@ -134,7 +134,7 @@
   "disallowSpacesInsideObjectBrackets": true,
   "disallowQuotedKeysInObjects": true,
   "disallowSpaceAfterObjectKeys": true,
-  "disallowTrailingWhitespace": false,
+  "disallowTrailingWhitespace": true,
   "disallowMixedSpacesAndTabs": "smart",
   "safeContextKeyword": "self",
 

@@ -49,7 +49,7 @@
     this.route('users_list', {
       path: '/users',
       before: [
-        'home', // Executing the home route as a trigger
+        {path: '/'}, // Executing the home route as a trigger
         'other_module'
       ],
       action: function () {
