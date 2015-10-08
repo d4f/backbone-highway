@@ -198,6 +198,9 @@
 
     Backbone.Highway.route('test_route', {
       path: '/test',
+      before: [
+        {path: '/users'}
+      ],
       action: function () {
         console.log('meh \\o/');
       }
