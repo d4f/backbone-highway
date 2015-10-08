@@ -542,7 +542,7 @@
           cache.done = true;
         }
 
-        debugger;
+        // debugger;
 
         // Check if the trigger is actually a declared route
         if (this.exists({name: trigger.name})) {
@@ -665,9 +665,13 @@
     name: function (path) {
       var name;
 
+      // Remove first slash
+      if (path.indexOf('/') === 0) {
+        path = path.substring(1);
+      }
+
       // Loop through all the controllers
       for (name in extendedController) {
-        // debugger;
         if (extendedController[name].re && extendedController[name].re.test(path)) {
           return name;
         }
