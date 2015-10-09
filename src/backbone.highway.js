@@ -662,6 +662,11 @@
       return false;
     },
 
+    // --------------------------------
+
+    // **Retrieve the name of a route by it's path**
+    // - *@param {String} **path**  The route path*
+    // - *@return {Mixed} The name of the route, false if it doesn't exist*
     name: function (path) {
       var name;
 
@@ -672,6 +677,7 @@
 
       // Loop through all the controllers
       for (name in extendedController) {
+        // Check if given path validates against controller regular expression
         if (extendedController[name].re && extendedController[name].re.test(path)) {
           return name;
         }

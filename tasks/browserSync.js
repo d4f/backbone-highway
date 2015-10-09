@@ -10,7 +10,8 @@ module.exports = {
         baseDir: [
           '<%= config.demo %>',
           '<%= config.src %>',
-          '<%= config.dist %>'
+          '<%= config.dist %>',
+          'docs'
         ]
       },
       // browser: ['google chrome'],
