@@ -10,7 +10,7 @@
     this.route('404', {
       action: function (path) {
         console.log('Controller action: 404, path: %s', path);
-        $('.content').html('<h1>404 ! =(</h1>');
+        $('.content').html('404 ! =(');
       }
     });
 
@@ -18,7 +18,7 @@
     this.route('403', {
       action: function (path) {
         console.log('Controller action: 403, path: %s', path);
-        $('.content').html('<h1>403 ! =(</h1>');
+        $('.content').html('403 ! =(');
       }
     });
 
