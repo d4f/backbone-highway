@@ -37,6 +37,10 @@ header h1 img {
 	top: 5px;
 }
 
+header h1 .title {
+	margin-left: 5px;
+}
+
 header nav {
 	float: right;
 	height: 100%;

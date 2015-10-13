@@ -72,10 +72,20 @@
       action: 'users_list'
     });
 
+    this.route('alias.test', {
+      path: '/alias/:id',
+      before: [
+        {path: '/users/asdf'}
+      ],
+      action: function (id) {
+        console.log('Alias test: id=%s', id);
+      }
+    });
+
     // Declaring a secured route with a parameter
     this.route('user_show', {
       path: '/users/:id',
-      authenticated: true,
+      // authenticated: true,
       action: function (userId) {
         console.log('Controller action: user_show');
         $('.content').html('Current page: User #' + userId);

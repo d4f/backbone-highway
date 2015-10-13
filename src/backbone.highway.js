@@ -169,9 +169,13 @@
         if (!existingRoute && !this.options.silent) {
           this.options.log('[Backbone.Highway] Inexisting load route');
 
-          this.processControllers(self.options.routes.error404, [self.options.pushState ?
-            window.location.pathname.substring(1) : window.location.hash.substring(1)
-          ]);
+          this.processControllers({
+            name: self.options.routes.error404,
+            args: [
+              self.options.pushState ?
+              window.location.pathname.substring(1) : window.location.hash.substring(1)
+            ]
+          });
         }
         else {
           // Check if a route was stored while requiring a user login
@@ -312,7 +316,7 @@
 
         // Create a wrapping controller method to permit for multiple route/controller bindings
         controllerExtension[name] = function () {
-          self.processControllers(name, arguments);
+          self.processControllers({name: name, args: arguments});
         };
 
         // Apply the new routes
@@ -333,6 +337,7 @@
       }
 
       var controllerWrapper = function (args, trigger) {
+        // debugger;
         // Store the current route name if it is not a trigger
         if (!trigger) {
           self.currentRoutes.push(currentName);
@@ -351,7 +356,7 @@
             self.storeCurrentRoute();
 
             // Redirect to login
-            self.processControllers(self.options.routes.login);
+            self.processControllers({name: self.options.routes.login});
           }
           else {
             self.options.log('[Backbone.Highway] Skipping route "' + currentName +
@@ -360,19 +365,24 @@
             // Execute 403 controller
             //
             // @todo Apply better/finer logic for when the 403 controller should be executed
-            this.processControllers(self.options.routes.error403, [self.options.pushState ?
-              window.location.pathname.substring(1) : window.location.hash.substring(1)
-            ]);
+            this.processControllers({
+              name: self.options.routes.error403,
+              args: [
+                self.options.pushState ?
+                window.location.pathname.substring(1) : window.location.hash.substring(1)
+              ]
+            });
           }
           return false;
         }
 
         // Check if the route is an alias
+        // FIXME Aliasing through the action parameter will probably conflict with before/after triggers
         if (_.isString(def.action)) {
           self.options.log('[Backbone.Highway] Caught alias route: "' + currentName + '" >> "' + def.action + '"');
 
           // Execute alias route
-          self.processControllers(def.action, args, true);
+          self.processControllers({name: def.action, args: args}, true);
 
           return false;
         }
@@ -382,7 +392,7 @@
 
         // Process pre-triggers
         if (!_.isEmpty(def.before)) {
-          self.processTriggers(def.before);
+          self.processTriggers(def.before, args);
         }
 
         // Execute route main action
@@ -392,7 +402,7 @@
 
         // Process post-triggers
         if (!_.isEmpty(def.after)) {
-          self.processTriggers(def.after);
+          self.processTriggers(def.after, args);
         }
       };
 
@@ -452,9 +462,13 @@
         this.options.log('[Backbone.Highway] Inexisting route name: ' + name);
 
         // Execute 404 controller
-        this.processControllers(this.options.routes.error404, [this.options.pushState ?
-          window.location.pathname.substring(1) : window.location.hash.substring(1)
-        ]);
+        this.processControllers({
+          name: this.options.routes.error404,
+          args: [
+            this.options.pushState ?
+            window.location.pathname.substring(1) : window.location.hash.substring(1)
+          ]
+        });
       }
       else {
         var continueProcess = true,
@@ -500,16 +514,16 @@
 
     // **Process a list of triggers that can be declared as a simple string or an object**
     // - @param {Array} **triggers** The list of triggers to process*
-    processTriggers: function (triggers) {
+    processTriggers: function (triggers, routeArgs) {
       var self = this;
 
       if (_.isArray(triggers)) {
         _.forEach(triggers, function (trigger) {
-          self.processTrigger(trigger);
+          self.processTrigger(trigger, routeArgs);
         });
       }
       else if (_.isString(triggers) || _.isObject(triggers)) {
-        this.processTrigger(triggers);
+        this.processTrigger(triggers, routeArgs);
       }
       else {
         this.options.log('[Backbone.Highway.processTriggers] Bad triggers format, needs to be a string,' +
@@ -521,11 +535,8 @@
 
     // **Process a single trigger**
     // - @param {Mixed} **trigger** String or Object describing the trigger*
-    processTrigger: function (trigger) {
+    processTrigger: function (trigger, routeArgs) {
       if (_.isObject(trigger)) {
-        // Create a dispatcher format object
-        var args = [trigger.name];
-
         // Check if the trigger is marked for caching
         if (trigger.cache) {
           // Find cached trigger object
@@ -542,34 +553,40 @@
           cache.done = true;
         }
 
-        // debugger;
-
-        // Check if the trigger is actually a declared route
-        if (this.exists({name: trigger.name})) {
-          this.processControllers(trigger.name, trigger.args || null, true);
-          return;
-        }
-        else if (this.exists({path: trigger.path})) {
-          this.processControllers(this.name(trigger.path), trigger.args || null, true);
-        }
-
         // Wrap the given parameter in an array
         if (!_.isArray(trigger.args)) {
           trigger.args = [trigger.args];
         }
+
+        // Check if the trigger is actually a declared route
+        // FIXME Interpret arguments passed in the path if any
+        if (trigger.path) {
+          trigger.name = this.name(trigger.path);
+        }
+
+        if (trigger.name && this.exists({name: trigger.name})) {
+          this.processControllers(trigger, true);
+          return;
+        }
+
+        // Create a dispatcher format object
+        var args = [trigger.name];
 
         // Finish formatting trigger arguments for the dispatcher
         _.forEach(trigger.args, function (arg) {
           args.push(arg);
         });
 
-        // Dispatch the event
+        // Dispatch the event applying arguments
         this.dispatcher.trigger.apply(this.dispatcher, args);
       }
       else if (_.isString(trigger)) {
         // Check if the trigger is actually a declared route
         if (this.exists({name: trigger})) {
-          this.processControllers(trigger, null, true);
+          this.processControllers({
+            name: trigger,
+            args: routeArgs
+          }, true);
         }
         else {
           // Else give to the dispatcher
@@ -587,8 +604,10 @@
     // **Process a list of controllers**
     // - @param {String} **name** The name of the route*
     // - @param {Array} **args** JavaScript arguments array*
-    processControllers: function (name, args, trigger) {
-      var self = this;
+    processControllers: function (def, trigger) {
+      var self = this,
+          name = def.name,
+          args = def.args;
 
       // Do not interpret control as a trigger by default
       trigger = trigger || false;
