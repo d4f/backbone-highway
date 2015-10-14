@@ -170,10 +170,11 @@
           this.options.log('[Backbone.Highway] Inexisting load route');
 
           this.processControllers({
-            name: self.options.routes.error404,
+            name: this.options.routes.error404,
             args: [
-              self.options.pushState ?
-              window.location.pathname.substring(1) : window.location.hash.substring(1)
+              this.options.pushState ?
+              this.stripHeadingSlash(window.location.pathname) :
+              this.stripHeadingSlash(window.location.hash)
             ]
           });
         }
@@ -292,8 +293,8 @@
       }
 
       // Remove the first slash in the path for the Backbone router
-      if (def.path && def.path.charAt(0) === '/') {
-        def.path = def.path.substring(1);
+      if (def.path) {
+        def.path = this.stripHeadingSlash(def.path);
       }
 
       // Check if a controller has already registered this path
@@ -366,10 +367,11 @@
             //
             // @todo Apply better/finer logic for when the 403 controller should be executed
             this.processControllers({
-              name: self.options.routes.error403,
+              name: this.options.routes.error403,
               args: [
-                self.options.pushState ?
-                window.location.pathname.substring(1) : window.location.hash.substring(1)
+                this.options.pushState ?
+                this.stripHeadingSlash(window.location.pathname) :
+                this.stripHeadingSlash(window.location.hash)
               ]
             });
           }
@@ -443,7 +445,7 @@
         name = route.name;
 
         // Transfer route path and remove first slash
-        path = _.isString(route.path) && route.path.charAt(0) === '/' ? route.path.substring(1) : route.path;
+        path = _.isString(route.path) && this.stripHeadingSlash(route.path);
 
         // Transfer args
         args = route.args || args;
@@ -466,7 +468,8 @@
           name: this.options.routes.error404,
           args: [
             this.options.pushState ?
-            window.location.pathname.substring(1) : window.location.hash.substring(1)
+            this.stripHeadingSlash(window.location.pathname) :
+            this.stripHeadingSlash(window.location.hash)
           ]
         });
       }
@@ -553,8 +556,10 @@
           cache.done = true;
         }
 
+        // debugger;
+
         // Wrap the given parameter in an array
-        if (!_.isArray(trigger.args)) {
+        if (!_.isUndefined(trigger.args) && !_.isNull(trigger.args) && !_.isArray(trigger.args)) {
           trigger.args = [trigger.args];
         }
 
@@ -612,17 +617,24 @@
       // Do not interpret control as a trigger by default
       trigger = trigger || false;
 
-      // Lets not pass [undefined] or [null] as arguments to the controllers
-      if (_.isUndefined(args) || _.isNull(args)) {
-        args = [];
-      }
-      // Ensure args is an array or an arguments object
-      else if (!_.isObject && !_.isArray(args)) {
-        args = [args];
-      }
-
       // Check if the given controller actually exists
       if (extendedController[name]) {
+        // debugger;
+
+        // Lets not pass [undefined] or [null] as arguments to the controllers
+        if (_.isUndefined(args) || _.isNull(args)) {
+          if (def.path) {
+            args = this.extractParameters(name, def.path);
+          }
+          else {
+            args = [];
+          }
+        }
+        // Ensure args is an array or an arguments object
+        else if (!_.isObject(args) && !_.isArray(args)) {
+          args = [args];
+        }
+
         // Loop through each defined route controller
         _.forEach(extendedController[name].wrappers, function (callback) {
           // Execute controller wrapper
@@ -690,9 +702,7 @@
       var name;
 
       // Remove first slash
-      if (path.indexOf('/') === 0) {
-        path = path.substring(1);
-      }
+      path = this.stripHeadingSlash(path);
 
       // Loop through all the controllers
       for (name in extendedController) {
@@ -739,6 +749,7 @@
       var argIndex = 0;
 
       // Inject passed arguments
+      // FIXME Replace with a regex : var re = /(?:.*)(:[^\/]+)(?:.*)/g
       return _.map(path.split('/'), function (part) {
           if (part.charAt(0) === ':') {
             var arg = args[argIndex];
@@ -763,7 +774,7 @@
       var path = this.options.pushState ? window.location.pathname : window.location.hash;
 
       // Remove first / or #
-      path = path.substring(1);
+      path = this.stripHeadingSlash(path);
 
       this.options.log('[Backbone.Highway] Storing current path: ' + path);
 
@@ -789,6 +800,27 @@
       if (localStorage) {
         localStorage.removeItem('backbone-router:path');
       }
+    },
+
+    // --------------------------------
+
+    // **Remove heading slash or pound sign from a path, if any**
+    stripHeadingSlash: function (path) {
+      var first = path.charAt(0);
+      if (first === '/' || first === '#') {
+        return path.substring(1);
+      }
+      return path;
+    },
+
+    // --------------------------------
+
+    // **Extract parameters from the path of a route**
+    extractParameters: function (name, path) {
+      return Backbone.Router.prototype._extractParameters(
+        extendedController[name].re,
+        this.stripHeadingSlash(path)
+      );
     },
 
     // --------------------------------
