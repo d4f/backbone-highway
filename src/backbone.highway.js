@@ -53,17 +53,19 @@
   // - *@type {Array}*
   var cachedTriggers = [];
 
-  // Default options that are extended when the router is started
+  // --------------------------------
+
+  // **Default options that are extended when the router is started**
   // - *@type {Object}*
   var defaultOptions = {
-    // --------------------------------
-    // ### Backbone History options
+
+    // #### Backbone History options
     // Docs: http://backbonejs.org/#History
 
     // Use html5 pushState
     pushState: true,
 
-    // Root url
+    // Root url for pushState
     root: '',
 
     // Set to false to force page reloads for old browsers
@@ -72,7 +74,7 @@
     // Don't trigger the initial route
     silent: false,
 
-    // --------------------------------
+    // #### Backbone.Highway specific options
 
     // Event aggregator used to dispatch triggers
     dispatcher: null,
@@ -90,6 +92,7 @@
       error403: '403'
     },
 
+    // Local storage key prefix
     storePrefix: 'backbone-highway',
 
     // Print out debug information
@@ -379,6 +382,7 @@
         }
 
         // Check if the route is an alias
+        //
         // FIXME Aliasing through the action parameter will probably conflict with before/after triggers
         if (_.isString(def.action)) {
           self.options.log('[Backbone.Highway] Caught alias route: "' + currentName + '" >> "' + def.action + '"');
@@ -564,7 +568,6 @@
         }
 
         // Check if the trigger is actually a declared route
-        // FIXME Interpret arguments passed in the path if any
         if (trigger.path) {
           trigger.name = this.name(trigger.path);
         }
@@ -749,7 +752,8 @@
       var argIndex = 0;
 
       // Inject passed arguments
-      // FIXME Replace with a regex : var re = /(?:.*)(:[^\/]+)(?:.*)/g
+      //
+      // FIXME Replace with a regex : var re = /(?:.*)?((:[^\/]+)+)(?:.*)?/g
       return _.map(path.split('/'), function (part) {
           if (part.charAt(0) === ':') {
             var arg = args[argIndex];
