@@ -344,7 +344,6 @@
       }
 
       var controllerWrapper = function (args, trigger) {
-        // debugger;
         // Store the current route name if it is not a trigger
         if (!trigger) {
           self.currentRoutes.push(currentName);
@@ -558,8 +557,6 @@
           cache.done = true;
         }
 
-        // debugger;
-
         // Wrap the given parameter in an array
         if (!_.isUndefined(trigger.args) && !_.isNull(trigger.args) && !_.isArray(trigger.args)) {
           trigger.args = [trigger.args];
@@ -620,8 +617,6 @@
 
       // Check if the given controller actually exists
       if (extendedController[name]) {
-        // debugger;
-
         // Lets not pass [undefined] or [null] as arguments to the controllers
         if (_.isUndefined(args) || _.isNull(args)) {
           if (def.path) {
