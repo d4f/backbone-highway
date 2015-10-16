@@ -53,6 +53,11 @@
   // - *@type {Array}*
   var cachedTriggers = [];
 
+  var re = {
+    headingSlash: /^(\/|#)/,
+    trailingSlash: /\/$/
+  };
+
   // --------------------------------
 
   // **Default options that are extended when the router is started**
@@ -175,9 +180,7 @@
           this.processControllers({
             name: this.options.routes.error404,
             args: [
-              this.options.pushState ?
-              this.stripHeadingSlash(window.location.pathname) :
-              this.stripHeadingSlash(window.location.hash)
+              Backbone.history.getFragment()
             ]
           });
         }
@@ -311,7 +314,7 @@
 
         // Create a placeholder for the route controllers
         extendedController[name] = {
-          re: _.isString(def.path) ? Backbone.Router.prototype._routeToRegExp(def.path) : null,
+          re: _.isString(def.path) ? this.routeToRegExp(def.path) : null,
           wrappers: []
         };
 
@@ -372,9 +375,7 @@
             this.processControllers({
               name: this.options.routes.error403,
               args: [
-                this.options.pushState ?
-                this.stripHeadingSlash(window.location.pathname) :
-                this.stripHeadingSlash(window.location.hash)
+                Backbone.history.getFragment()
               ]
             });
           }
@@ -382,8 +383,7 @@
         }
 
         // Check if the route is an alias
-        //
-        // FIXME Aliasing through the action parameter will probably conflict with before/after triggers
+        // - FIXME Aliasing through the action parameter will probably conflict with before/after triggers
         if (_.isString(def.action)) {
           self.options.log('[Backbone.Highway] Caught alias route: "' + currentName + '" >> "' + def.action + '"');
 
@@ -471,9 +471,7 @@
         this.processControllers({
           name: this.options.routes.error404,
           args: [
-            this.options.pushState ?
-            this.stripHeadingSlash(window.location.pathname) :
-            this.stripHeadingSlash(window.location.hash)
+            Backbone.history.getFragment()
           ]
         });
       }
@@ -752,8 +750,7 @@
       var argIndex = 0;
 
       // Inject passed arguments
-      //
-      // FIXME Replace with a regex : var re = /(?:.*)?((:[^\/]+)+)(?:.*)?/g
+      // - FIXME Replace with a regex : var re = /(?:.*)?((:[^\/]+)+)(?:.*)?/g ?
       return _.map(path.split('/'), function (part) {
           if (part.charAt(0) === ':') {
             var arg = args[argIndex];
@@ -767,7 +764,7 @@
         // Remove opening parentheses in case of optional parameters
         .replace('(', '')
         // Remove trailing slash
-        .replace(/\/$/, '');
+        .replace(re.trailingSlash, '');
     },
 
     // --------------------------------
@@ -775,10 +772,7 @@
     // **Store the current pathname in the local storage**
     storeCurrentRoute: function () {
       // Retrieve current path
-      var path = this.options.pushState ? window.location.pathname : window.location.hash;
-
-      // Remove first / or #
-      path = this.stripHeadingSlash(path);
+      var path = Backbone.history.getFragment();
 
       this.options.log('[Backbone.Highway] Storing current path: ' + path);
 
@@ -810,11 +804,7 @@
 
     // **Remove heading slash or pound sign from a path, if any**
     stripHeadingSlash: function (path) {
-      var first = path.charAt(0);
-      if (first === '/' || first === '#') {
-        return path.substring(1);
-      }
-      return path;
+      return path.replace(re.headingSlash, '');
     },
 
     // --------------------------------
@@ -825,6 +815,13 @@
         extendedController[name].re,
         this.stripHeadingSlash(path)
       );
+    },
+
+    // --------------------------------
+
+    // **Transform a route path to a regular expression**
+    routeToRegExp: function (path) {
+      return Backbone.Router.prototype._routeToRegExp(path);
     },
 
     // --------------------------------
