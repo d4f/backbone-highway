@@ -75,7 +75,8 @@
     this.route('alias.test', {
       path: '/alias/:id',
       before: [
-        {path: '/users/asdf', args: [99]}
+        {path: '/users/1234', args: [5432]}
+        // {name: 'user_show', args: [99]}
       ],
       action: function (id) {
         console.log('Alias test: id=%s', id);

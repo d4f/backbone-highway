@@ -541,6 +541,11 @@
     // - @param {Mixed} **trigger** String or Object describing the trigger*
     processTrigger: function (trigger, routeArgs) {
       if (_.isObject(trigger)) {
+        // Retrieve the name of the trigger if it's declared using a path
+        if (trigger.path) {
+          trigger.name = this.name(trigger.path);
+        }
+
         // Check if the trigger is marked for caching
         if (trigger.cache) {
           // Find cached trigger object
@@ -562,11 +567,11 @@
           trigger.args = [trigger.args];
         }
 
-        // Check if the trigger is actually a declared route
-        if (trigger.path) {
-          trigger.name = this.name(trigger.path);
+        if (_.isEmpty(trigger.args)) {
+          trigger.args = routeArgs;
         }
 
+        // If the trigger is actually a controller execute it
         if (trigger.name && this.exists({name: trigger.name})) {
           this.processControllers(trigger, true);
           return;
@@ -617,14 +622,19 @@
 
       // Check if the given controller actually exists
       if (extendedController[name]) {
+        // Extract parameters from path if possible
+        if (def.path) {
+          args = this.extractParameters(name, def.path);
+          // Backbone gives [null] for routes without arguments
+          // so if there is not more than one argument use the passed arguments instead
+          if (args.length === 1 && args[0] === null) {
+            args = def.args;
+          }
+        }
+
         // Lets not pass [undefined] or [null] as arguments to the controllers
         if (_.isUndefined(args) || _.isNull(args)) {
-          if (def.path) {
-            args = this.extractParameters(name, def.path);
-          }
-          else {
-            args = [];
-          }
+          args = [];
         }
         // Ensure args is an array or an arguments object
         else if (!_.isObject(args) && !_.isArray(args)) {
