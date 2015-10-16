@@ -1823,11 +1823,13 @@ Adding the new controller to the given route controllers list</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-103">&#182;</a>
               </div>
-              <p>Check if the trigger is marked for caching</p>
+              <p>Retrieve the name of the trigger if it’s declared using a path</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>        <span class="hljs-keyword">if</span> (trigger.cache) {</pre></div></div>
+            <div class="content"><div class='highlight'><pre>        <span class="hljs-keyword">if</span> (trigger.path) {
+          trigger.name = <span class="hljs-keyword">this</span>.name(trigger.path);
+        }</pre></div></div>
             
         </li>
         
@@ -1838,11 +1840,11 @@ Adding the new controller to the given route controllers list</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-104">&#182;</a>
               </div>
-              <p>Find cached trigger object</p>
+              <p>Check if the trigger is marked for caching</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>          <span class="hljs-keyword">var</span> cache = <span class="hljs-keyword">this</span>.findCachedTrigger(trigger);</pre></div></div>
+            <div class="content"><div class='highlight'><pre>        <span class="hljs-keyword">if</span> (trigger.cache) {</pre></div></div>
             
         </li>
         
@@ -1852,6 +1854,21 @@ Adding the new controller to the given route controllers list</p>
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-105">&#182;</a>
+              </div>
+              <p>Find cached trigger object</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>          <span class="hljs-keyword">var</span> cache = <span class="hljs-keyword">this</span>.findCachedTrigger(trigger);</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-106">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-106">&#182;</a>
               </div>
               <p>Has it already been executed ?</p>
 
@@ -1866,11 +1883,11 @@ Adding the new controller to the given route controllers list</p>
         </li>
         
         
-        <li id="section-106">
+        <li id="section-107">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-106">&#182;</a>
+                <a class="pilcrow" href="#section-107">&#182;</a>
               </div>
               <p>Mark it done</p>
 
@@ -1882,11 +1899,11 @@ Adding the new controller to the given route controllers list</p>
         </li>
         
         
-        <li id="section-107">
+        <li id="section-108">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-107">&#182;</a>
+                <a class="pilcrow" href="#section-108">&#182;</a>
               </div>
               <p>Wrap the given parameter in an array</p>
 
@@ -1894,28 +1911,10 @@ Adding the new controller to the given route controllers list</p>
             
             <div class="content"><div class='highlight'><pre>        <span class="hljs-keyword">if</span> (!_.isUndefined(trigger.args) &amp;&amp; !_.isNull(trigger.args) &amp;&amp; !_.isArray(trigger.args)) {
           trigger.args = [trigger.args];
-        }</pre></div></div>
-            
-        </li>
-        
-        
-        <li id="section-108">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-108">&#182;</a>
-              </div>
-              <p>Check if the trigger is actually a declared route</p>
-
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>        <span class="hljs-keyword">if</span> (trigger.path) {
-          trigger.name = <span class="hljs-keyword">this</span>.name(trigger.path);
         }
 
-        <span class="hljs-keyword">if</span> (trigger.name &amp;&amp; <span class="hljs-keyword">this</span>.exists({name: trigger.name})) {
-          <span class="hljs-keyword">this</span>.processControllers(trigger, <span class="hljs-literal">true</span>);
-          <span class="hljs-keyword">return</span>;
+        <span class="hljs-keyword">if</span> (_.isEmpty(trigger.args)) {
+          trigger.args = routeArgs;
         }</pre></div></div>
             
         </li>
@@ -1927,11 +1926,14 @@ Adding the new controller to the given route controllers list</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-109">&#182;</a>
               </div>
-              <p>Create a dispatcher format object</p>
+              <p>If the trigger is actually a controller execute it</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>        <span class="hljs-keyword">var</span> args = [trigger.name];</pre></div></div>
+            <div class="content"><div class='highlight'><pre>        <span class="hljs-keyword">if</span> (trigger.name &amp;&amp; <span class="hljs-keyword">this</span>.exists({name: trigger.name})) {
+          <span class="hljs-keyword">this</span>.processControllers(trigger, <span class="hljs-literal">true</span>);
+          <span class="hljs-keyword">return</span>;
+        }</pre></div></div>
             
         </li>
         
@@ -1941,6 +1943,21 @@ Adding the new controller to the given route controllers list</p>
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-110">&#182;</a>
+              </div>
+              <p>Create a dispatcher format object</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        <span class="hljs-keyword">var</span> args = [trigger.name];</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-111">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-111">&#182;</a>
               </div>
               <p>Finish formatting trigger arguments for the dispatcher</p>
 
@@ -1953,11 +1970,11 @@ Adding the new controller to the given route controllers list</p>
         </li>
         
         
-        <li id="section-111">
+        <li id="section-112">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-111">&#182;</a>
+                <a class="pilcrow" href="#section-112">&#182;</a>
               </div>
               <p>Dispatch the event applying arguments</p>
 
@@ -1970,11 +1987,11 @@ Adding the new controller to the given route controllers list</p>
         </li>
         
         
-        <li id="section-112">
+        <li id="section-113">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-112">&#182;</a>
+                <a class="pilcrow" href="#section-113">&#182;</a>
               </div>
               <p>Check if the trigger is actually a declared route</p>
 
@@ -1991,11 +2008,11 @@ Adding the new controller to the given route controllers list</p>
         </li>
         
         
-        <li id="section-113">
+        <li id="section-114">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-113">&#182;</a>
+                <a class="pilcrow" href="#section-114">&#182;</a>
               </div>
               <p>Else give to the dispatcher</p>
 
@@ -2013,26 +2030,14 @@ Adding the new controller to the given route controllers list</p>
         </li>
         
         
-        <li id="section-114">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-114">&#182;</a>
-              </div>
-              <hr>
-
-            </div>
-            
-        </li>
-        
-        
         <li id="section-115">
             <div class="annotation">
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-115">&#182;</a>
               </div>
-              
+              <hr>
+
             </div>
             
         </li>
@@ -2043,6 +2048,18 @@ Adding the new controller to the given route controllers list</p>
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-116">&#182;</a>
+              </div>
+              
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-117">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-117">&#182;</a>
               </div>
               <p><strong>Process a list of controllers</strong></p>
 <ul>
@@ -2060,11 +2077,11 @@ Adding the new controller to the given route controllers list</p>
         </li>
         
         
-        <li id="section-117">
+        <li id="section-118">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-117">&#182;</a>
+                <a class="pilcrow" href="#section-118">&#182;</a>
               </div>
               <p>Do not interpret control as a trigger by default</p>
 
@@ -2075,11 +2092,11 @@ Adding the new controller to the given route controllers list</p>
         </li>
         
         
-        <li id="section-118">
+        <li id="section-119">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-118">&#182;</a>
+                <a class="pilcrow" href="#section-119">&#182;</a>
               </div>
               <p>Check if the given controller actually exists</p>
 
@@ -2090,33 +2107,63 @@ Adding the new controller to the given route controllers list</p>
         </li>
         
         
-        <li id="section-119">
+        <li id="section-120">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-119">&#182;</a>
+                <a class="pilcrow" href="#section-120">&#182;</a>
               </div>
-              <p>Lets not pass [undefined] or [null] as arguments to the controllers</p>
+              <p>Extract parameters from path if possible</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>        <span class="hljs-keyword">if</span> (_.isUndefined(args) || _.isNull(args)) {
-          <span class="hljs-keyword">if</span> (def.path) {
-            args = <span class="hljs-keyword">this</span>.extractParameters(name, def.path);
-          }
-          <span class="hljs-keyword">else</span> {
-            args = [];
+            <div class="content"><div class='highlight'><pre>        <span class="hljs-keyword">if</span> (def.path) {
+          args = <span class="hljs-keyword">this</span>.extractParameters(name, def.path);</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-121">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-121">&#182;</a>
+              </div>
+              <p>Backbone gives [null] for routes without arguments
+so if there is not more than one argument use the passed arguments instead</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>          <span class="hljs-keyword">if</span> (args.length === <span class="hljs-number">1</span> &amp;&amp; args[<span class="hljs-number">0</span>] === <span class="hljs-literal">null</span>) {
+            args = def.args;
           }
         }</pre></div></div>
             
         </li>
         
         
-        <li id="section-120">
+        <li id="section-122">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-120">&#182;</a>
+                <a class="pilcrow" href="#section-122">&#182;</a>
+              </div>
+              <p>Lets not pass [undefined] or [null] as arguments to the controllers</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        <span class="hljs-keyword">if</span> (_.isUndefined(args) || _.isNull(args)) {
+          args = [];
+        }</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-123">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-123">&#182;</a>
               </div>
               <p>Ensure args is an array or an arguments object</p>
 
@@ -2129,11 +2176,11 @@ Adding the new controller to the given route controllers list</p>
         </li>
         
         
-        <li id="section-121">
+        <li id="section-124">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-121">&#182;</a>
+                <a class="pilcrow" href="#section-124">&#182;</a>
               </div>
               <p>Loop through each defined route controller</p>
 
@@ -2144,11 +2191,11 @@ Adding the new controller to the given route controllers list</p>
         </li>
         
         
-        <li id="section-122">
+        <li id="section-125">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-122">&#182;</a>
+                <a class="pilcrow" href="#section-125">&#182;</a>
               </div>
               <p>Execute controller wrapper</p>
 
@@ -2165,11 +2212,11 @@ Adding the new controller to the given route controllers list</p>
         </li>
         
         
-        <li id="section-123">
+        <li id="section-126">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-123">&#182;</a>
+                <a class="pilcrow" href="#section-126">&#182;</a>
               </div>
               <hr>
 
@@ -2178,11 +2225,11 @@ Adding the new controller to the given route controllers list</p>
         </li>
         
         
-        <li id="section-124">
+        <li id="section-127">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-124">&#182;</a>
+                <a class="pilcrow" href="#section-127">&#182;</a>
               </div>
               
             </div>
@@ -2190,11 +2237,11 @@ Adding the new controller to the given route controllers list</p>
         </li>
         
         
-        <li id="section-125">
+        <li id="section-128">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-125">&#182;</a>
+                <a class="pilcrow" href="#section-128">&#182;</a>
               </div>
               <p><strong>Find a cached trigger</strong></p>
 <ul>
@@ -2209,11 +2256,11 @@ Adding the new controller to the given route controllers list</p>
         </li>
         
         
-        <li id="section-126">
+        <li id="section-129">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-126">&#182;</a>
+                <a class="pilcrow" href="#section-129">&#182;</a>
               </div>
               <p>Try to check if it already exists</p>
 
@@ -2226,11 +2273,11 @@ Adding the new controller to the given route controllers list</p>
         </li>
         
         
-        <li id="section-127">
+        <li id="section-130">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-127">&#182;</a>
+                <a class="pilcrow" href="#section-130">&#182;</a>
               </div>
               <p>If it doesn’t, create it and retrieve it again</p>
 
@@ -2242,48 +2289,6 @@ Adding the new controller to the given route controllers list</p>
       }
 
       <span class="hljs-keyword">return</span> cache;
-    },</pre></div></div>
-            
-        </li>
-        
-        
-        <li id="section-128">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-128">&#182;</a>
-              </div>
-              <hr>
-
-            </div>
-            
-        </li>
-        
-        
-        <li id="section-129">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-129">&#182;</a>
-              </div>
-              
-            </div>
-            
-        </li>
-        
-        
-        <li id="section-130">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-130">&#182;</a>
-              </div>
-              <p><strong>Clear all cached triggers</strong></p>
-
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>    clearCache: <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
-      cachedTriggers = [];
     },</pre></div></div>
             
         </li>
@@ -2320,26 +2325,12 @@ Adding the new controller to the given route controllers list</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-133">&#182;</a>
               </div>
-              <p><strong>Retrieve the path of a route by it’s name.</strong></p>
-<ul>
-<li><em>@param  {String} <strong>routeName</strong>  The route name</em></li>
-<li><em>@param  {Array}  <strong>args</strong>       The arguments that need to be injected into the path</em></li>
-<li><em>@return {String} The route path or false if the route doesn’t exist</em></li>
-</ul>
-<p>Pass in optional arguments to be parsed into the path.</p>
+              <p><strong>Clear all cached triggers</strong></p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>    path: <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">routeName, args</span>) </span>{
-      <span class="hljs-keyword">var</span> path;
-
-      <span class="hljs-keyword">for</span> (path <span class="hljs-keyword">in</span> routes) {
-        <span class="hljs-keyword">if</span> (routes[path] === routeName) {
-          <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.parse(path, args);
-        }
-      }
-
-      <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>;
+            <div class="content"><div class='highlight'><pre>    clearCache: <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
+      cachedTriggers = [];
     },</pre></div></div>
             
         </li>
@@ -2376,6 +2367,62 @@ Adding the new controller to the given route controllers list</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-136">&#182;</a>
               </div>
+              <p><strong>Retrieve the path of a route by it’s name.</strong></p>
+<ul>
+<li><em>@param  {String} <strong>routeName</strong>  The route name</em></li>
+<li><em>@param  {Array}  <strong>args</strong>       The arguments that need to be injected into the path</em></li>
+<li><em>@return {String} The route path or false if the route doesn’t exist</em></li>
+</ul>
+<p>Pass in optional arguments to be parsed into the path.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    path: <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">routeName, args</span>) </span>{
+      <span class="hljs-keyword">var</span> path;
+
+      <span class="hljs-keyword">for</span> (path <span class="hljs-keyword">in</span> routes) {
+        <span class="hljs-keyword">if</span> (routes[path] === routeName) {
+          <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.parse(path, args);
+        }
+      }
+
+      <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>;
+    },</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-137">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-137">&#182;</a>
+              </div>
+              <hr>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-138">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-138">&#182;</a>
+              </div>
+              
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-139">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-139">&#182;</a>
+              </div>
               <p><strong>Retrieve the name of a route by it’s path</strong></p>
 <ul>
 <li><em>@param {String} <strong>path</strong>  The route path</em></li>
@@ -2390,11 +2437,11 @@ Adding the new controller to the given route controllers list</p>
         </li>
         
         
-        <li id="section-137">
+        <li id="section-140">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-137">&#182;</a>
+                <a class="pilcrow" href="#section-140">&#182;</a>
               </div>
               <p>Remove first slash</p>
 
@@ -2405,11 +2452,11 @@ Adding the new controller to the given route controllers list</p>
         </li>
         
         
-        <li id="section-138">
+        <li id="section-141">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-138">&#182;</a>
+                <a class="pilcrow" href="#section-141">&#182;</a>
               </div>
               <p>Loop through all the controllers</p>
 
@@ -2420,11 +2467,11 @@ Adding the new controller to the given route controllers list</p>
         </li>
         
         
-        <li id="section-139">
+        <li id="section-142">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-139">&#182;</a>
+                <a class="pilcrow" href="#section-142">&#182;</a>
               </div>
               <p>Check if given path validates against controller regular expression</p>
 
@@ -2433,63 +2480,6 @@ Adding the new controller to the given route controllers list</p>
             <div class="content"><div class='highlight'><pre>        <span class="hljs-keyword">if</span> (extendedController[name].re &amp;&amp; extendedController[name].re.test(path)) {
           <span class="hljs-keyword">return</span> name;
         }
-      }
-
-      <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>;
-    },</pre></div></div>
-            
-        </li>
-        
-        
-        <li id="section-140">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-140">&#182;</a>
-              </div>
-              <hr>
-
-            </div>
-            
-        </li>
-        
-        
-        <li id="section-141">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-141">&#182;</a>
-              </div>
-              
-            </div>
-            
-        </li>
-        
-        
-        <li id="section-142">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-142">&#182;</a>
-              </div>
-              <p><strong>Check if a route exists by its name or its path</strong></p>
-<ul>
-<li><em>@param  {Object}  <strong>params</strong> Object with a name or path key</em></li>
-<li><em>@return {Boolean} True if route exists else false</em></li>
-</ul>
-
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>    exists: <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">params</span>) </span>{
-      <span class="hljs-keyword">if</span> (!_.isObject(params)) {
-        <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>;
-      }
-
-      <span class="hljs-keyword">if</span> (params.name) {
-        <span class="hljs-keyword">return</span> !_.isUndefined(extendedController[params.name]);
-      }
-      <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (_.isString(params.path)) {
-        <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.name(params.path);
       }
 
       <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>;
@@ -2529,6 +2519,63 @@ Adding the new controller to the given route controllers list</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-145">&#182;</a>
               </div>
+              <p><strong>Check if a route exists by its name or its path</strong></p>
+<ul>
+<li><em>@param  {Object}  <strong>params</strong> Object with a name or path key</em></li>
+<li><em>@return {Boolean} True if route exists else false</em></li>
+</ul>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    exists: <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">params</span>) </span>{
+      <span class="hljs-keyword">if</span> (!_.isObject(params)) {
+        <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>;
+      }
+
+      <span class="hljs-keyword">if</span> (params.name) {
+        <span class="hljs-keyword">return</span> !_.isUndefined(extendedController[params.name]);
+      }
+      <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (_.isString(params.path)) {
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.name(params.path);
+      }
+
+      <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>;
+    },</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-146">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-146">&#182;</a>
+              </div>
+              <hr>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-147">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-147">&#182;</a>
+              </div>
+              
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-148">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-148">&#182;</a>
+              </div>
               <p><strong>Parse a path to inject a list of arguments into the path.</strong></p>
 <ul>
 <li><em>@param  {String} <strong>path</strong> The path to parse containing argument declarations starting with colons</em></li>
@@ -2548,11 +2595,11 @@ Adding the new controller to the given route controllers list</p>
         </li>
         
         
-        <li id="section-146">
+        <li id="section-149">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-146">&#182;</a>
+                <a class="pilcrow" href="#section-149">&#182;</a>
               </div>
               <p>Inject passed arguments</p>
 <ul>
@@ -2573,11 +2620,11 @@ Adding the new controller to the given route controllers list</p>
         </li>
         
         
-        <li id="section-147">
+        <li id="section-150">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-147">&#182;</a>
+                <a class="pilcrow" href="#section-150">&#182;</a>
               </div>
               <p>Join the parts with slashes</p>
 
@@ -2588,11 +2635,11 @@ Adding the new controller to the given route controllers list</p>
         </li>
         
         
-        <li id="section-148">
+        <li id="section-151">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-148">&#182;</a>
+                <a class="pilcrow" href="#section-151">&#182;</a>
               </div>
               <p>Remove opening parentheses in case of optional parameters</p>
 
@@ -2603,11 +2650,11 @@ Adding the new controller to the given route controllers list</p>
         </li>
         
         
-        <li id="section-149">
+        <li id="section-152">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-149">&#182;</a>
+                <a class="pilcrow" href="#section-152">&#182;</a>
               </div>
               <p>Remove trailing slash</p>
 
@@ -2619,11 +2666,11 @@ Adding the new controller to the given route controllers list</p>
         </li>
         
         
-        <li id="section-150">
+        <li id="section-153">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-150">&#182;</a>
+                <a class="pilcrow" href="#section-153">&#182;</a>
               </div>
               <hr>
 
@@ -2632,11 +2679,11 @@ Adding the new controller to the given route controllers list</p>
         </li>
         
         
-        <li id="section-151">
+        <li id="section-154">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-151">&#182;</a>
+                <a class="pilcrow" href="#section-154">&#182;</a>
               </div>
               
             </div>
@@ -2644,11 +2691,11 @@ Adding the new controller to the given route controllers list</p>
         </li>
         
         
-        <li id="section-152">
+        <li id="section-155">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-152">&#182;</a>
+                <a class="pilcrow" href="#section-155">&#182;</a>
               </div>
               <p><strong>Store the current pathname in the local storage</strong></p>
 
@@ -2659,11 +2706,11 @@ Adding the new controller to the given route controllers list</p>
         </li>
         
         
-        <li id="section-153">
+        <li id="section-156">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-153">&#182;</a>
+                <a class="pilcrow" href="#section-156">&#182;</a>
               </div>
               <p>Retrieve current path</p>
 
@@ -2676,11 +2723,11 @@ Adding the new controller to the given route controllers list</p>
         </li>
         
         
-        <li id="section-154">
+        <li id="section-157">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-154">&#182;</a>
+                <a class="pilcrow" href="#section-157">&#182;</a>
               </div>
               <p>Store the path for next init after page reload</p>
 
@@ -2689,52 +2736,6 @@ Adding the new controller to the given route controllers list</p>
             <div class="content"><div class='highlight'><pre>      <span class="hljs-keyword">if</span> (localStorage) {
         localStorage.setItem(<span class="hljs-string">'backbone-router:path'</span>, path);
       }
-    },</pre></div></div>
-            
-        </li>
-        
-        
-        <li id="section-155">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-155">&#182;</a>
-              </div>
-              <hr>
-
-            </div>
-            
-        </li>
-        
-        
-        <li id="section-156">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-156">&#182;</a>
-              </div>
-              
-            </div>
-            
-        </li>
-        
-        
-        <li id="section-157">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-157">&#182;</a>
-              </div>
-              <p><strong>Retrieve the stored route if any</strong></p>
-<ul>
-<li><em>@return {String} The currenlty stored route as a string,
-null if not existing, false if localStorage doesn’t exist</em></li>
-</ul>
-
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>    getStoredRoute: <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
-      <span class="hljs-keyword">return</span> localStorage &amp;&amp; localStorage.getItem(<span class="hljs-string">'backbone-router:path'</span>);
     },</pre></div></div>
             
         </li>
@@ -2771,14 +2772,16 @@ null if not existing, false if localStorage doesn’t exist</em></li>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-160">&#182;</a>
               </div>
-              <p><strong>Clear the stored route</strong></p>
+              <p><strong>Retrieve the stored route if any</strong></p>
+<ul>
+<li><em>@return {String} The currenlty stored route as a string,
+null if not existing, false if localStorage doesn’t exist</em></li>
+</ul>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>    clearStore: <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
-      <span class="hljs-keyword">if</span> (localStorage) {
-        localStorage.removeItem(<span class="hljs-string">'backbone-router:path'</span>);
-      }
+            <div class="content"><div class='highlight'><pre>    getStoredRoute: <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
+      <span class="hljs-keyword">return</span> localStorage &amp;&amp; localStorage.getItem(<span class="hljs-string">'backbone-router:path'</span>);
     },</pre></div></div>
             
         </li>
@@ -2815,12 +2818,14 @@ null if not existing, false if localStorage doesn’t exist</em></li>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-163">&#182;</a>
               </div>
-              <p><strong>Remove heading slash or pound sign from a path, if any</strong></p>
+              <p><strong>Clear the stored route</strong></p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>    stripHeadingSlash: <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">path</span>) </span>{
-      <span class="hljs-keyword">return</span> path.replace(re.headingSlash, <span class="hljs-string">''</span>);
+            <div class="content"><div class='highlight'><pre>    clearStore: <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
+      <span class="hljs-keyword">if</span> (localStorage) {
+        localStorage.removeItem(<span class="hljs-string">'backbone-router:path'</span>);
+      }
     },</pre></div></div>
             
         </li>
@@ -2857,15 +2862,12 @@ null if not existing, false if localStorage doesn’t exist</em></li>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-166">&#182;</a>
               </div>
-              <p><strong>Extract parameters from the path of a route</strong></p>
+              <p><strong>Remove heading slash or pound sign from a path, if any</strong></p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>    extractParameters: <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">name, path</span>) </span>{
-      <span class="hljs-keyword">return</span> Backbone.Router.prototype._extractParameters(
-        extendedController[name].re,
-        <span class="hljs-keyword">this</span>.stripHeadingSlash(path)
-      );
+            <div class="content"><div class='highlight'><pre>    stripHeadingSlash: <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">path</span>) </span>{
+      <span class="hljs-keyword">return</span> path.replace(re.headingSlash, <span class="hljs-string">''</span>);
     },</pre></div></div>
             
         </li>
@@ -2902,12 +2904,15 @@ null if not existing, false if localStorage doesn’t exist</em></li>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-169">&#182;</a>
               </div>
-              <p><strong>Transform a route path to a regular expression</strong></p>
+              <p><strong>Extract parameters from the path of a route</strong></p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>    routeToRegExp: <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">path</span>) </span>{
-      <span class="hljs-keyword">return</span> Backbone.Router.prototype._routeToRegExp(path);
+            <div class="content"><div class='highlight'><pre>    extractParameters: <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">name, path</span>) </span>{
+      <span class="hljs-keyword">return</span> Backbone.Router.prototype._extractParameters(
+        extendedController[name].re,
+        <span class="hljs-keyword">this</span>.stripHeadingSlash(path)
+      );
     },</pre></div></div>
             
         </li>
@@ -2944,9 +2949,13 @@ null if not existing, false if localStorage doesn’t exist</em></li>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-172">&#182;</a>
               </div>
-              <p><strong>Original Backbone.Router Methods</strong></p>
+              <p><strong>Transform a route path to a regular expression</strong></p>
 
             </div>
+            
+            <div class="content"><div class='highlight'><pre>    routeToRegExp: <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">path</span>) </span>{
+      <span class="hljs-keyword">return</span> Backbone.Router.prototype._routeToRegExp(path);
+    },</pre></div></div>
             
         </li>
         
@@ -2956,6 +2965,44 @@ null if not existing, false if localStorage doesn’t exist</em></li>
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-173">&#182;</a>
+              </div>
+              <hr>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-174">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-174">&#182;</a>
+              </div>
+              
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-175">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-175">&#182;</a>
+              </div>
+              <p><strong>Original Backbone.Router Methods</strong></p>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-176">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-176">&#182;</a>
               </div>
               <p>Listen to original Backbone.Router events</p>
 
@@ -2968,11 +3015,11 @@ null if not existing, false if localStorage doesn’t exist</em></li>
         </li>
         
         
-        <li id="section-174">
+        <li id="section-177">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-174">&#182;</a>
+                <a class="pilcrow" href="#section-177">&#182;</a>
               </div>
               <p>Stop listening to original Backbone.Router events</p>
 
