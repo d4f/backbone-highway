@@ -97,8 +97,11 @@
       error403: '403'
     },
 
-    // Local storage key prefix
-    storePrefix: 'backbone-highway',
+    // Local storage
+    store: {
+      prefix: 'backbone-highway',
+      separator: ':'
+    },
 
     // Print out debug information
     debug: false,
@@ -783,8 +786,21 @@
 
       // Store the path for next init after page reload
       if (localStorage) {
-        localStorage.setItem('backbone-router:path', path);
+        localStorage.setItem(
+          this.getStoreKey('path'),
+          path
+        );
       }
+    },
+
+    // --------------------------------
+
+    // **Generate a complete store key using the prefix in the options**
+    getStoreKey: function (key) {
+      // Retrieve store options
+      var store = this.options.store;
+      // Concatenate prefix, separator and key
+      return store.prefix + store.separator + key;
     },
 
     // --------------------------------
