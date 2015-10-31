@@ -55,7 +55,8 @@
 
   var re = {
     headingSlash: /^(\/|#)/,
-    trailingSlash: /\/$/
+    trailingSlash: /\/$/,
+    parentheses: /\(|\)/g
   };
 
   // --------------------------------
@@ -769,8 +770,8 @@
         })
         // Join the parts with slashes
         .join('/')
-        // Remove opening parentheses in case of optional parameters
-        .replace('(', '')
+        // Remove opening/closing parentheses in case of optional parameters
+        .replace(re.parentheses, '')
         // Remove trailing slash
         .replace(re.trailingSlash, '');
     },
