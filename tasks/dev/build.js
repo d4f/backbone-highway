@@ -3,6 +3,7 @@ module.exports = function (grunt) {
 
   grunt.registerTask('build', [
     'lint',
+    'test',
     'uglify'
   ]);
 };

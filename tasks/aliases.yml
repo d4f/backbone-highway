@@ -1,14 +1,19 @@
 default:
-    - lint
+  - lint
+test:
+  - karma:single:start
+test-watch:
+  - karma:unit:start
+  - watch
 lint:
-    - jshint
-    - jscs
-    - lintspaces
+  - jshint
+  - jscs
+  - lintspaces
 lint:code:
-    - jshint:code
-    - jscs:code
-    - lintspaces:code
+  - jshint:code
+  - jscs:code
+  - lintspaces:code
 lint:grunt:
-    - jshint:grunt
-    - jscs:grunt
-    - lintspaces:grunt
+  - jshint:grunt
+  - jscs:grunt
+  - lintspaces:grunt

@@ -11,8 +11,16 @@ module.exports = {
   code: {
     files: [
       '<%= config.src %>/**/*.js',
+      '<%= config.test %>/**/*.spec.js',
       'assets/**/*.js'
     ],
     tasks: ['lint:code']
+  },
+  tests: {
+    files: [
+      '<%= config.src %>/**/*.js',
+      '<%= config.test %>/**/*.spec.js'
+    ],
+    tasks: ['karma:unit:run']
   }
 };

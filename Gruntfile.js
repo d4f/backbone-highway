@@ -10,10 +10,7 @@ module.exports = function (grunt) {
     tmp: '.tmp',
     dist: 'dist',
     src: 'src',
-    // testFiles: 'test/**/**/*.js',
-    // img: 'img/**/*.{png,jpg,jpeg,gif,webp}',
-    // tplDir: 'js/templates/',
-    // tplPath: this.tplDir + '*.{ejs,mustache,hbs}',
+    test: 'test/spec'
   };
 
   var config = {
@@ -32,84 +29,6 @@ module.exports = function (grunt) {
     configPath: [tasksDir, path.join(tasksDir, 'extra')],
     overridePath: path.join(tasksDir, grunt.option('target') || 'dev'),
     init: true,
-    config: config,
-    // jitGrunt: {
-    //   staticMappings: {
-    //     useminPrepare: 'grunt-usemin'
-    //   }
-    // }
+    config: config
   });
 };
-
-// module.exports = function (grunt) {
-
-//   // Project configuration
-//   grunt.initConfig({
-
-//     // Retrieve package.json file for project info
-//     "pkg": grunt.file.readJSON("package.json"),
-
-//     /**
-//      * ====================================================================
-//      *
-//      *               Validate javascript syntax with jshint
-//      *
-//      * ====================================================================
-//      */
-//     "jshint": {
-//       "all": [
-//         "Gruntfile.js",
-//         "src/backbone.router.js"
-//       ]
-//     },
-
-//     /**
-//      * ====================================================================
-//      *
-//      *              Minify concatenated javascript files
-//      *
-//      * ====================================================================
-//      */
-//     "uglify": {
-//       // Minification options
-//       "options": {
-//         "mangle": false
-//       },
-
-//       // Task
-//       "js": {
-//         "files": {
-
-//         }
-//       }
-//     },
-
-//     /**
-//      * ====================================================================
-//      *
-//      *           Watch added/removed files and re-execute tasks
-//      *
-//      * ====================================================================
-//      */
-//     "watch": {
-//       // Source files to observe
-//       "files": [
-//         "<%= jshint.all %>"
-//       ],
-
-//       // Tasks to be run when files change
-//       "tasks": [
-//         "jshint"
-//       ]
-
-//     }
-//   });
-
-//   // Load plugins
-//   grunt.loadNpmTasks('grunt-contrib-jshint');
-//   grunt.loadNpmTasks("grunt-contrib-uglify");
-//   grunt.loadNpmTasks("grunt-contrib-watch");
-
-//   // Declare default task
-//   grunt.registerTask("default", ["jshint"]);
-// };

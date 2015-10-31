@@ -249,7 +249,8 @@ like Node.</p>
 
   <span class="hljs-keyword">var</span> re = {
     headingSlash: <span class="hljs-regexp">/^(\/|#)/</span>,
-    trailingSlash: <span class="hljs-regexp">/\/$/</span>
+    trailingSlash: <span class="hljs-regexp">/\/$/</span>,
+    parentheses: <span class="hljs-regexp">/\(|\)/g</span>
   };</pre></div></div>
             
         </li>
@@ -455,11 +456,14 @@ like Node.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-27">&#182;</a>
               </div>
-              <p>Local storage key prefix</p>
+              <p>Local storage</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>    storePrefix: <span class="hljs-string">'backbone-highway'</span>,</pre></div></div>
+            <div class="content"><div class='highlight'><pre>    store: {
+      prefix: <span class="hljs-string">'backbone-highway'</span>,
+      separator: <span class="hljs-string">':'</span>
+    },</pre></div></div>
             
         </li>
         
@@ -2641,11 +2645,11 @@ so if there is not more than one argument use the passed arguments instead</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-151">&#182;</a>
               </div>
-              <p>Remove opening parentheses in case of optional parameters</p>
+              <p>Remove opening/closing parentheses in case of optional parameters</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>        .replace(<span class="hljs-string">'('</span>, <span class="hljs-string">''</span>)</pre></div></div>
+            <div class="content"><div class='highlight'><pre>        .replace(re.parentheses, <span class="hljs-string">''</span>)</pre></div></div>
             
         </li>
         
@@ -2734,7 +2738,10 @@ so if there is not more than one argument use the passed arguments instead</p>
             </div>
             
             <div class="content"><div class='highlight'><pre>      <span class="hljs-keyword">if</span> (localStorage) {
-        localStorage.setItem(<span class="hljs-string">'backbone-router:path'</span>, path);
+        localStorage.setItem(
+          <span class="hljs-keyword">this</span>.getStoreKey(<span class="hljs-string">'path'</span>),
+          path
+        );
       }
     },</pre></div></div>
             
@@ -2772,6 +2779,77 @@ so if there is not more than one argument use the passed arguments instead</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-160">&#182;</a>
               </div>
+              <p><strong>Generate a complete store key using the prefix in the options</strong></p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    getStoreKey: <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">key</span>) </span>{</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-161">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-161">&#182;</a>
+              </div>
+              <p>Retrieve store options</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      <span class="hljs-keyword">var</span> store = <span class="hljs-keyword">this</span>.options.store;</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-162">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-162">&#182;</a>
+              </div>
+              <p>Concatenate prefix, separator and key</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      <span class="hljs-keyword">return</span> store.prefix + store.separator + key;
+    },</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-163">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-163">&#182;</a>
+              </div>
+              <hr>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-164">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-164">&#182;</a>
+              </div>
+              
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-165">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-165">&#182;</a>
+              </div>
               <p><strong>Retrieve the stored route if any</strong></p>
 <ul>
 <li><em>@return {String} The currenlty stored route as a string,
@@ -2787,11 +2865,11 @@ null if not existing, false if localStorage doesn’t exist</em></li>
         </li>
         
         
-        <li id="section-161">
+        <li id="section-166">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-161">&#182;</a>
+                <a class="pilcrow" href="#section-166">&#182;</a>
               </div>
               <hr>
 
@@ -2800,11 +2878,11 @@ null if not existing, false if localStorage doesn’t exist</em></li>
         </li>
         
         
-        <li id="section-162">
+        <li id="section-167">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-162">&#182;</a>
+                <a class="pilcrow" href="#section-167">&#182;</a>
               </div>
               
             </div>
@@ -2812,11 +2890,11 @@ null if not existing, false if localStorage doesn’t exist</em></li>
         </li>
         
         
-        <li id="section-163">
+        <li id="section-168">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-163">&#182;</a>
+                <a class="pilcrow" href="#section-168">&#182;</a>
               </div>
               <p><strong>Clear the stored route</strong></p>
 
@@ -2831,11 +2909,11 @@ null if not existing, false if localStorage doesn’t exist</em></li>
         </li>
         
         
-        <li id="section-164">
+        <li id="section-169">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-164">&#182;</a>
+                <a class="pilcrow" href="#section-169">&#182;</a>
               </div>
               <hr>
 
@@ -2844,11 +2922,11 @@ null if not existing, false if localStorage doesn’t exist</em></li>
         </li>
         
         
-        <li id="section-165">
+        <li id="section-170">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-165">&#182;</a>
+                <a class="pilcrow" href="#section-170">&#182;</a>
               </div>
               
             </div>
@@ -2856,11 +2934,11 @@ null if not existing, false if localStorage doesn’t exist</em></li>
         </li>
         
         
-        <li id="section-166">
+        <li id="section-171">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-166">&#182;</a>
+                <a class="pilcrow" href="#section-171">&#182;</a>
               </div>
               <p><strong>Remove heading slash or pound sign from a path, if any</strong></p>
 
@@ -2873,11 +2951,11 @@ null if not existing, false if localStorage doesn’t exist</em></li>
         </li>
         
         
-        <li id="section-167">
+        <li id="section-172">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-167">&#182;</a>
+                <a class="pilcrow" href="#section-172">&#182;</a>
               </div>
               <hr>
 
@@ -2886,11 +2964,11 @@ null if not existing, false if localStorage doesn’t exist</em></li>
         </li>
         
         
-        <li id="section-168">
+        <li id="section-173">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-168">&#182;</a>
+                <a class="pilcrow" href="#section-173">&#182;</a>
               </div>
               
             </div>
@@ -2898,11 +2976,11 @@ null if not existing, false if localStorage doesn’t exist</em></li>
         </li>
         
         
-        <li id="section-169">
+        <li id="section-174">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-169">&#182;</a>
+                <a class="pilcrow" href="#section-174">&#182;</a>
               </div>
               <p><strong>Extract parameters from the path of a route</strong></p>
 
@@ -2918,80 +2996,13 @@ null if not existing, false if localStorage doesn’t exist</em></li>
         </li>
         
         
-        <li id="section-170">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-170">&#182;</a>
-              </div>
-              <hr>
-
-            </div>
-            
-        </li>
-        
-        
-        <li id="section-171">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-171">&#182;</a>
-              </div>
-              
-            </div>
-            
-        </li>
-        
-        
-        <li id="section-172">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-172">&#182;</a>
-              </div>
-              <p><strong>Transform a route path to a regular expression</strong></p>
-
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>    routeToRegExp: <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">path</span>) </span>{
-      <span class="hljs-keyword">return</span> Backbone.Router.prototype._routeToRegExp(path);
-    },</pre></div></div>
-            
-        </li>
-        
-        
-        <li id="section-173">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-173">&#182;</a>
-              </div>
-              <hr>
-
-            </div>
-            
-        </li>
-        
-        
-        <li id="section-174">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-174">&#182;</a>
-              </div>
-              
-            </div>
-            
-        </li>
-        
-        
         <li id="section-175">
             <div class="annotation">
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-175">&#182;</a>
               </div>
-              <p><strong>Original Backbone.Router Methods</strong></p>
+              <hr>
 
             </div>
             
@@ -3004,6 +3015,73 @@ null if not existing, false if localStorage doesn’t exist</em></li>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-176">&#182;</a>
               </div>
+              
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-177">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-177">&#182;</a>
+              </div>
+              <p><strong>Transform a route path to a regular expression</strong></p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    routeToRegExp: <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">path</span>) </span>{
+      <span class="hljs-keyword">return</span> Backbone.Router.prototype._routeToRegExp(path);
+    },</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-178">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-178">&#182;</a>
+              </div>
+              <hr>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-179">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-179">&#182;</a>
+              </div>
+              
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-180">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-180">&#182;</a>
+              </div>
+              <p><strong>Original Backbone.Router Methods</strong></p>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-181">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-181">&#182;</a>
+              </div>
               <p>Listen to original Backbone.Router events</p>
 
             </div>
@@ -3015,11 +3093,11 @@ null if not existing, false if localStorage doesn’t exist</em></li>
         </li>
         
         
-        <li id="section-177">
+        <li id="section-182">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-177">&#182;</a>
+                <a class="pilcrow" href="#section-182">&#182;</a>
               </div>
               <p>Stop listening to original Backbone.Router events</p>
 

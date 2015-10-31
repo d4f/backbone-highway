@@ -7,7 +7,7 @@ module.exports = {
   code: {
     files: {
       'dist/backbone.highway.min.js': [
-        'src/backbone.highway.js'
+        '<%= config.src %>/**/*.js'
       ]
     }
   }

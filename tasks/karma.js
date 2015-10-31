@@ -7,7 +7,7 @@ module.exports = {
     background: true,
     captureTimeout: 6000
   },
-  unittest: {
+  single: {
     reporters: ['mocha'],
     singleRun: true,
     captureTimeout: 6000
