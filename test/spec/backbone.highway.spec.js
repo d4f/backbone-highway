@@ -104,5 +104,12 @@ define([
         expect(args[0]).to.deep.equal('42');
       });
     });
+
+    describe('routeToRegExp', function () {
+      it('should generate a regular expression from a path', function () {
+        var re = router.routeToRegExp('users/:id');
+        expect(re instanceof RegExp).to.be.ok;
+      });
+    });
   });
 });
