@@ -810,7 +810,9 @@
     // - *@return {String} The currenlty stored route as a string,
     //   null if not existing, false if localStorage doesn't exist*
     getStoredRoute: function () {
-      return localStorage && localStorage.getItem('backbone-router:path');
+      return localStorage && localStorage.getItem(
+        this.getStoreKey('path')
+      );
     },
 
     // --------------------------------
@@ -818,7 +820,9 @@
     // **Clear the stored route**
     clearStore: function () {
       if (localStorage) {
-        localStorage.removeItem('backbone-router:path');
+        localStorage.removeItem(
+          this.getStoreKey('path')
+        );
       }
     },
 

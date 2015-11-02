@@ -85,5 +85,24 @@ define([
         router.getStoreKey(key).should.deep.equal(store.prefix + store.separator + key);
       });
     });
+
+    describe('extractParameters', function () {
+      before(function () {
+        router.route('user.detail', {
+          path: '/users/:id',
+          action: function () {}
+        });
+        router.start({dispatcher: dispatcher});
+      });
+
+      it('should extract parameters from a path', function () {
+        var args = router.extractParameters('user.detail', '/users/42');
+        expect(
+          _.isArray(args)
+        ).to.be.ok;
+
+        expect(args[0]).to.deep.equal('42');
+      });
+    });
   });
 });
