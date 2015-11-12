@@ -18,9 +18,9 @@ require.config({
     test: '../test/spec',
 
     jquery: '../demo/assets/vendor/jquery/dist/jquery.min',
-    underscore: '../demo/assets/vendor/underscore/underscore-min',
-    backbone: '../demo/assets/vendor/backbone/backbone-min',
-    marionette: '../demo/assets/vendor/backbone.marionette/lib/backbone.marionette.min'
+    underscore: '../demo/assets/vendor/underscore/underscore',
+    backbone: '../demo/assets/vendor/backbone/backbone',
+    marionette: '../demo/assets/vendor/backbone.marionette/lib/backbone.marionette'
   },
 
   deps: [

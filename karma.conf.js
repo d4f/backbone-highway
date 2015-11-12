@@ -20,9 +20,9 @@ module.exports = function (config) {
 
       // bower components
       {pattern: 'demo/assets/vendor/jquery/dist/jquery.min.js', included: false},
-      {pattern: 'demo/assets/vendor/underscore/underscore-min.js', included: false},
-      {pattern: 'demo/assets/vendor/backbone/backbone-min.js', included: false},
-      {pattern: 'demo/assets/vendor/backbone.marionette/lib/backbone.marionette.min.js', included: false},
+      {pattern: 'demo/assets/vendor/underscore/*.js', included: false},
+      {pattern: 'demo/assets/vendor/backbone/*.js', included: false},
+      {pattern: 'demo/assets/vendor/backbone.marionette/lib/*.js', included: false},
 
       {pattern: 'test/spec/**/*.spec.js', included: false}
     ],

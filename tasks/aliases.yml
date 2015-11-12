@@ -4,7 +4,7 @@ test:
   - karma:single:start
 test-watch:
   - karma:unit:start
-  - watch
+  - watch:tests
 lint:
   - jshint
   - jscs

@@ -34,6 +34,7 @@
         "beforeEach": true,
         "afterEach": true,
         "expect": true,
+        "should": true,
         "Backbone": true,
         "app": true,
         "_": true,
