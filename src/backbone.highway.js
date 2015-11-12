@@ -117,7 +117,10 @@
 
   // **Backbone.Highway commander**
   // - @type {Object}
-  Backbone.Highway = {
+  var Highway = function Highway () {};
+
+  // Highway prototype
+  Highway.fn = Highway.prototype = {
 
     // Which event aggregator to use for the triggers listed in each routes (mandatory)
     dispatcher: null,
@@ -129,8 +132,6 @@
     // **Initialize the Backbone.Highway router**
     // - *@param {Object} **options** - Object to override default router configuration*
     start: function (options) {
-      var self = this;
-
       // Extend default options
       this.options = _.extend({}, defaultOptions, options);
 
@@ -142,15 +143,13 @@
       this.dispatcher = this.options.dispatcher;
 
       // Ensure that the dispatcher has the expected method.
-      // e.g. The method "trigger" of Backbone.Events
-      var methods = _.filter(['trigger'], function (method) {
-        return _.isFunction(self.dispatcher[method]);
-      });
+      // i.e. The method "trigger" of Backbone.Events
+      var hasCorrectDispatcher = this.dispatcher && _.isFunction(this.dispatcher.trigger);
 
       // Throw an error if the given event aggregator does not seem to be compliant
-      if (_.isEmpty(methods)) {
-        throw '[Backbone.Highway.start] Missing a correct' +
-          'dispatcher object, needs to be an instance of Backbone.Events';
+      if (!hasCorrectDispatcher) {
+        throw new ReferenceError('[Backbone.Highway.start] Missing a correct ' +
+          'dispatcher object, needs to be an instance of Backbone.Events');
       }
 
       this.options.log('[Backbone.Highway.start] Starting router');
@@ -163,49 +162,7 @@
       // Initialize router
       router = new Router();
 
-      // Check if Backbone.History is already enabled
-      if (!Backbone.History.started) {
-        this.options.log('[Backbone.Highway.start] Starting Backbone.history (' +
-          (this.options.root ? 'root: ' + this.options.root : 'empty root url') + ')');
-
-        // Init Backbone.history
-        var existingRoute = Backbone.history.start({
-          pushState: this.options.pushState,
-          root: this.options.root,
-          hashChange: this.options.hashChange,
-          silent: this.options.silent
-        });
-
-        // Trigger a 404 if the current route doesn't exist.
-        // Ensure the 'silent' options isn't activated
-        if (!existingRoute && !this.options.silent) {
-          this.options.log('[Backbone.Highway] Inexisting load route');
-
-          this.processControllers({
-            name: this.options.routes.error404,
-            args: [
-              Backbone.history.getFragment()
-            ]
-          });
-        }
-        else {
-          // Check if a route was stored while requiring a user login
-          var storedRoute = this.getStoredRoute();
-
-          // If a route is stored, use it!
-          if (storedRoute) {
-            this.options.log('[Backbone.Highway] Loaded stored route: ' + storedRoute);
-
-            // Clear stored route
-            this.clearStore();
-
-            // Redirect to stored route
-            this.go({
-              path: storedRoute
-            });
-          }
-        }
-      }
+      this._startHistory();
     },
 
     // --------------------------------
@@ -297,14 +254,18 @@
         controllerExtension = {},
         currentName = name;
 
+      if (!_.isString(name)) {
+        throw new ReferenceError('[Backbone.Highway.route] Route name should be a string');
+      }
+
       // Throw an exception, if def is an empty object nothing will work
       if (!_.isObject(def)) {
-        throw '[Backbone.Highway.route] Route definition needs to be an object';
+        throw new ReferenceError('[Backbone.Highway.route] Route definition needs to be an object');
       }
 
       // Remove the first slash in the path for the Backbone router
       if (def.path) {
-        def.path = this.stripHeadingSlash(def.path);
+        def.path = this._stripHeadingSlash(def.path);
       }
 
       // Check if a controller has already registered this path
@@ -318,7 +279,7 @@
 
         // Create a placeholder for the route controllers
         extendedController[name] = {
-          re: _.isString(def.path) ? this.routeToRegExp(def.path) : null,
+          re: _.isString(def.path) ? this._routeToRegExp(def.path) : null,
           wrappers: []
         };
 
@@ -327,7 +288,7 @@
 
         // Create a wrapping controller method to permit for multiple route/controller bindings
         controllerExtension[name] = function () {
-          self.processControllers({name: name, args: arguments});
+          self._processControllers({name: name, args: arguments});
         };
 
         // Apply the new routes
@@ -336,7 +297,7 @@
         // Apply the new controllers
         _.extend(controller, controllerExtension);
 
-        if (router !== null) {
+        if (router !== null && def.path) {
           // Add route dynamically since the router has already been started
           router.route(def.path, name, controllerExtension[name]);
         }
@@ -363,10 +324,10 @@
             self.options.log('[Backbone.Highway] Secured page, redirecting to login');
 
             // Store current route in case login reloads the page
-            self.storeCurrentRoute();
+            self._storeCurrentRoute();
 
             // Redirect to login
-            self.processControllers({name: self.options.routes.login});
+            self._processControllers({name: self.options.routes.login});
           }
           else {
             self.options.log('[Backbone.Highway] Skipping route "' + currentName +
@@ -375,12 +336,7 @@
             // Execute 403 controller
             //
             // @todo Apply better/finer logic for when the 403 controller should be executed
-            this.processControllers({
-              name: this.options.routes.error403,
-              args: [
-                Backbone.history.getFragment()
-              ]
-            });
+            this._httpError(403);
           }
           return false;
         }
@@ -391,7 +347,7 @@
           self.options.log('[Backbone.Highway] Caught alias route: "' + currentName + '" >> "' + def.action + '"');
 
           // Execute alias route
-          self.processControllers({name: def.action, args: args}, true);
+          self._processControllers({name: def.action, args: args}, true);
 
           return false;
         }
@@ -401,7 +357,7 @@
 
         // Process pre-triggers
         if (!_.isEmpty(def.before)) {
-          self.processTriggers(def.before, args);
+          self._processTriggers(def.before, args);
         }
 
         // Execute route main action
@@ -411,8 +367,10 @@
 
         // Process post-triggers
         if (!_.isEmpty(def.after)) {
-          self.processTriggers(def.after, args);
+          self._processTriggers(def.after, args);
         }
+
+        return true;
       };
 
       // Push the new controller name to the route name's list
@@ -431,6 +389,8 @@
           wrappers: [controllerWrapper]
         };
       }
+
+      return true;
     },
 
     // --------------------------------
@@ -441,7 +401,7 @@
     // - @return {Boolean} Will return false if the routing was cancelled, else true
     go: function (name, args, options) {
       var route = null,
-        path = null;
+          path = null;
 
       // Check if an object is given instead of a string
       if (_.isObject(name)) {
@@ -452,7 +412,7 @@
         name = route.name;
 
         // Transfer route path and remove first slash
-        path = _.isString(route.path) && this.stripHeadingSlash(route.path);
+        path = _.isString(route.path) && this._stripHeadingSlash(route.path);
 
         // Transfer args
         args = route.args || args;
@@ -465,30 +425,24 @@
 
       // Check if route exists
       if (
-        (name && !this.exists({name: name})) ||
-        (path && !this.exists({path: path}))
+        (name && !this._exists({name: name})) ||
+        (path && !this._exists({path: path}))
       ) {
         this.options.log('[Backbone.Highway] Inexisting route name: ' + name);
 
         // Execute 404 controller
-        this.processControllers({
-          name: this.options.routes.error404,
-          args: [
-            Backbone.history.getFragment()
-          ]
-        });
+        this._httpError(404);
       }
       else {
-        var continueProcess = true,
-          self = this;
+        var continueProcess = true;
 
-        _.forEach(this.currentRoutes, function (route) {
+        _.forEach(this.currentRoutes, _.bind(function (route) {
           // Check if the previous route has a close controller
           if (_.isFunction(closeControllers[route]) && name !== route) {
             // Execute close controller passing current route data and retrieve result
-            continueProcess = closeControllers[route].call(self, name, args, options);
+            continueProcess = closeControllers[route].call(this, name, args, options);
           }
-        });
+        }, this));
 
         // If controller returned false, cancel go process
         if (!continueProcess) {
@@ -499,14 +453,11 @@
         this.currentRoutes = [];
 
         // Extend default router navigate options
-        options = _.extend({
-          trigger: true,
-          replace: false
-        }, options);
+        options = _.extend({trigger: true, replace: false}, options);
 
         if (!path) {
           // Retrieve route path passing arguments
-          path = this.path(name, args);
+          path = this._path(name, args);
         }
 
         if (path !== false) {
@@ -522,19 +473,19 @@
 
     // **Process a list of triggers that can be declared as a simple string or an object**
     // - @param {Array} **triggers** The list of triggers to process*
-    processTriggers: function (triggers, routeArgs) {
+    _processTriggers: function (triggers, routeArgs) {
       var self = this;
 
       if (_.isArray(triggers)) {
         _.forEach(triggers, function (trigger) {
-          self.processTrigger(trigger, routeArgs);
+          self._processTrigger(trigger, routeArgs);
         });
       }
       else if (_.isString(triggers) || _.isObject(triggers)) {
-        this.processTrigger(triggers, routeArgs);
+        this._processTrigger(triggers, routeArgs);
       }
       else {
-        this.options.log('[Backbone.Highway.processTriggers] Bad triggers format, needs to be a string,' +
+        this.options.log('[Backbone.Highway._processTriggers] Bad triggers format, needs to be a string,' +
           ' an object, an array of strings or an array of objects');
       }
     },
@@ -543,17 +494,17 @@
 
     // **Process a single trigger**
     // - @param {Mixed} **trigger** String or Object describing the trigger*
-    processTrigger: function (trigger, routeArgs) {
+    _processTrigger: function (trigger, routeArgs) {
       if (_.isObject(trigger)) {
         // Retrieve the name of the trigger if it's declared using a path
         if (trigger.path) {
-          trigger.name = this.name(trigger.path);
+          trigger.name = this._name(trigger.path);
         }
 
         // Check if the trigger is marked for caching
         if (trigger.cache) {
           // Find cached trigger object
-          var cache = this.findCachedTrigger(trigger);
+          var cache = this._findCachedTrigger(trigger);
 
           // Has it already been executed ?
           if (cache.done) {
@@ -576,8 +527,8 @@
         }
 
         // If the trigger is actually a controller execute it
-        if (trigger.name && this.exists({name: trigger.name})) {
-          this.processControllers(trigger, true);
+        if (trigger.name && this._exists({name: trigger.name})) {
+          this._processControllers(trigger, true);
           return;
         }
 
@@ -594,8 +545,8 @@
       }
       else if (_.isString(trigger)) {
         // Check if the trigger is actually a declared route
-        if (this.exists({name: trigger})) {
-          this.processControllers({
+        if (this._exists({name: trigger})) {
+          this._processControllers({
             name: trigger,
             args: routeArgs
           }, true);
@@ -606,7 +557,7 @@
         }
       }
       else {
-        this.options.log('[Backbone.Highway.processTrigger] Bad trigger format, ' +
+        this.options.log('[Backbone.Highway._processTrigger] Bad trigger format, ' +
           'needs to be a string or an object, given: ' + typeof trigger);
       }
     },
@@ -616,7 +567,7 @@
     // **Process a list of controllers**
     // - @param {String} **name** The name of the route*
     // - @param {Array} **args** JavaScript arguments array*
-    processControllers: function (def, trigger) {
+    _processControllers: function (def, trigger) {
       var self = this,
           name = def.name,
           args = def.args;
@@ -628,7 +579,7 @@
       if (extendedController[name]) {
         // Extract parameters from path if possible
         if (def.path) {
-          args = this.extractParameters(name, def.path);
+          args = this._extractParameters(name, def.path);
           // Backbone gives [null] for routes without arguments
           // so if there is not more than one argument use the passed arguments instead
           if (args.length === 1 && args[0] === null) {
@@ -650,10 +601,12 @@
           // Execute controller wrapper
           callback.call(self, args, trigger);
         });
+
+        return true;
       }
-      else {
-        this.options.log('[Backbone.Highway.processControllers] Inexisting controller: ' + name);
-      }
+
+      this.options.log('[Backbone.Highway._processControllers] Inexisting controller: ' + name);
+      return false;
     },
 
     // --------------------------------
@@ -661,7 +614,7 @@
     // **Find a cached trigger**
     // - *@param  {Object} **trigger** Trigger object definition*
     // - *@return {Object} Cached trigger object*
-    findCachedTrigger: function (trigger) {
+    _findCachedTrigger: function (trigger) {
       // Try to check if it already exists
       var cache = _.find(cachedTriggers, function (item) {
         return item.name === trigger.name;
@@ -670,7 +623,7 @@
       // If it doesn't, create it and retrieve it again
       if (!cache) {
         cachedTriggers.push(_.extend({}, trigger));
-        return this.findCachedTrigger(trigger);
+        return this._findCachedTrigger(trigger);
       }
 
       return cache;
@@ -679,11 +632,77 @@
     // --------------------------------
 
     // **Clear all cached triggers**
-    clearCache: function () {
+    _clearCache: function () {
       cachedTriggers = [];
     },
 
     // --------------------------------
+
+    // **Start Backbone.History if it hasn't been done yet.**
+    // Will trigger a client-side 404 if the loading route doesn't exist
+    _startHistory: function () {
+      // Check if Backbone.History is already enabled
+      if (!Backbone.History.started) {
+        this.options.log('[Backbone.Highway.start] Starting Backbone.history (' +
+          (this.options.root ? 'root: ' + this.options.root : 'empty root url') + ')');
+
+        // Init Backbone.history
+        var existingRoute = Backbone.history.start({
+          pushState: this.options.pushState,
+          root: this.options.root,
+          hashChange: this.options.hashChange,
+          silent: this.options.silent
+        });
+
+        // Trigger a 404 if the current route doesn't exist.
+        // Ensure the 'silent' options isn't activated
+        if (!existingRoute && !this.options.silent) {
+          this._httpError(404);
+        }
+        else {
+          this._applyStoredRoute();
+        }
+      }
+    },
+
+    // --------------------------------
+
+    // **Trigger an error controller**
+    // - *@param  {Int} **code** Error code to trigger (404|403)*
+    _httpError: function (code) {
+      var url = Backbone.history.getFragment();
+      this.options.log('[Backbone.Highway] Inexisting route: ' + url);
+
+      if (code !== 404 && code !== 403) {
+        throw new Error('[Backbone.Highway] Unhandled http error code: ' + code);
+      }
+
+      return this._processControllers({
+        name: this.options.routes['error' + code],
+        args: [url]
+      });
+    },
+
+    // --------------------------------
+
+    // **Reload the route that was stored before redirecting to login controller**
+    _applyStoredRoute: function () {
+      // Check if a route was stored while requiring a user login
+      var storedRoute = this._getStoredRoute();
+
+      // If a route is stored, use it!
+      if (storedRoute) {
+        this.options.log('[Backbone.Highway] Loaded stored route: ' + storedRoute);
+
+        // Clear stored route
+        this._clearStore();
+
+        // Redirect to stored route
+        this.go({
+          path: storedRoute
+        });
+      }
+    },
 
     // **Retrieve the path of a route by it's name.**
     // - *@param  {String} **routeName**  The route name*
@@ -691,12 +710,12 @@
     // - *@return {String} The route path or false if the route doesn't exist*
     //
     // Pass in optional arguments to be parsed into the path.
-    path: function (routeName, args) {
+    _path: function (routeName, args) {
       var path;
 
       for (path in routes) {
         if (routes[path] === routeName) {
-          return this.parse(path, args);
+          return this._parse(path, args);
         }
       }
 
@@ -708,11 +727,11 @@
     // **Retrieve the name of a route by it's path**
     // - *@param {String} **path**  The route path*
     // - *@return {Mixed} The name of the route, false if it doesn't exist*
-    name: function (path) {
+    _name: function (path) {
       var name;
 
       // Remove first slash
-      path = this.stripHeadingSlash(path);
+      path = this._stripHeadingSlash(path);
 
       // Loop through all the controllers
       for (name in extendedController) {
@@ -730,7 +749,7 @@
     // **Check if a route exists by its name or its path**
     // - *@param  {Object}  **params** Object with a name or path key*
     // - *@return {Boolean} True if route exists else false*
-    exists: function (params) {
+    _exists: function (params) {
       if (!_.isObject(params)) {
         return false;
       }
@@ -739,7 +758,7 @@
         return !_.isUndefined(extendedController[params.name]);
       }
       else if (_.isString(params.path)) {
-        return this.name(params.path);
+        return this._name(params.path);
       }
 
       return false;
@@ -751,7 +770,7 @@
     // - *@param  {String} **path** The path to parse containing argument declarations starting with colons*
     // - *@param  {Array}  **args** List of arguments to inject into the path*
     // - *@return {String}      The path with the arguments injected*
-    parse: function (path, args) {
+    _parse: function (path, args) {
       if (!_.isArray(args) || _.isEmpty(args)) {
         return path;
       }
@@ -779,7 +798,7 @@
     // --------------------------------
 
     // **Store the current pathname in the local storage**
-    storeCurrentRoute: function () {
+    _storeCurrentRoute: function () {
       // Retrieve current path
       var path = Backbone.history.getFragment();
 
@@ -788,16 +807,18 @@
       // Store the path for next init after page reload
       if (localStorage) {
         localStorage.setItem(
-          this.getStoreKey('path'),
+          this._getStoreKey('path'),
           path
         );
+
+        return true;
       }
     },
 
     // --------------------------------
 
     // **Generate a complete store key using the prefix in the options**
-    getStoreKey: function (key) {
+    _getStoreKey: function (key) {
       // Retrieve store options
       var store = this.options.store;
       // Concatenate prefix, separator and key
@@ -809,19 +830,19 @@
     // **Retrieve the stored route if any**
     // - *@return {String} The currenlty stored route as a string,
     //   null if not existing, false if localStorage doesn't exist*
-    getStoredRoute: function () {
+    _getStoredRoute: function () {
       return localStorage && localStorage.getItem(
-        this.getStoreKey('path')
+        this._getStoreKey('path')
       );
     },
 
     // --------------------------------
 
     // **Clear the stored route**
-    clearStore: function () {
+    _clearStore: function () {
       if (localStorage) {
         localStorage.removeItem(
-          this.getStoreKey('path')
+          this._getStoreKey('path')
         );
       }
     },
@@ -829,24 +850,24 @@
     // --------------------------------
 
     // **Remove heading slash or pound sign from a path, if any**
-    stripHeadingSlash: function (path) {
+    _stripHeadingSlash: function (path) {
       return path.replace(re.headingSlash, '');
     },
 
     // --------------------------------
 
     // **Extract parameters from the path of a route**
-    extractParameters: function (name, path) {
+    _extractParameters: function (name, path) {
       return Backbone.Router.prototype._extractParameters(
         extendedController[name].re,
-        this.stripHeadingSlash(path)
+        this._stripHeadingSlash(path)
       );
     },
 
     // --------------------------------
 
     // **Transform a route path to a regular expression**
-    routeToRegExp: function (path) {
+    _routeToRegExp: function (path) {
       return Backbone.Router.prototype._routeToRegExp(path);
     },
 
@@ -856,15 +877,21 @@
 
     // Listen to original Backbone.Router events
     on: function () {
-      router.on.apply(router, arguments);
+      return router && router.on.apply(router, arguments);
     },
 
     // Stop listening to original Backbone.Router events
     off: function () {
-      router.off.apply(router, arguments);
-    }
+      return router && router.off.apply(router, arguments);
+    },
 
+    // Trigger event on original Backbone.Router
+    trigger: function () {
+      return router && router.trigger.apply(router, arguments);
+    }
   };
+
+  Backbone.Highway = new Highway();
 
   return Backbone.Highway;
 }));
