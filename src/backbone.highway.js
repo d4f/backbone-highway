@@ -704,6 +704,8 @@
       }
     },
 
+    // --------------------------------
+
     // **Retrieve the path of a route by it's name.**
     // - *@param  {String} **routeName**  The route name*
     // - *@param  {Array}  **args**       The arguments that need to be injected into the path*
@@ -891,7 +893,11 @@
     }
   };
 
+  // --------------------------------
+
+  // Initialize Backbone.Highway controller instance
   Backbone.Highway = new Highway();
 
+  // Return instance for AMD/Require environments
   return Backbone.Highway;
 }));
