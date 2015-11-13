@@ -172,13 +172,16 @@
     // This method gets as the only parameter a function which will be executed in the router context,
     // therefore, any methods of the router can be called from 'this' inside that function.
     // Typically, only the 'route' method will be used.
-    map: function (routesDefiner) {
-      if (!_.isFunction(routesDefiner)) {
+    map: function (definer) {
+      if (!_.isFunction(definer)) {
         this.options.log('[Backbone.Highway.map] Missing routes definer method as the first param');
+        throw new TypeError(
+          '[Backbone.Highway.map] First and only argument should be a function, instead got ' +
+          (typeof defined)
+        );
       }
-      else {
-        routesDefiner.call(this);
-      }
+
+      return definer.call(this);
     },
 
     // --------------------------------
@@ -412,13 +415,16 @@
         name = route.name;
 
         // Transfer route path and remove first slash
-        path = _.isString(route.path) && this._stripHeadingSlash(route.path);
+        if (_.isString(route.path)) {
+          path = this._stripHeadingSlash(route.path);
+        }
 
         // Transfer args
         args = route.args || args;
       }
 
-      if (!name && !path) {
+      // FIXME - go({path: '/'}) will generate an empty path string, thus full-filling this condition when it should not
+      if (!name && path === null) {
         this.options.log('[Backbone.Highway.go] Missing parameters, name or path is necessary');
         return false;
       }
@@ -432,41 +438,42 @@
 
         // Execute 404 controller
         this._httpError(404);
+
+        return false;
       }
-      else {
-        var continueProcess = true;
 
-        _.forEach(this.currentRoutes, _.bind(function (route) {
-          // Check if the previous route has a close controller
-          if (_.isFunction(closeControllers[route]) && name !== route) {
-            // Execute close controller passing current route data and retrieve result
-            continueProcess = closeControllers[route].call(this, name, args, options);
-          }
-        }, this));
+      var continueProcess = true;
 
-        // If controller returned false, cancel go process
-        if (!continueProcess) {
-          return false;
+      _.forEach(this.currentRoutes, _.bind(function (route) {
+        // Check if the previous route has a close controller
+        if (_.isFunction(closeControllers[route]) && name !== route) {
+          // Execute close controller passing current route data and retrieve result
+          continueProcess = closeControllers[route].call(this, name, args, options);
         }
+      }, this));
 
-        // Re-initialize currentRoutes storage
-        this.currentRoutes = [];
-
-        // Extend default router navigate options
-        options = _.extend({trigger: true, replace: false}, options);
-
-        if (!path) {
-          // Retrieve route path passing arguments
-          path = this._path(name, args);
-        }
-
-        if (path !== false) {
-          // Navigate the Backbone.Router
-          router.navigate(path, options);
-        }
-
-        return true;
+      // If controller returned false, cancel go process
+      if (!continueProcess) {
+        return false;
       }
+
+      // Re-initialize currentRoutes storage
+      this.currentRoutes = [];
+
+      // Extend default router navigate options
+      options = _.extend({trigger: true, replace: false}, options);
+
+      if (!path) {
+        // Retrieve route path passing arguments
+        path = this._path(name, args);
+      }
+
+      if (path !== false) {
+        // Navigate the Backbone.Router
+        router.navigate(path, options);
+      }
+
+      return true;
     },
 
     // --------------------------------

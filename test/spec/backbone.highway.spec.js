@@ -9,12 +9,30 @@ define([
 
   var dispatcher = _.extend({}, Backbone.Events);
 
+  var options = {
+    allowClose: true
+  };
+
   before(function () {
+    router.route('home', {
+      path: '/',
+      action: function () {}
+    });
+    router.route('settings', {
+      path: '/settings',
+      action: function () {},
+      close: function () {
+        return options.allowClose;
+      }
+    });
     router.route('users.detail', {
       path: '/users/:id',
       action: function () {}
     });
-    router.start({dispatcher: dispatcher});
+    router.start({
+      dispatcher: dispatcher,
+      pushState: false
+    });
   });
 
   describe('Exposed object', function () {
@@ -43,6 +61,18 @@ define([
       });
     });
 
+    describe('map', function () {
+      it('should throw a TypeError if the first argument is not a function', function () {
+        var fn = _.bind(router.map, router);
+        expect(fn).to.throw(TypeError, /should be a function/);
+      });
+
+      it('should execute given definer function', function () {
+        var callback = function () { return true; };
+        router.map(callback).should.be.true;
+      });
+    });
+
     describe('route', function () {
       it('should throw a ReferenceError if the name is not a string', function () {
         var fn = _.bind(router.route, router, 1337);
@@ -52,6 +82,38 @@ define([
       it('should throw a ReferenceError if the route definition is not an object', function () {
         var fn = _.bind(router.route, router, 'bad.definition', 500);
         expect(fn).to.throw(ReferenceError, /needs to be an object/);
+      });
+    });
+
+    describe('go', function () {
+      it('should accept a route name', function () {
+        router.go('home').should.be.true;
+      });
+
+      it('should accept a route object with a name', function () {
+        router.go({name: 'home'}).should.be.true;
+      });
+
+      it('should accept a route object with a path', function () {
+        router.go({path: '/'}).should.be.true;
+      });
+
+      it('should change the url fragment', function () {
+        router.go('home').should.be.true;
+        Backbone.history.getFragment().should.equal('');
+
+        router.go({path: '/users/42'}).should.be.true;
+        Backbone.history.getFragment().should.equal('users/42');
+      });
+
+      it('should get allowed or blocked by the close controller of a route', function () {
+        router.go('settings');
+
+        options.allowClose = false;
+        router.go('home').should.be.false;
+
+        options.allowClose = true;
+        router.go('home').should.be.true;
       });
     });
   });
