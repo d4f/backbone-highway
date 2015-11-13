@@ -5,6 +5,8 @@ test:
 test-watch:
   - karma:unit:start
   - watch:tests
+test-ci:
+  - karma:ci:start
 lint:
   - jshint
   - jscs

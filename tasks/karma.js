@@ -30,10 +30,10 @@ module.exports = {
   //     }
   //   }
   // },
-  // ci: {
-  //   reporters: 'dots',
-  //   browsers: ['PhantomJS'],
-  //   captureTimeout: 5000,
-  //   singleRun: true
-  // }
+  ci: {
+    reporters: 'dots',
+    browsers: ['PhantomJS'],
+    captureTimeout: 5000,
+    singleRun: true
+  }
 };
