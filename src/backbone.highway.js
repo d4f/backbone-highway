@@ -509,19 +509,8 @@
         }
 
         // Check if the trigger is marked for caching
-        if (trigger.cache) {
-          // Find cached trigger object
-          var cache = this._findCachedTrigger(trigger);
-
-          // Has it already been executed ?
-          if (cache.done) {
-            this.options.log('[Backbone.Highway] Trigger [ ' +
-              (trigger.name || trigger.path) + ' ] has been skipped (cached)');
-            return;
-          }
-
-          // Mark it done
-          cache.done = true;
+        if (trigger.cache && this._cacheTrigger(trigger)) {
+          return;
         }
 
         // Wrap the given parameter in an array
@@ -634,6 +623,28 @@
       }
 
       return cache;
+    },
+
+    // --------------------------------
+
+    // **Set a triggers cache state**
+    // - *@param  {Object} **trigger** Trigger object definition*
+    // - *@return {Boolean} True if already executed, else false*
+    _cacheTrigger: function (trigger) {
+      // Find cached trigger object
+      var cache = this._findCachedTrigger(trigger);
+
+      // Has it already been executed ?
+      if (cache.done) {
+        this.options.log('[Backbone.Highway] Trigger [ ' +
+          (trigger.name || trigger.path) + ' ] has been skipped (cached)');
+        return true;
+      }
+
+      // Mark it done
+      cache.done = true;
+
+      return false;
     },
 
     // --------------------------------
