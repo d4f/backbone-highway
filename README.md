@@ -1,4 +1,6 @@
 # Routing Backbone with style \o/
+
+[![Build Status](https://travis-ci.org/d4f/backbone-highway.svg?branch=dev)](https://travis-ci.org/d4f/backbone-highway)
 ----
 
 ```Backbone.Highway``` wraps the ```Backbone.Router``` to simplify its use and bring new functionalities
@@ -80,7 +82,7 @@ $(function () {
 ## Start routing
 
 The router has to be started via the ```start``` method.
-It receives an ```options``` object containing at least a ```dispatcher``` 
+It receives an ```options``` object containing at least a ```dispatcher```
 
 Parameters:
 
@@ -428,4 +430,3 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-
