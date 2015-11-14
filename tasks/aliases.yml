@@ -1,9 +1,9 @@
 default:
   - lint
 test:
-  - karma:single:start
+  - karma:once:start
 test-watch:
-  - karma:unit:start
+  - karma:watch:start
   - watch:tests
 test-ci:
   - karma:ci:start

@@ -2,12 +2,12 @@ module.exports = {
   options: {
     configFile: 'karma.conf.js'
   },
-  unit: {
+  watch: {
     reporters: ['mocha'],
     background: true,
     captureTimeout: 6000
   },
-  single: {
+  once: {
     reporters: ['mocha'],
     singleRun: true,
     captureTimeout: 6000

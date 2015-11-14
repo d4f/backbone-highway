@@ -18,6 +18,7 @@
     "build": "grunt build",
     "lint": "grunt lint",
     "test-watch": "grunt test-watch",
+    "test-once": "grunt test",
     "test": "grunt test-ci"
   },
   "devDependencies": {
