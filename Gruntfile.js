@@ -10,7 +10,8 @@ module.exports = function (grunt) {
     tmp: '.tmp',
     dist: 'dist',
     src: 'src',
-    test: 'test/spec'
+    test: 'test/spec',
+    coverage: 'coverage'
   };
 
   var config = {

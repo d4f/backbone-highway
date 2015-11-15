@@ -28,8 +28,7 @@ module.exports = {
         // jshint strict: false
         return browser.toLowerCase().split(/[ /-]/)[0];
       }
-    },
-    // plugins: ['karma-coverage']
+    }
   },
   ci: {
     reporters: 'dots',
