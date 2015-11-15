@@ -12,24 +12,25 @@ module.exports = {
     singleRun: true,
     captureTimeout: 6000
   },
-  // coverage: {
-  //   reporters: ['progress', 'coverage'],
-  //   browsers: ['PhantomJS'],
-  //   captureTimeout: 5000,
-  //   singleRun: true,
-  //   preprocessors: {
-  //     '<%= config.app %>/scripts/**/*.js': ['coverage']
-  //   },
-  //   coverageReporter: {
-  //     type: 'lcov',
-  //     includeAllSources: true,
-  //     dir: 'build/coverage',
-  //     subdir: function (browser) {
-  //       // jshint strict: false
-  //       return browser.toLowerCase().split(/[ /-]/)[0];
-  //     }
-  //   }
-  // },
+  coverage: {
+    reporters: ['progress', 'coverage'],
+    browsers: ['PhantomJS'],
+    captureTimeout: 5000,
+    singleRun: true,
+    preprocessors: {
+      '<%= config.src %>/**/*.js': ['coverage']
+    },
+    coverageReporter: {
+      type: 'lcov',
+      includeAllSources: true,
+      dir: 'coverage',
+      subdir: function (browser) {
+        // jshint strict: false
+        return browser.toLowerCase().split(/[ /-]/)[0];
+      }
+    },
+    // plugins: ['karma-coverage']
+  },
   ci: {
     reporters: 'dots',
     browsers: ['PhantomJS'],
