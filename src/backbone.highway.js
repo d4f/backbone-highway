@@ -798,11 +798,11 @@
       var argIndex = 0;
 
       // Inject passed arguments
-      // - FIXME Replace with a regex : var re = /(?:.*)?((:[^\/]+)+)(?:.*)?/g ?
       return _.map(path.split('/'), function (part) {
           if (part.charAt(0) === ':') {
-            var arg = args[argIndex];
-            argIndex += 1;
+            // jshint -W016
+            var arg = args[argIndex++];
+            // jshint +W016
             return arg;
           }
           return part;

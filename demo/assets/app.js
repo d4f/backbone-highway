@@ -116,6 +116,13 @@
       }
     });
 
+    this.route('splat', {
+      path: '/splat(/p:id)(/name/*path)',
+      action: function () {
+        console.log('Splat route', arguments);
+      }
+    });
+
   });
 
   App.MenuView = Backbone.Marionette.ItemView.extend({

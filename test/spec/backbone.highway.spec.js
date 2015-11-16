@@ -29,6 +29,10 @@ define([
       path: '/users/:id',
       action: function () {}
     });
+    router.route('splat', {
+      path: '/splat/*',
+      action: function () {}
+    });
     router.start({
       dispatcher: dispatcher,
       pushState: false
@@ -120,12 +124,6 @@ define([
 
   describe('Private method', function () {
     describe('_parse', function () {
-      // FIXME - Maybe the _parse method should return an error for this
-      it.skip('should return the path as is if no arguments are given or arguments is not an array', function () {
-        router._parse('/test/path').should.equal('/test/path');
-        router._parse('/user/:id', 'meh').should.equal('/user/:id');
-      });
-
       it('should inject parameters into the path', function () {
         router._parse(
           'users/:id',
@@ -150,10 +148,22 @@ define([
         ).should.equal('users/42/edit/email');
       });
 
-      it('should remove optional parameters part from path if no arguments are given', function () {
-        // FIXME - _parse('/user(/:id)') === '/user'
-        // router._parse('/user(/:id)').should.equal('/user');
+      it.skip('should generate an error if required parameters are missing', function () {
+        router._parse('/test/path').should.equal('/test/path');
+        router._parse('/user/:id', 'meh').should.equal('/user/:id');
       });
+
+      it.skip('should remove optional parameters part from path if no arguments are given', function () {
+        // FIXME - _parse('/user(/:id)') === '/user'
+        router._parse('/user(/:id)', [null]).should.equal('/user');
+        router._parse('/user(/:id)').should.equal('/user');
+      });
+
+      it.skip('should handle splat params', function () {});
+
+      it.skip('should allow text to surround a parameter in a URL component', function () {});
+
+      it.skip('should allow for multiple parameters in a single URL component', function () {});
     });
 
     describe('_path', function () {
