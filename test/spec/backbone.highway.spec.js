@@ -55,6 +55,10 @@ define([
     it('should have a `go` method', function () {
       should.exist(router.go);
     });
+
+    it('should have a `clearCache` method', function () {
+      should.exist(router.clearCache);
+    });
   });
 
   describe('Public method', function () {
@@ -118,6 +122,12 @@ define([
 
         options.allowClose = true;
         router.go('home').should.be.true;
+      });
+    });
+
+    describe('clearCache', function () {
+      it('should empty trigger cache memory', function () {
+        router.clearCache().should.be.true;
       });
     });
   });

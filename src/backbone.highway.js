@@ -478,6 +478,14 @@
 
     // --------------------------------
 
+    // **Clear all cached triggers**
+    clearCache: function () {
+      cachedTriggers = [];
+      return true;
+    },
+
+    // --------------------------------
+
     // **Process a list of triggers that can be declared as a simple string or an object**
     // - @param {Array} **triggers** The list of triggers to process*
     _processTriggers: function (triggers, routeArgs) {
@@ -645,13 +653,6 @@
       cache.done = true;
 
       return false;
-    },
-
-    // --------------------------------
-
-    // **Clear all cached triggers**
-    _clearCache: function () {
-      cachedTriggers = [];
     },
 
     // --------------------------------
