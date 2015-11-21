@@ -26,33 +26,27 @@
   var localStorage = window.localStorage;
 
   // Instance holder for the actual Backbone.Router
-  // - *@type {Backbone.Router}*
   var router = null;
 
   // Basic Backbone routes object
-  // - *@type {Object}*
   var routes = {};
 
   // Extended routes definitions
-  // - *@type {Object}*
   var extendedRoutes = {};
 
   // Basic Backbone controller object
-  // - *@type {Object}*
   var controller = {};
 
   // Extended controller
-  // - *@type {Object}*
   var extendedController = {};
 
   // Collection of routes close event
-  // - *@type {Object}*
   var closeControllers = {};
 
   // Trigger cache memory
-  // - *@type {Array}*
   var cachedTriggers = [];
 
+  // Path parsing regular expressions
   var re = {
     headingSlash: /^(\/|#)/,
     trailingSlash: /\/$/,
@@ -66,7 +60,6 @@
   // --------------------------------
 
   // **Default options that are extended when the router is started**
-  // - *@type {Object}*
   var defaultOptions = {
 
     // #### Backbone History options
@@ -120,11 +113,10 @@
   };
 
   // **Backbone.Highway commander**
-  // - @type {Object}
   var Highway = function Highway () {};
 
   // Highway prototype
-  Highway.fn = Highway.prototype = {
+  Highway.prototype = {
 
     // Which event aggregator to use for the triggers listed in each routes (mandatory)
     dispatcher: null,
@@ -163,7 +155,7 @@
         routes: routes
       }));
 
-      // Initialize router
+      // Initialize Backbone.Router instance
       router = new Router();
 
       this._startHistory();
@@ -669,7 +661,7 @@
         this.options.log('[Backbone.Highway.start] Starting Backbone.history (' +
           (this.options.root ? 'root: ' + this.options.root : 'empty root url') + ')');
 
-        // Init Backbone.history
+        // Initialize Backbone.history
         var existingRoute = Backbone.history.start({
           pushState: this.options.pushState,
           root: this.options.root,
