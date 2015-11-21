@@ -147,31 +147,35 @@ define([
       });
 
       it('should inject optional params into the path', function () {
-        router._parse(
-          'users(/:id)',
-          [42]
-        ).should.equal('users/42');
-
-        router._parse(
-          'users/:id(/edit/:part)',
-          [42, 'email']
-        ).should.equal('users/42/edit/email');
+        router._parse('users(/:id)', [42]).should.equal('users/42');
+        router._parse('users/:id(/edit/:part)', [42, 'email']).should.equal('users/42/edit/email');
       });
 
-      it.skip('should generate an error if required parameters are missing', function () {
-        router._parse('/test/path').should.equal('/test/path');
-        router._parse('/user/:id', 'meh').should.equal('/user/:id');
+      it('should generate an error if required parameters are missing', function () {
+        var fn = _.bind(router._parse, router, '/user/:id');
+        expect(fn).to.throw(ReferenceError, /Missing necessary arguments/);
+
+        fn = _.bind(router._parse, router, '/user/:id/edit/:context', [42]);
+        expect(fn).to.throw(ReferenceError, /Missing necessary arguments/);
       });
 
-      it.skip('should remove optional parameters part from path if no arguments are given', function () {
-        // FIXME - _parse('/user(/:id)') === '/user'
-        router._parse('/user(/:id)', [null]).should.equal('/user');
-        router._parse('/user(/:id)').should.equal('/user');
+      it('should remove optional parameters part from path if no arguments are given', function () {
+        var simpleRoute = '/users(/:id)',
+            complicatedRoute = '/users(/:id)(/edit/:context)';
+
+        router._parse(simpleRoute).should.equal('/users');
+        router._parse(simpleRoute, [null]).should.equal('/users');
+
+        router._parse(complicatedRoute, []).should.equal('/users');
+        router._parse(complicatedRoute, [42, null]).should.equal('/users/42');
+        router._parse(complicatedRoute, [42, 'profile']).should.equal('/users/42/edit/profile');
       });
 
       it.skip('should handle splat params', function () {});
 
-      it.skip('should allow text to surround a parameter in a URL component', function () {});
+      it('should allow text to surround a parameter in a URL component', function () {
+        router._parse('/article/:name/p:number', ['title', 5]).should.equal('/article/title/p5');
+      });
 
       it.skip('should allow for multiple parameters in a single URL component', function () {});
     });

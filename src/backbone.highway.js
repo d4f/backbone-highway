@@ -56,7 +56,11 @@
   var re = {
     headingSlash: /^(\/|#)/,
     trailingSlash: /\/$/,
-    parentheses: /\(|\)/g
+    parentheses: /\(|\)/g,
+    optionalParams: /\((.*?)\)/g,
+    namedParams: /(\(\?)?:\w+/g,
+    splatParams: /\*\w+/g,
+    namedParam: /(\(\?)?:\w+/
   };
 
   // --------------------------------
@@ -792,28 +796,63 @@
     // - *@param  {Array}  **args** List of arguments to inject into the path*
     // - *@return {String}      The path with the arguments injected*
     _parse: function (path, args) {
-      if (!_.isArray(args) || _.isEmpty(args)) {
+      // Check if any arguments were passed to the parser
+      if (!this._isValidArgsArray(args)) {
+        // Remove optional parameters from the path
+        path = path.replace(re.optionalParams, '');
+
+        // Validate path
+        this._checkPath(path);
+
         return path;
       }
 
-      var argIndex = 0;
+      // Replace named parameters with actual arguments
+      _.forEach(this._sanitizeArgs(args), function (arg) {
+        path = path.replace(re.namedParam, arg);
+      });
 
-      // Inject passed arguments
-      return _.map(path.split('/'), function (part) {
-          if (part.charAt(0) === ':') {
-            // jshint -W016
-            var arg = args[argIndex++];
-            // jshint +W016
-            return arg;
-          }
-          return part;
-        })
-        // Join the parts with slashes
-        .join('/')
-        // Remove opening/closing parentheses in case of optional parameters
+      // Remove remaining optional components from the path
+      _.forEach(path.match(re.optionalParams), function (part) {
+        // Only remove components for which arguments where missing
+        if (re.namedParams.test(part) || re.splatParams.test(part)) {
+          path = path.replace(part, '');
+        }
+      });
+
+      // Remove remaining parentheses and trailing slashes
+      path = path
         .replace(re.parentheses, '')
-        // Remove trailing slash
-        .replace(re.trailingSlash, '');
+        .replace(re.trailingSlash);
+
+      // Validate path
+      this._checkPath(path);
+
+      return path;
+    },
+
+    // --------------------------------
+
+    // **Validate parsed path**
+    _checkPath: function (path) {
+      // Throw an error if mandatory parameters are missing
+      if (re.namedParams.test(path) || re.splatParams.test(path)) {
+        throw new ReferenceError('[Backbone.Highway._parse] Missing necessary arguments for path');
+      }
+    },
+
+    // --------------------------------
+
+    // **Clean arguments array**
+    _sanitizeArgs: function (args) {
+      return _.without(args, null);
+    },
+
+    // --------------------------------
+
+    // **Check if parameter is a valid arguments array**
+    _isValidArgsArray: function (args) {
+      return _.isArray(args) && !_.isEmpty(this._sanitizeArgs(args));
     },
 
     // --------------------------------

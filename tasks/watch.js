@@ -21,6 +21,6 @@ module.exports = {
       '<%= config.src %>/**/*.js',
       '<%= config.test %>/**/*.spec.js'
     ],
-    tasks: ['karma:unit:run']
+    tasks: ['karma:watch:run']
   }
 };
