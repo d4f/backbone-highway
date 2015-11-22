@@ -159,7 +159,7 @@ define([
         expect(fn).to.throw(ReferenceError, /Missing necessary arguments/);
       });
 
-      it('should remove optional parameters part from path if no arguments are given', function () {
+      it('should remove optional parameters part from path if no or part of arguments are given', function () {
         var simpleRoute = '/users(/:id)',
             complicatedRoute = '/users(/:id)(/edit/:context)';
 
@@ -171,13 +171,18 @@ define([
         router._parse(complicatedRoute, [42, 'profile']).should.equal('/users/42/edit/profile');
       });
 
-      it.skip('should handle splat params', function () {});
-
       it('should allow text to surround a parameter in a URL component', function () {
         router._parse('/article/:name/p:number', ['title', 5]).should.equal('/article/title/p5');
       });
 
-      it.skip('should allow for multiple parameters in a single URL component', function () {});
+      it.skip('should allow for multiple parameters in a single URL component', function () {
+        router._parse('/article/p:page-:section', [5, 'summary']).should.equal('/article/p5-summary');
+      });
+
+      it.skip('should handle splat params', function () {
+        router._parse('/article/*options', ['42/edit']).should.equal('/article/42/edit');
+        router._parse('/article/p:id(/*options)', [5]).should.equal('/article/p5');
+      });
     });
 
     describe('_path', function () {

@@ -799,9 +799,11 @@
         return path;
       }
 
+      var self = this;
+
       // Replace named parameters with actual arguments
       _.forEach(this._sanitizeArgs(args), function (arg) {
-        path = path.replace(re.namedParam, arg);
+        path = self._replaceArg(path, arg);
       });
 
       // Remove remaining optional components from the path
@@ -821,6 +823,17 @@
       this._checkPath(path);
 
       return path;
+    },
+
+    // --------------------------------
+
+    // **Replace a named argument or a splat parameter in a path**
+    // FIXME - Make it handle splat param replacing
+    _replaceArg: function (path, arg) {
+      return path.indexOf(':') !== -1 && path.replace(re.namedParam, arg);
+      // return path.indexOf(':') !== -1 && path.indexOf(':') < path.indexOf('*') ?
+      //   path.replace(re.namedParam, arg) :
+      //   path.replace(re.splatParams, arg);
     },
 
     // --------------------------------
