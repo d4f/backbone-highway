@@ -271,13 +271,14 @@ define([
         router._parse('/article/:name/p:number', ['title', 5]).should.equal('/article/title/p5');
       });
 
-      it.skip('should allow for multiple parameters in a single URL component', function () {
+      it('should allow for multiple parameters in a single URL component', function () {
         router._parse('/article/p:page-:section', [5, 'summary']).should.equal('/article/p5-summary');
       });
 
-      it.skip('should handle splat params', function () {
+      it('should inject splat params being optional or not', function () {
         router._parse('/article/*options', ['42/edit']).should.equal('/article/42/edit');
         router._parse('/article/p:id(/*options)', [5]).should.equal('/article/p5');
+        router._parse('/article/p:id(/*options)', [5, 'view/details']).should.equal('/article/p5/view/details');
       });
     });
 
