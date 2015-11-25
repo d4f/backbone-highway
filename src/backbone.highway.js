@@ -850,7 +850,7 @@
 
     // **Clean arguments array**
     _sanitizeArgs: function (args) {
-      return _.without(args, null);
+      return _.without(args, null, undefined);
     },
 
     // --------------------------------

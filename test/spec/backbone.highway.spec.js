@@ -133,6 +133,86 @@ define([
   });
 
   describe('Private method', function () {
+    describe('_processTriggers', function () {
+      it.skip('should process a list of triggers', function () {});
+    });
+
+    describe('_processTrigger', function () {
+      it.skip('should process a single trigger', function () {});
+    });
+
+    describe('_processControllers', function () {
+      it.skip('should process a list of controllers', function () {});
+    });
+
+    describe('_findCachedTrigger', function () {
+      it.skip('should retrieve a cached trigger', function () {});
+    });
+
+    describe('_cacheTrigger', function () {
+      it.skip('should set a trigger as cached', function () {});
+    });
+
+    describe('_startHistory', function () {
+      it.skip('should start Backbone.History', function () {});
+
+      it.skip('should trigger a 404 if the opening route does not exist', function () {});
+
+      it.skip('should apply stored route if it exists', function () {});
+    });
+
+    describe('_httpError', function () {
+      it('should not execute anything if no error controllers are defined', function () {
+        router._httpError(404).should.be.false;
+        router._httpError(403).should.be.false;
+      });
+
+      it('should throw an Error if unhandled http error code is given', function () {
+        var fn = _.bind(router._httpError, router, 500);
+        expect(fn).to.throw(Error, /Unhandled http error code: 500/);
+      });
+
+      it('should execute error controllers if defined', function () {
+        var errorRoute = {
+          action: function () {}
+        };
+        router.route('404', errorRoute);
+        router.route('403', errorRoute);
+
+        router._httpError(404).should.be.true;
+        router._httpError(403).should.be.true;
+      });
+    });
+
+    describe('_applyStoredRoute', function () {
+      it.skip('should load route from storage and navigate to it', function () {});
+    });
+
+    describe('_path', function () {
+      it('should return false if the route does not exist', function () {
+        router._path('inexisting.route').should.be.false;
+      });
+
+      it('should return the route url with injected parameters for an existing route', function () {
+        router._path('users.detail', [42]).should.equal('users/42');
+      });
+
+      it('should throw an error if mandatory parameters are not passed', function () {
+        var fn = _.bind(router._path, router, 'users.detail', []);
+        expect(fn).to.throw(ReferenceError, /Missing necessary arguments/);
+      });
+    });
+
+    describe('_name', function () {
+      it.skip('should find the name of a route by its path', function () {});
+
+      it.skip('should return false if the path does not exist', function () {});
+    });
+
+    describe('_exists', function () {
+      it.skip('should tell if a route exists by its name or its path', function () {});
+    });
+
     describe('_parse', function () {
       it('should inject parameters into the path', function () {
         router._parse(
@@ -151,7 +231,7 @@ define([
         router._parse('users/:id(/edit/:part)', [42, 'email']).should.equal('users/42/edit/email');
       });
 
-      it('should generate an error if required parameters are missing', function () {
+      it('should throw an error if mandatory parameters are not passed', function () {
         var fn = _.bind(router._parse, router, '/user/:id');
         expect(fn).to.throw(ReferenceError, /Missing necessary arguments/);
 
@@ -185,14 +265,21 @@ define([
       });
     });
 
-    describe('_path', function () {
-      it('should return false if the route does not exist', function () {
-        router._path('inexisting.route').should.be.false;
-      });
+    describe('_replaceArg', function () {
+      it.skip('should replace a named parameters', function () {});
+      it.skip('should replace splat parameters', function () {});
+    });
 
-      it('should return the route url with injected parameters for an existing route', function () {
-        router._path('users.detail', [42]).should.equal('users/42');
-      });
+    describe('_checkPath', function () {
+      it.skip('should validate the structure of a given path', function () {});
+    });
+
+    describe('_sanitizeArgs', function () {
+      it.skip('should remove undesired argument values (null, undefined)', function () {});
+    });
+
+    describe('_isValidArgsArray', function () {
+      it.skip('should validate the structure and content of passed arguments', function () {});
     });
 
     describe('_stripHeadingSlash', function () {
@@ -238,29 +325,6 @@ define([
       it('should generate a regular expression from a path', function () {
         var re = router._routeToRegExp('users/:id');
         expect(re instanceof RegExp).to.be.ok;
-      });
-    });
-
-    describe('_httpError', function () {
-      it('should not execute anything if no error controllers are defined', function () {
-        router._httpError(404).should.be.false;
-        router._httpError(403).should.be.false;
-      });
-
-      it('should throw an Error if unhandled http error code is given', function () {
-        var fn = _.bind(router._httpError, router, 500);
-        expect(fn).to.throw(Error, /Unhandled http error code: 500/);
-      });
-
-      it('should execute error controllers if defined', function () {
-        var errorRoute = {
-          action: function () {}
-        };
-        router.route('404', errorRoute);
-        router.route('403', errorRoute);
-
-        router._httpError(404).should.be.true;
-        router._httpError(403).should.be.true;
       });
     });
   });
