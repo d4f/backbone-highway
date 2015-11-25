@@ -765,20 +765,12 @@
 
     // **Check if a route exists by its name or its path**
     // - *@param  {Object}  **params** Object with a name or path key*
-    // - *@return {Boolean} True if route exists else false*
+    // - *@return {Boolean} True if route exists else false.
+    //   Will also return false when wrong type of parameter is passed*
     _exists: function (params) {
-      if (!_.isObject(params)) {
-        return false;
-      }
-
-      if (params.name) {
-        return !_.isUndefined(extendedController[params.name]);
-      }
-      else if (_.isString(params.path)) {
-        return this._name(params.path);
-      }
-
-      return false;
+      return _.isObject(params) && (
+        !_.isUndefined(extendedController[params.name]) || this._name(params.path) !== false
+      );
     },
 
     // --------------------------------
@@ -801,7 +793,7 @@
 
       var self = this;
 
-      // Replace named parameters with actual arguments
+      // Replace named/splat parameters with actual arguments
       _.forEach(this._sanitizeArgs(args), function (arg) {
         path = self._replaceArg(path, arg);
       });
@@ -815,9 +807,7 @@
       });
 
       // Remove remaining parentheses and trailing slashes
-      path = path
-        .replace(re.parentheses, '')
-        .replace(re.trailingSlash);
+      path = path.replace(re.parentheses, '').replace(re.trailingSlash);
 
       // Validate path
       this._checkPath(path);
@@ -828,12 +818,8 @@
     // --------------------------------
 
     // **Replace a named argument or a splat parameter in a path**
-    // FIXME - Make it handle splat param replacing
     _replaceArg: function (path, arg) {
-      return path.indexOf(':') !== -1 && path.replace(re.namedParam, arg);
-      // return path.indexOf(':') !== -1 && path.indexOf(':') < path.indexOf('*') ?
-      //   path.replace(re.namedParam, arg) :
-      //   path.replace(re.splatParams, arg);
+      return path.indexOf(':') !== -1 ? path.replace(re.namedParam, arg) : path.replace(re.splatParams, arg);
     },
 
     // --------------------------------
@@ -871,23 +857,18 @@
 
       // Store the path for next init after page reload
       if (localStorage) {
-        localStorage.setItem(
-          this._getStoreKey('path'),
-          path
-        );
-
+        localStorage.setItem(this._getStoreKey('path'), path);
         return true;
       }
+      return false;
     },
 
     // --------------------------------
 
     // **Generate a complete store key using the prefix in the options**
     _getStoreKey: function (key) {
-      // Retrieve store options
-      var store = this.options.store;
       // Concatenate prefix, separator and key
-      return store.prefix + store.separator + key;
+      return this.options.store.prefix + this.options.store.separator + key;
     },
 
     // --------------------------------
@@ -896,9 +877,7 @@
     // - *@return {String} The currenlty stored route as a string,
     //   null if not existing, false if localStorage doesn't exist*
     _getStoredRoute: function () {
-      return localStorage && localStorage.getItem(
-        this._getStoreKey('path')
-      );
+      return localStorage && localStorage.getItem(this._getStoreKey('path'));
     },
 
     // --------------------------------
@@ -906,17 +885,17 @@
     // **Clear the stored route**
     _clearStore: function () {
       if (localStorage) {
-        localStorage.removeItem(
-          this._getStoreKey('path')
-        );
+        localStorage.removeItem(this._getStoreKey('path'));
+        return true;
       }
+      return false;
     },
 
     // --------------------------------
 
     // **Remove heading slash or pound sign from a path, if any**
     _stripHeadingSlash: function (path) {
-      return path.replace(re.headingSlash, '');
+      return _.isString(path) && path.replace(re.headingSlash, '');
     },
 
     // --------------------------------

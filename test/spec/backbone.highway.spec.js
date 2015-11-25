@@ -7,13 +7,15 @@ define([
 
   // jshint -W030
 
-  var dispatcher = _.extend({}, Backbone.Events);
-
-  var options = {
-    allowClose: true
-  };
-
   before(function () {
+    this.dispatcher = _.extend({}, Backbone.Events);
+
+    this.options = {
+      allowClose: true
+    };
+
+    var self = this;
+
     router.route('home', {
       path: '/',
       action: function () {}
@@ -22,7 +24,7 @@ define([
       path: '/settings',
       action: function () {},
       close: function () {
-        return options.allowClose;
+        return self.options.allowClose;
       }
     });
     router.route('users.detail', {
@@ -30,11 +32,11 @@ define([
       action: function () {}
     });
     router.route('splat', {
-      path: '/splat/*',
+      path: '/splat/*stuff',
       action: function () {}
     });
     router.start({
-      dispatcher: dispatcher,
+      dispatcher: this.dispatcher,
       pushState: false
     });
   });
@@ -117,10 +119,10 @@ define([
       it('should get allowed or blocked by the close controller of a route', function () {
         router.go('settings');
 
-        options.allowClose = false;
+        this.options.allowClose = false;
         router.go('home').should.be.false;
 
-        options.allowClose = true;
+        this.options.allowClose = true;
         router.go('home').should.be.true;
       });
     });
@@ -204,13 +206,27 @@ define([
     });
 
     describe('_name', function () {
-      it.skip('should find the name of a route by its path', function () {});
+      it('should find the name of a route by its path', function () {
+        router._name('/settings').should.equal('settings');
+        router._name('/users/42').should.equal('users.detail');
+        router._name('/splat/stuff/going-behind').should.equal('splat');
+      });
 
-      it.skip('should return false if the path does not exist', function () {});
+      it('should return false if the path does not exist', function () {
+        router._name('/inexisting/path').should.be.false;
+      });
     });
 
     describe('_exists', function () {
-      it.skip('should tell if a route exists by its name or its path', function () {});
+      it('should tell if a route exists by its name', function () {
+        router._exists({name: 'users.detail'}).should.be.true;
+        router._exists({name: 'undefined.route.name'}).should.be.false;
+      });
+
+      it('should tell if a route exists by its path', function () {
+        router._exists({path: '/users/99'}).should.be.true;
+        router._exists({path: '/some/random/route'}).should.be.false;
+      });
     });
 
     describe('_parse', function () {
@@ -266,8 +282,15 @@ define([
     });
 
     describe('_replaceArg', function () {
-      it.skip('should replace a named parameters', function () {});
-      it.skip('should replace splat parameters', function () {});
+      it('should replace a named parameters', function () {
+        router._replaceArg('/user/:id', '42').should.equal('/user/42');
+      });
+      it('should replace a splat parameter', function () {
+        router._replaceArg('/user/*definition', '42/edit').should.equal('/user/42/edit');
+      });
+      it('should return path unaltered if no parameters are left to be replaced', function () {
+        router._replaceArg('/user/42', 'name').should.equal('/user/42');
+      });
     });
 
     describe('_checkPath', function () {
@@ -285,6 +308,12 @@ define([
     describe('_stripHeadingSlash', function () {
       it('should remove first slash from a path', function () {
         router._stripHeadingSlash('/test/path').should.equal('test/path');
+      });
+
+      it('should return false if wrong parameter type is given', function () {
+        router._stripHeadingSlash(777).should.be.false;
+        router._stripHeadingSlash(['stuff']).should.be.false;
+        router._stripHeadingSlash({some: 'object'}).should.be.false;
       });
     });
 
