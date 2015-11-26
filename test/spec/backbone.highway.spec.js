@@ -295,7 +295,19 @@ define([
     });
 
     describe('_checkPath', function () {
-      it.skip('should validate the structure of a given path', function () {});
+      it('should validate the structure of a given path', function () {
+        router._checkPath('/users/42').should.be.true;
+        router._checkPath('/articles/99/p5-summary').should.be.true;
+
+        var fn = _.bind(router._checkPath, router, '/users/:id');
+        expect(fn).to.throw(ReferenceError, /Missing necessary arguments/);
+
+        fn = _.bind(router._checkPath, router, '/articles(/p:page)');
+        expect(fn).to.throw(ReferenceError, /Missing necessary arguments/);
+
+        fn = _.bind(router._checkPath, router, '/splat/*stuff');
+        expect(fn).to.throw(ReferenceError, /Missing necessary arguments/);
+      });
     });
 
     describe('_sanitizeArgs', function () {

@@ -830,6 +830,7 @@
       if (re.namedParams.test(path) || re.splatParams.test(path)) {
         throw new ReferenceError('[Backbone.Highway._parse] Missing necessary arguments for path');
       }
+      return true;
     },
 
     // --------------------------------
