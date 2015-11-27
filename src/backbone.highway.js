@@ -155,6 +155,7 @@
       // Initialize Backbone.Router instance
       router = new Router();
 
+      // Start Backbone.History
       this._startHistory();
     },
 

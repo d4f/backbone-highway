@@ -31,6 +31,10 @@ define([
       path: '/users/:id',
       action: function () {}
     });
+    router.route('users.action', {
+      path: '/users/:id/:action-:section',
+      action: function () {}
+    });
     router.route('splat', {
       path: '/splat/*stuff',
       action: function () {}
@@ -114,6 +118,9 @@ define([
 
         router.go({path: '/users/42'}).should.be.true;
         Backbone.history.getFragment().should.equal('users/42');
+
+        router.go('users.action', [42, 'edit', 'profile']).should.be.true;
+        Backbone.history.getFragment().should.equal('users/42/edit-profile');
       });
 
       it('should get allowed or blocked by the close controller of a route', function () {
