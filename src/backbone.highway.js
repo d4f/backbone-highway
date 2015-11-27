@@ -565,15 +565,16 @@
     // --------------------------------
 
     // **Process a list of controllers**
-    // - @param {String} **name** The name of the route*
-    // - @param {Array} **args** JavaScript arguments array*
-    _processControllers: function (def, trigger) {
+    // - @param {Object} **def** The controller definition containing either the route name or its path and
+    //   eventually arguments to be passed to the controller*
+    // - @param {Boolean} **isTrigger** Is the controller being executed as a trigger i.e. as an alias
+    _processControllers: function (def, isTrigger) {
       var self = this,
           name = def.name,
           args = def.args;
 
       // Do not interpret control as a trigger by default
-      trigger = trigger || false;
+      isTrigger = isTrigger || false;
 
       // Check if the given controller actually exists
       if (extendedController[name]) {
@@ -587,19 +588,13 @@
           }
         }
 
-        // Lets not pass [undefined] or [null] as arguments to the controllers
-        if (_.isUndefined(args) || _.isNull(args)) {
-          args = [];
-        }
-        // Ensure args is an array or an arguments object
-        else if (!_.isObject(args) && !_.isArray(args)) {
-          args = [args];
-        }
+        // Ensure args is properly declared and remove unwanted values
+        args = this._sanitizeArgs(args);
 
         // Loop through each defined route controller
         _.forEach(extendedController[name].wrappers, function (callback) {
           // Execute controller wrapper
-          callback.call(self, args, trigger);
+          callback.call(self, args, isTrigger);
         });
 
         return true;
@@ -837,6 +832,10 @@
 
     // **Clean arguments array**
     _sanitizeArgs: function (args) {
+      // Ensure args is an array or an arguments object
+      if (!_.isObject(args) && !_.isArray(args)) {
+        args = [args];
+      }
       return _.without(args, null, undefined);
     },
 
