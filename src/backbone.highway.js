@@ -118,9 +118,6 @@
   // Highway prototype
   Highway.prototype = {
 
-    // Which event aggregator to use for the triggers listed in each routes (mandatory)
-    dispatcher: null,
-
     // Store routes that were executed last
     currentRoutes: [],
 
