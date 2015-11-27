@@ -50,9 +50,8 @@
   var re = {
     headingSlash: /^(\/|#)/,
     trailingSlash: /\/$/,
-    parentheses: /\(|\)/g,
+    parentheses: /[\(\)]/g,
     optionalParams: /\((.*?)\)/g,
-    namedParams: /(\(\?)?:\w+/g,
     splatParams: /\*\w+/g,
     namedParam: /(\(\?)?:\w+/
   };
@@ -475,18 +474,13 @@
     _processTriggers: function (triggers, routeArgs) {
       var self = this;
 
-      if (_.isArray(triggers)) {
-        _.forEach(triggers, function (trigger) {
-          self._processTrigger(trigger, routeArgs);
-        });
+      if (!_.isArray(triggers)) {
+        triggers = [triggers];
       }
-      else if (_.isString(triggers) || _.isObject(triggers)) {
-        this._processTrigger(triggers, routeArgs);
-      }
-      else {
-        this.options.log('[Backbone.Highway._processTriggers] Bad triggers format, needs to be a string,' +
-          ' an object, an array of strings or an array of objects');
-      }
+
+      _.forEach(triggers, function (trigger) {
+        self._processTrigger(trigger, routeArgs);
+      });
     },
 
     // --------------------------------
@@ -510,6 +504,7 @@
           trigger.args = [trigger.args];
         }
 
+        // If no arguments were passed to the trigger pass along route arguments
         if (_.isEmpty(trigger.args)) {
           trigger.args = routeArgs;
         }
@@ -792,7 +787,7 @@
       // Remove remaining optional components from the path
       _.forEach(path.match(re.optionalParams), function (part) {
         // Only remove components for which arguments where missing
-        if (re.namedParams.test(part) || re.splatParams.test(part)) {
+        if (re.namedParam.test(part) || re.splatParams.test(part)) {
           path = path.replace(part, '');
         }
       });
@@ -818,7 +813,7 @@
     // **Validate parsed path**
     _checkPath: function (path) {
       // Throw an error if mandatory parameters are missing
-      if (re.namedParams.test(path) || re.splatParams.test(path)) {
+      if (re.namedParam.test(path) || re.splatParams.test(path)) {
         throw new ReferenceError('[Backbone.Highway._parse] Missing necessary arguments for path');
       }
       return true;
