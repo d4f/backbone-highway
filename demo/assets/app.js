@@ -199,7 +199,7 @@
     }
 
     Backbone.Highway.start({
-      dispatcher: App.events,
+      // dispatcher: App.events,
       authenticated: App.user ? true : false,
       redirectToLogin: true,
       debug: true,

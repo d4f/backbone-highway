@@ -529,7 +529,7 @@
         });
 
         // Dispatch the event applying arguments
-        if (this.hasDispatcher) {
+        if (this.hasDispatcher()) {
           this.dispatcher.trigger.apply(this.dispatcher, args);
         }
       }
@@ -543,7 +543,7 @@
         }
         else {
           // Else give to the dispatcher
-          if (this.hasDispatcher) {
+          if (this.hasDispatcher()) {
             this.dispatcher.trigger.call(this.dispatcher, trigger);
           }
         }
