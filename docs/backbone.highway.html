@@ -1950,13 +1950,14 @@ Adding the new controller to the given route controllers list</p>
               </div>
               <p><strong>Process a list of controllers</strong></p>
 <ul>
-<li>@param {String} <strong>name</strong> The name of the route*</li>
-<li>@param {Array} <strong>args</strong> JavaScript arguments array*</li>
+<li>@param {Object} <strong>def</strong> The controller definition containing either the route name or its path and
+eventually arguments to be passed to the controller*</li>
+<li>@param {Boolean} <strong>isTrigger</strong> Is the controller being executed as a trigger i.e. as an alias</li>
 </ul>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>    _processControllers: <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">def, trigger</span>) </span>{
+            <div class="content"><div class='highlight'><pre>    _processControllers: <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">def, isTrigger</span>) </span>{
       <span class="hljs-keyword">var</span> self = <span class="hljs-keyword">this</span>,
           name = def.name,
           args = def.args;</pre></div></div>
@@ -1974,7 +1975,7 @@ Adding the new controller to the given route controllers list</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>      trigger = trigger || <span class="hljs-literal">false</span>;</pre></div></div>
+            <div class="content"><div class='highlight'><pre>      isTrigger = isTrigger || <span class="hljs-literal">false</span>;</pre></div></div>
             
         </li>
         
@@ -2035,13 +2036,11 @@ so if there is not more than one argument use the passed arguments instead</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-118">&#182;</a>
               </div>
-              <p>Lets not pass [undefined] or [null] as arguments to the controllers</p>
+              <p>Ensure args is properly declared and remove unwanted values</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>        <span class="hljs-keyword">if</span> (_.isUndefined(args) || _.isNull(args)) {
-          args = [];
-        }</pre></div></div>
+            <div class="content"><div class='highlight'><pre>        args = <span class="hljs-keyword">this</span>._sanitizeArgs(args);</pre></div></div>
             
         </li>
         
@@ -2052,13 +2051,11 @@ so if there is not more than one argument use the passed arguments instead</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-119">&#182;</a>
               </div>
-              <p>Ensure args is an array or an arguments object</p>
+              <p>Loop through each defined route controller</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>        <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (!_.isObject(args) &amp;&amp; !_.isArray(args)) {
-          args = [args];
-        }</pre></div></div>
+            <div class="content"><div class='highlight'><pre>        _.forEach(extendedController[name].wrappers, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">callback</span>) </span>{</pre></div></div>
             
         </li>
         
@@ -2069,26 +2066,11 @@ so if there is not more than one argument use the passed arguments instead</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-120">&#182;</a>
               </div>
-              <p>Loop through each defined route controller</p>
-
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>        _.forEach(extendedController[name].wrappers, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">callback</span>) </span>{</pre></div></div>
-            
-        </li>
-        
-        
-        <li id="section-121">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-121">&#182;</a>
-              </div>
               <p>Execute controller wrapper</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>          callback.call(self, args, trigger);
+            <div class="content"><div class='highlight'><pre>          callback.call(self, args, isTrigger);
         });
 
         <span class="hljs-keyword">return</span> <span class="hljs-literal">true</span>;
@@ -2101,14 +2083,26 @@ so if there is not more than one argument use the passed arguments instead</p>
         </li>
         
         
+        <li id="section-121">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-121">&#182;</a>
+              </div>
+              <hr>
+
+            </div>
+            
+        </li>
+        
+        
         <li id="section-122">
             <div class="annotation">
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-122">&#182;</a>
               </div>
-              <hr>
-
+              
             </div>
             
         </li>
@@ -2119,18 +2113,6 @@ so if there is not more than one argument use the passed arguments instead</p>
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-123">&#182;</a>
-              </div>
-              
-            </div>
-            
-        </li>
-        
-        
-        <li id="section-124">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-124">&#182;</a>
               </div>
               <p><strong>Find a cached trigger</strong></p>
 <ul>
@@ -2145,11 +2127,11 @@ so if there is not more than one argument use the passed arguments instead</p>
         </li>
         
         
-        <li id="section-125">
+        <li id="section-124">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-125">&#182;</a>
+                <a class="pilcrow" href="#section-124">&#182;</a>
               </div>
               <p>Try to check if it already exists</p>
 
@@ -2162,11 +2144,11 @@ so if there is not more than one argument use the passed arguments instead</p>
         </li>
         
         
-        <li id="section-126">
+        <li id="section-125">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-126">&#182;</a>
+                <a class="pilcrow" href="#section-125">&#182;</a>
               </div>
               <p>If it doesn’t, create it and retrieve it again</p>
 
@@ -2183,14 +2165,26 @@ so if there is not more than one argument use the passed arguments instead</p>
         </li>
         
         
+        <li id="section-126">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-126">&#182;</a>
+              </div>
+              <hr>
+
+            </div>
+            
+        </li>
+        
+        
         <li id="section-127">
             <div class="annotation">
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-127">&#182;</a>
               </div>
-              <hr>
-
+              
             </div>
             
         </li>
@@ -2201,18 +2195,6 @@ so if there is not more than one argument use the passed arguments instead</p>
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-128">&#182;</a>
-              </div>
-              
-            </div>
-            
-        </li>
-        
-        
-        <li id="section-129">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-129">&#182;</a>
               </div>
               <p><strong>Set a triggers cache state</strong></p>
 <ul>
@@ -2227,11 +2209,11 @@ so if there is not more than one argument use the passed arguments instead</p>
         </li>
         
         
-        <li id="section-130">
+        <li id="section-129">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-130">&#182;</a>
+                <a class="pilcrow" href="#section-129">&#182;</a>
               </div>
               <p>Find cached trigger object</p>
 
@@ -2242,11 +2224,11 @@ so if there is not more than one argument use the passed arguments instead</p>
         </li>
         
         
-        <li id="section-131">
+        <li id="section-130">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-131">&#182;</a>
+                <a class="pilcrow" href="#section-130">&#182;</a>
               </div>
               <p>Has it already been executed ?</p>
 
@@ -2261,11 +2243,11 @@ so if there is not more than one argument use the passed arguments instead</p>
         </li>
         
         
-        <li id="section-132">
+        <li id="section-131">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-132">&#182;</a>
+                <a class="pilcrow" href="#section-131">&#182;</a>
               </div>
               <p>Mark it done</p>
 
@@ -2279,14 +2261,26 @@ so if there is not more than one argument use the passed arguments instead</p>
         </li>
         
         
+        <li id="section-132">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-132">&#182;</a>
+              </div>
+              <hr>
+
+            </div>
+            
+        </li>
+        
+        
         <li id="section-133">
             <div class="annotation">
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-133">&#182;</a>
               </div>
-              <hr>
-
+              
             </div>
             
         </li>
@@ -2298,18 +2292,6 @@ so if there is not more than one argument use the passed arguments instead</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-134">&#182;</a>
               </div>
-              
-            </div>
-            
-        </li>
-        
-        
-        <li id="section-135">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-135">&#182;</a>
-              </div>
               <p><strong>Start Backbone.History if it hasn’t been done yet.</strong>
 Will trigger a client-side 404 if the loading route doesn’t exist</p>
 
@@ -2320,11 +2302,11 @@ Will trigger a client-side 404 if the loading route doesn’t exist</p>
         </li>
         
         
-        <li id="section-136">
+        <li id="section-135">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-136">&#182;</a>
+                <a class="pilcrow" href="#section-135">&#182;</a>
               </div>
               <p>Check if Backbone.History is already enabled</p>
 
@@ -2337,11 +2319,11 @@ Will trigger a client-side 404 if the loading route doesn’t exist</p>
         </li>
         
         
-        <li id="section-137">
+        <li id="section-136">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-137">&#182;</a>
+                <a class="pilcrow" href="#section-136">&#182;</a>
               </div>
               <p>Initialize Backbone.history</p>
 
@@ -2357,11 +2339,11 @@ Will trigger a client-side 404 if the loading route doesn’t exist</p>
         </li>
         
         
-        <li id="section-138">
+        <li id="section-137">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-138">&#182;</a>
+                <a class="pilcrow" href="#section-137">&#182;</a>
               </div>
               <p>Trigger a 404 if the current route doesn’t exist.
 Ensure the ‘silent’ options isn’t activated</p>
@@ -2380,14 +2362,26 @@ Ensure the ‘silent’ options isn’t activated</p>
         </li>
         
         
+        <li id="section-138">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-138">&#182;</a>
+              </div>
+              <hr>
+
+            </div>
+            
+        </li>
+        
+        
         <li id="section-139">
             <div class="annotation">
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-139">&#182;</a>
               </div>
-              <hr>
-
+              
             </div>
             
         </li>
@@ -2398,18 +2392,6 @@ Ensure the ‘silent’ options isn’t activated</p>
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-140">&#182;</a>
-              </div>
-              
-            </div>
-            
-        </li>
-        
-        
-        <li id="section-141">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-141">&#182;</a>
               </div>
               <p><strong>Trigger an error controller</strong></p>
 <ul>
@@ -2435,14 +2417,26 @@ Ensure the ‘silent’ options isn’t activated</p>
         </li>
         
         
+        <li id="section-141">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-141">&#182;</a>
+              </div>
+              <hr>
+
+            </div>
+            
+        </li>
+        
+        
         <li id="section-142">
             <div class="annotation">
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-142">&#182;</a>
               </div>
-              <hr>
-
+              
             </div>
             
         </li>
@@ -2454,8 +2448,11 @@ Ensure the ‘silent’ options isn’t activated</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-143">&#182;</a>
               </div>
-              
+              <p><strong>Reload the route that was stored before redirecting to login controller</strong></p>
+
             </div>
+            
+            <div class="content"><div class='highlight'><pre>    _applyStoredRoute: <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{</pre></div></div>
             
         </li>
         
@@ -2466,21 +2463,6 @@ Ensure the ‘silent’ options isn’t activated</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-144">&#182;</a>
               </div>
-              <p><strong>Reload the route that was stored before redirecting to login controller</strong></p>
-
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>    _applyStoredRoute: <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{</pre></div></div>
-            
-        </li>
-        
-        
-        <li id="section-145">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-145">&#182;</a>
-              </div>
               <p>Check if a route was stored while requiring a user login</p>
 
             </div>
@@ -2490,11 +2472,11 @@ Ensure the ‘silent’ options isn’t activated</p>
         </li>
         
         
-        <li id="section-146">
+        <li id="section-145">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-146">&#182;</a>
+                <a class="pilcrow" href="#section-145">&#182;</a>
               </div>
               <p>If a route is stored, use it!</p>
 
@@ -2506,11 +2488,11 @@ Ensure the ‘silent’ options isn’t activated</p>
         </li>
         
         
-        <li id="section-147">
+        <li id="section-146">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-147">&#182;</a>
+                <a class="pilcrow" href="#section-146">&#182;</a>
               </div>
               <p>Clear stored route</p>
 
@@ -2521,11 +2503,11 @@ Ensure the ‘silent’ options isn’t activated</p>
         </li>
         
         
-        <li id="section-148">
+        <li id="section-147">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-148">&#182;</a>
+                <a class="pilcrow" href="#section-147">&#182;</a>
               </div>
               <p>Redirect to stored route</p>
 
@@ -2540,14 +2522,26 @@ Ensure the ‘silent’ options isn’t activated</p>
         </li>
         
         
+        <li id="section-148">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-148">&#182;</a>
+              </div>
+              <hr>
+
+            </div>
+            
+        </li>
+        
+        
         <li id="section-149">
             <div class="annotation">
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-149">&#182;</a>
               </div>
-              <hr>
-
+              
             </div>
             
         </li>
@@ -2558,18 +2552,6 @@ Ensure the ‘silent’ options isn’t activated</p>
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-150">&#182;</a>
-              </div>
-              
-            </div>
-            
-        </li>
-        
-        
-        <li id="section-151">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-151">&#182;</a>
               </div>
               <p><strong>Retrieve the path of a route by it’s name.</strong></p>
 <ul>
@@ -2596,14 +2578,26 @@ Ensure the ‘silent’ options isn’t activated</p>
         </li>
         
         
+        <li id="section-151">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-151">&#182;</a>
+              </div>
+              <hr>
+
+            </div>
+            
+        </li>
+        
+        
         <li id="section-152">
             <div class="annotation">
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-152">&#182;</a>
               </div>
-              <hr>
-
+              
             </div>
             
         </li>
@@ -2614,18 +2608,6 @@ Ensure the ‘silent’ options isn’t activated</p>
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-153">&#182;</a>
-              </div>
-              
-            </div>
-            
-        </li>
-        
-        
-        <li id="section-154">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-154">&#182;</a>
               </div>
               <p><strong>Retrieve the name of a route by it’s path</strong></p>
 <ul>
@@ -2641,11 +2623,11 @@ Ensure the ‘silent’ options isn’t activated</p>
         </li>
         
         
-        <li id="section-155">
+        <li id="section-154">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-155">&#182;</a>
+                <a class="pilcrow" href="#section-154">&#182;</a>
               </div>
               <p>Remove first slash</p>
 
@@ -2656,11 +2638,11 @@ Ensure the ‘silent’ options isn’t activated</p>
         </li>
         
         
-        <li id="section-156">
+        <li id="section-155">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-156">&#182;</a>
+                <a class="pilcrow" href="#section-155">&#182;</a>
               </div>
               <p>Loop through all the controllers</p>
 
@@ -2671,11 +2653,11 @@ Ensure the ‘silent’ options isn’t activated</p>
         </li>
         
         
-        <li id="section-157">
+        <li id="section-156">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-157">&#182;</a>
+                <a class="pilcrow" href="#section-156">&#182;</a>
               </div>
               <p>Check if given path validates against controller regular expression</p>
 
@@ -2692,14 +2674,26 @@ Ensure the ‘silent’ options isn’t activated</p>
         </li>
         
         
+        <li id="section-157">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-157">&#182;</a>
+              </div>
+              <hr>
+
+            </div>
+            
+        </li>
+        
+        
         <li id="section-158">
             <div class="annotation">
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-158">&#182;</a>
               </div>
-              <hr>
-
+              
             </div>
             
         </li>
@@ -2711,8 +2705,20 @@ Ensure the ‘silent’ options isn’t activated</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-159">&#182;</a>
               </div>
-              
+              <p><strong>Check if a route exists by its name or its path</strong></p>
+<ul>
+<li><em>@param  {Object}  <strong>params</strong> Object with a name or path key</em></li>
+<li><em>@return {Boolean} True if route exists else false.
+Will also return false when wrong type of parameter is passed</em></li>
+</ul>
+
             </div>
+            
+            <div class="content"><div class='highlight'><pre>    _exists: <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">params</span>) </span>{
+      <span class="hljs-keyword">return</span> _.isObject(params) &amp;&amp; (
+        !_.isUndefined(extendedController[params.name]) || <span class="hljs-keyword">this</span>._name(params.path) !== <span class="hljs-literal">false</span>
+      );
+    },</pre></div></div>
             
         </li>
         
@@ -2723,28 +2729,9 @@ Ensure the ‘silent’ options isn’t activated</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-160">&#182;</a>
               </div>
-              <p><strong>Check if a route exists by its name or its path</strong></p>
-<ul>
-<li><em>@param  {Object}  <strong>params</strong> Object with a name or path key</em></li>
-<li><em>@return {Boolean} True if route exists else false</em></li>
-</ul>
+              <hr>
 
             </div>
-            
-            <div class="content"><div class='highlight'><pre>    _exists: <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">params</span>) </span>{
-      <span class="hljs-keyword">if</span> (!_.isObject(params)) {
-        <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>;
-      }
-
-      <span class="hljs-keyword">if</span> (params.name) {
-        <span class="hljs-keyword">return</span> !_.isUndefined(extendedController[params.name]);
-      }
-      <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (_.isString(params.path)) {
-        <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>._name(params.path);
-      }
-
-      <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>;
-    },</pre></div></div>
             
         </li>
         
@@ -2755,8 +2742,7 @@ Ensure the ‘silent’ options isn’t activated</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-161">&#182;</a>
               </div>
-              <hr>
-
+              
             </div>
             
         </li>
@@ -2767,18 +2753,6 @@ Ensure the ‘silent’ options isn’t activated</p>
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-162">&#182;</a>
-              </div>
-              
-            </div>
-            
-        </li>
-        
-        
-        <li id="section-163">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-163">&#182;</a>
               </div>
               <p><strong>Parse a path to inject a list of arguments into the path.</strong></p>
 <ul>
@@ -2794,11 +2768,11 @@ Ensure the ‘silent’ options isn’t activated</p>
         </li>
         
         
-        <li id="section-164">
+        <li id="section-163">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-164">&#182;</a>
+                <a class="pilcrow" href="#section-163">&#182;</a>
               </div>
               <p>Check if any arguments were passed to the parser</p>
 
@@ -2809,11 +2783,11 @@ Ensure the ‘silent’ options isn’t activated</p>
         </li>
         
         
-        <li id="section-165">
+        <li id="section-164">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-165">&#182;</a>
+                <a class="pilcrow" href="#section-164">&#182;</a>
               </div>
               <p>Remove optional parameters from the path</p>
 
@@ -2824,11 +2798,11 @@ Ensure the ‘silent’ options isn’t activated</p>
         </li>
         
         
-        <li id="section-166">
+        <li id="section-165">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-166">&#182;</a>
+                <a class="pilcrow" href="#section-165">&#182;</a>
               </div>
               <p>Validate path</p>
 
@@ -2837,7 +2811,26 @@ Ensure the ‘silent’ options isn’t activated</p>
             <div class="content"><div class='highlight'><pre>        <span class="hljs-keyword">this</span>._checkPath(path);
 
         <span class="hljs-keyword">return</span> path;
-      }</pre></div></div>
+      }
+
+      <span class="hljs-keyword">var</span> self = <span class="hljs-keyword">this</span>;</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-166">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-166">&#182;</a>
+              </div>
+              <p>Replace named/splat parameters with actual arguments</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      _.forEach(<span class="hljs-keyword">this</span>._sanitizeArgs(args), <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">arg</span>) </span>{
+        path = self._replaceArg(path, arg);
+      });</pre></div></div>
             
         </li>
         
@@ -2848,23 +2841,6 @@ Ensure the ‘silent’ options isn’t activated</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-167">&#182;</a>
               </div>
-              <p>Replace named parameters with actual arguments</p>
-
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>      _.forEach(<span class="hljs-keyword">this</span>._sanitizeArgs(args), <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">arg</span>) </span>{
-        path = path.replace(re.namedParam, arg);
-      });</pre></div></div>
-            
-        </li>
-        
-        
-        <li id="section-168">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-168">&#182;</a>
-              </div>
               <p>Remove remaining optional components from the path</p>
 
             </div>
@@ -2874,11 +2850,11 @@ Ensure the ‘silent’ options isn’t activated</p>
         </li>
         
         
-        <li id="section-169">
+        <li id="section-168">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-169">&#182;</a>
+                <a class="pilcrow" href="#section-168">&#182;</a>
               </div>
               <p>Only remove components for which arguments where missing</p>
 
@@ -2892,28 +2868,26 @@ Ensure the ‘silent’ options isn’t activated</p>
         </li>
         
         
-        <li id="section-170">
+        <li id="section-169">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-170">&#182;</a>
+                <a class="pilcrow" href="#section-169">&#182;</a>
               </div>
               <p>Remove remaining parentheses and trailing slashes</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>      path = path
-        .replace(re.parentheses, <span class="hljs-string">''</span>)
-        .replace(re.trailingSlash);</pre></div></div>
+            <div class="content"><div class='highlight'><pre>      path = path.replace(re.parentheses, <span class="hljs-string">''</span>).replace(re.trailingSlash);</pre></div></div>
             
         </li>
         
         
-        <li id="section-171">
+        <li id="section-170">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-171">&#182;</a>
+                <a class="pilcrow" href="#section-170">&#182;</a>
               </div>
               <p>Validate path</p>
 
@@ -2927,14 +2901,26 @@ Ensure the ‘silent’ options isn’t activated</p>
         </li>
         
         
+        <li id="section-171">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-171">&#182;</a>
+              </div>
+              <hr>
+
+            </div>
+            
+        </li>
+        
+        
         <li id="section-172">
             <div class="annotation">
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-172">&#182;</a>
               </div>
-              <hr>
-
+              
             </div>
             
         </li>
@@ -2946,8 +2932,13 @@ Ensure the ‘silent’ options isn’t activated</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-173">&#182;</a>
               </div>
-              
+              <p><strong>Replace a named argument or a splat parameter in a path</strong></p>
+
             </div>
+            
+            <div class="content"><div class='highlight'><pre>    _replaceArg: <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">path, arg</span>) </span>{
+      <span class="hljs-keyword">return</span> path.indexOf(<span class="hljs-string">':'</span>) !== -<span class="hljs-number">1</span> ? path.replace(re.namedParam, arg) : path.replace(re.splatParams, arg);
+    },</pre></div></div>
             
         </li>
         
@@ -2958,11 +2949,9 @@ Ensure the ‘silent’ options isn’t activated</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-174">&#182;</a>
               </div>
-              <p><strong>Validate parsed path</strong></p>
+              <hr>
 
             </div>
-            
-            <div class="content"><div class='highlight'><pre>    _checkPath: <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">path</span>) </span>{</pre></div></div>
             
         </li>
         
@@ -2973,14 +2962,8 @@ Ensure the ‘silent’ options isn’t activated</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-175">&#182;</a>
               </div>
-              <p>Throw an error if mandatory parameters are missing</p>
-
+              
             </div>
-            
-            <div class="content"><div class='highlight'><pre>      <span class="hljs-keyword">if</span> (re.namedParams.test(path) || re.splatParams.test(path)) {
-        <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-built_in">ReferenceError</span>(<span class="hljs-string">'[Backbone.Highway._parse] Missing necessary arguments for path'</span>);
-      }
-    },</pre></div></div>
             
         </li>
         
@@ -2991,9 +2974,11 @@ Ensure the ‘silent’ options isn’t activated</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-176">&#182;</a>
               </div>
-              <hr>
+              <p><strong>Validate parsed path</strong></p>
 
             </div>
+            
+            <div class="content"><div class='highlight'><pre>    _checkPath: <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">path</span>) </span>{</pre></div></div>
             
         </li>
         
@@ -3004,8 +2989,15 @@ Ensure the ‘silent’ options isn’t activated</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-177">&#182;</a>
               </div>
-              
+              <p>Throw an error if mandatory parameters are missing</p>
+
             </div>
+            
+            <div class="content"><div class='highlight'><pre>      <span class="hljs-keyword">if</span> (re.namedParams.test(path) || re.splatParams.test(path)) {
+        <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-built_in">ReferenceError</span>(<span class="hljs-string">'[Backbone.Highway._parse] Missing necessary arguments for path'</span>);
+      }
+      <span class="hljs-keyword">return</span> <span class="hljs-literal">true</span>;
+    },</pre></div></div>
             
         </li>
         
@@ -3016,13 +3008,9 @@ Ensure the ‘silent’ options isn’t activated</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-178">&#182;</a>
               </div>
-              <p><strong>Clean arguments array</strong></p>
+              <hr>
 
             </div>
-            
-            <div class="content"><div class='highlight'><pre>    _sanitizeArgs: <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">args</span>) </span>{
-      <span class="hljs-keyword">return</span> _.without(args, <span class="hljs-literal">null</span>);
-    },</pre></div></div>
             
         </li>
         
@@ -3033,8 +3021,7 @@ Ensure the ‘silent’ options isn’t activated</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-179">&#182;</a>
               </div>
-              <hr>
-
+              
             </div>
             
         </li>
@@ -3046,8 +3033,11 @@ Ensure the ‘silent’ options isn’t activated</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-180">&#182;</a>
               </div>
-              
+              <p><strong>Clean arguments array</strong></p>
+
             </div>
+            
+            <div class="content"><div class='highlight'><pre>    _sanitizeArgs: <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">args</span>) </span>{</pre></div></div>
             
         </li>
         
@@ -3058,12 +3048,14 @@ Ensure the ‘silent’ options isn’t activated</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-181">&#182;</a>
               </div>
-              <p><strong>Check if parameter is a valid arguments array</strong></p>
+              <p>Ensure args is an array or an arguments object</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>    _isValidArgsArray: <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">args</span>) </span>{
-      <span class="hljs-keyword">return</span> _.isArray(args) &amp;&amp; !_.isEmpty(<span class="hljs-keyword">this</span>._sanitizeArgs(args));
+            <div class="content"><div class='highlight'><pre>      <span class="hljs-keyword">if</span> (!_.isObject(args) &amp;&amp; !_.isArray(args)) {
+        args = [args];
+      }
+      <span class="hljs-keyword">return</span> _.without(args, <span class="hljs-literal">null</span>, <span class="hljs-literal">undefined</span>);
     },</pre></div></div>
             
         </li>
@@ -3100,11 +3092,13 @@ Ensure the ‘silent’ options isn’t activated</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-184">&#182;</a>
               </div>
-              <p><strong>Store the current pathname in the local storage</strong></p>
+              <p><strong>Check if parameter is a valid arguments array sanitizing it before hand</strong></p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>    _storeCurrentRoute: <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{</pre></div></div>
+            <div class="content"><div class='highlight'><pre>    _isValidArgsArray: <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">args</span>) </span>{
+      <span class="hljs-keyword">return</span> !_.isEmpty(<span class="hljs-keyword">this</span>._sanitizeArgs(args));
+    },</pre></div></div>
             
         </li>
         
@@ -3114,6 +3108,46 @@ Ensure the ‘silent’ options isn’t activated</p>
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-185">&#182;</a>
+              </div>
+              <hr>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-186">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-186">&#182;</a>
+              </div>
+              
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-187">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-187">&#182;</a>
+              </div>
+              <p><strong>Store the current pathname in the local storage</strong></p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    _storeCurrentRoute: <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-188">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-188">&#182;</a>
               </div>
               <p>Retrieve current path</p>
 
@@ -3126,65 +3160,22 @@ Ensure the ‘silent’ options isn’t activated</p>
         </li>
         
         
-        <li id="section-186">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-186">&#182;</a>
-              </div>
-              <p>Store the path for next init after page reload</p>
-
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>      <span class="hljs-keyword">if</span> (localStorage) {
-        localStorage.setItem(
-          <span class="hljs-keyword">this</span>._getStoreKey(<span class="hljs-string">'path'</span>),
-          path
-        );
-
-        <span class="hljs-keyword">return</span> <span class="hljs-literal">true</span>;
-      }
-    },</pre></div></div>
-            
-        </li>
-        
-        
-        <li id="section-187">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-187">&#182;</a>
-              </div>
-              <hr>
-
-            </div>
-            
-        </li>
-        
-        
-        <li id="section-188">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-188">&#182;</a>
-              </div>
-              
-            </div>
-            
-        </li>
-        
-        
         <li id="section-189">
             <div class="annotation">
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-189">&#182;</a>
               </div>
-              <p><strong>Generate a complete store key using the prefix in the options</strong></p>
+              <p>Store the path for next init after page reload</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>    _getStoreKey: <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">key</span>) </span>{</pre></div></div>
+            <div class="content"><div class='highlight'><pre>      <span class="hljs-keyword">if</span> (localStorage) {
+        localStorage.setItem(<span class="hljs-keyword">this</span>._getStoreKey(<span class="hljs-string">'path'</span>), path);
+        <span class="hljs-keyword">return</span> <span class="hljs-literal">true</span>;
+      }
+      <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>;
+    },</pre></div></div>
             
         </li>
         
@@ -3195,11 +3186,9 @@ Ensure the ‘silent’ options isn’t activated</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-190">&#182;</a>
               </div>
-              <p>Retrieve store options</p>
+              <hr>
 
             </div>
-            
-            <div class="content"><div class='highlight'><pre>      <span class="hljs-keyword">var</span> store = <span class="hljs-keyword">this</span>.options.store;</pre></div></div>
             
         </li>
         
@@ -3210,12 +3199,8 @@ Ensure the ‘silent’ options isn’t activated</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-191">&#182;</a>
               </div>
-              <p>Concatenate prefix, separator and key</p>
-
+              
             </div>
-            
-            <div class="content"><div class='highlight'><pre>      <span class="hljs-keyword">return</span> store.prefix + store.separator + key;
-    },</pre></div></div>
             
         </li>
         
@@ -3226,9 +3211,11 @@ Ensure the ‘silent’ options isn’t activated</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-192">&#182;</a>
               </div>
-              <hr>
+              <p><strong>Generate a complete store key using the prefix in the options</strong></p>
 
             </div>
+            
+            <div class="content"><div class='highlight'><pre>    _getStoreKey: <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">key</span>) </span>{</pre></div></div>
             
         </li>
         
@@ -3239,8 +3226,12 @@ Ensure the ‘silent’ options isn’t activated</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-193">&#182;</a>
               </div>
-              
+              <p>Concatenate prefix, separator and key</p>
+
             </div>
+            
+            <div class="content"><div class='highlight'><pre>      <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.options.store.prefix + <span class="hljs-keyword">this</span>.options.store.separator + key;
+    },</pre></div></div>
             
         </li>
         
@@ -3251,19 +3242,9 @@ Ensure the ‘silent’ options isn’t activated</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-194">&#182;</a>
               </div>
-              <p><strong>Retrieve the stored route if any</strong></p>
-<ul>
-<li><em>@return {String} The currenlty stored route as a string,
-null if not existing, false if localStorage doesn’t exist</em></li>
-</ul>
+              <hr>
 
             </div>
-            
-            <div class="content"><div class='highlight'><pre>    _getStoredRoute: <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
-      <span class="hljs-keyword">return</span> localStorage &amp;&amp; localStorage.getItem(
-        <span class="hljs-keyword">this</span>._getStoreKey(<span class="hljs-string">'path'</span>)
-      );
-    },</pre></div></div>
             
         </li>
         
@@ -3274,8 +3255,7 @@ null if not existing, false if localStorage doesn’t exist</em></li>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-195">&#182;</a>
               </div>
-              <hr>
-
+              
             </div>
             
         </li>
@@ -3287,8 +3267,17 @@ null if not existing, false if localStorage doesn’t exist</em></li>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-196">&#182;</a>
               </div>
-              
+              <p><strong>Retrieve the stored route if any</strong></p>
+<ul>
+<li><em>@return {String} The currenlty stored route as a string,
+null if not existing, false if localStorage doesn’t exist</em></li>
+</ul>
+
             </div>
+            
+            <div class="content"><div class='highlight'><pre>    _getStoredRoute: <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
+      <span class="hljs-keyword">return</span> localStorage &amp;&amp; localStorage.getItem(<span class="hljs-keyword">this</span>._getStoreKey(<span class="hljs-string">'path'</span>));
+    },</pre></div></div>
             
         </li>
         
@@ -3299,17 +3288,9 @@ null if not existing, false if localStorage doesn’t exist</em></li>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-197">&#182;</a>
               </div>
-              <p><strong>Clear the stored route</strong></p>
+              <hr>
 
             </div>
-            
-            <div class="content"><div class='highlight'><pre>    _clearStore: <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
-      <span class="hljs-keyword">if</span> (localStorage) {
-        localStorage.removeItem(
-          <span class="hljs-keyword">this</span>._getStoreKey(<span class="hljs-string">'path'</span>)
-        );
-      }
-    },</pre></div></div>
             
         </li>
         
@@ -3320,8 +3301,7 @@ null if not existing, false if localStorage doesn’t exist</em></li>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-198">&#182;</a>
               </div>
-              <hr>
-
+              
             </div>
             
         </li>
@@ -3333,8 +3313,17 @@ null if not existing, false if localStorage doesn’t exist</em></li>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-199">&#182;</a>
               </div>
-              
+              <p><strong>Clear the stored route</strong></p>
+
             </div>
+            
+            <div class="content"><div class='highlight'><pre>    _clearStore: <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
+      <span class="hljs-keyword">if</span> (localStorage) {
+        localStorage.removeItem(<span class="hljs-keyword">this</span>._getStoreKey(<span class="hljs-string">'path'</span>));
+        <span class="hljs-keyword">return</span> <span class="hljs-literal">true</span>;
+      }
+      <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>;
+    },</pre></div></div>
             
         </li>
         
@@ -3345,13 +3334,9 @@ null if not existing, false if localStorage doesn’t exist</em></li>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-200">&#182;</a>
               </div>
-              <p><strong>Remove heading slash or pound sign from a path, if any</strong></p>
+              <hr>
 
             </div>
-            
-            <div class="content"><div class='highlight'><pre>    _stripHeadingSlash: <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">path</span>) </span>{
-      <span class="hljs-keyword">return</span> path.replace(re.headingSlash, <span class="hljs-string">''</span>);
-    },</pre></div></div>
             
         </li>
         
@@ -3362,8 +3347,7 @@ null if not existing, false if localStorage doesn’t exist</em></li>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-201">&#182;</a>
               </div>
-              <hr>
-
+              
             </div>
             
         </li>
@@ -3375,8 +3359,13 @@ null if not existing, false if localStorage doesn’t exist</em></li>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-202">&#182;</a>
               </div>
-              
+              <p><strong>Remove heading slash or pound sign from a path, if any</strong></p>
+
             </div>
+            
+            <div class="content"><div class='highlight'><pre>    _stripHeadingSlash: <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">path</span>) </span>{
+      <span class="hljs-keyword">return</span> _.isString(path) &amp;&amp; path.replace(re.headingSlash, <span class="hljs-string">''</span>);
+    },</pre></div></div>
             
         </li>
         
@@ -3386,6 +3375,31 @@ null if not existing, false if localStorage doesn’t exist</em></li>
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-203">&#182;</a>
+              </div>
+              <hr>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-204">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-204">&#182;</a>
+              </div>
+              
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-205">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-205">&#182;</a>
               </div>
               <p><strong>Extract parameters from the path of a route</strong></p>
 
@@ -3401,11 +3415,11 @@ null if not existing, false if localStorage doesn’t exist</em></li>
         </li>
         
         
-        <li id="section-204">
+        <li id="section-206">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-204">&#182;</a>
+                <a class="pilcrow" href="#section-206">&#182;</a>
               </div>
               <hr>
 
@@ -3414,11 +3428,11 @@ null if not existing, false if localStorage doesn’t exist</em></li>
         </li>
         
         
-        <li id="section-205">
+        <li id="section-207">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-205">&#182;</a>
+                <a class="pilcrow" href="#section-207">&#182;</a>
               </div>
               
             </div>
@@ -3426,11 +3440,11 @@ null if not existing, false if localStorage doesn’t exist</em></li>
         </li>
         
         
-        <li id="section-206">
+        <li id="section-208">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-206">&#182;</a>
+                <a class="pilcrow" href="#section-208">&#182;</a>
               </div>
               <p><strong>Transform a route path to a regular expression</strong></p>
 
@@ -3443,38 +3457,13 @@ null if not existing, false if localStorage doesn’t exist</em></li>
         </li>
         
         
-        <li id="section-207">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-207">&#182;</a>
-              </div>
-              <hr>
-
-            </div>
-            
-        </li>
-        
-        
-        <li id="section-208">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-208">&#182;</a>
-              </div>
-              
-            </div>
-            
-        </li>
-        
-        
         <li id="section-209">
             <div class="annotation">
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-209">&#182;</a>
               </div>
-              <p><strong>Original Backbone.Router Methods</strong></p>
+              <hr>
 
             </div>
             
@@ -3487,6 +3476,31 @@ null if not existing, false if localStorage doesn’t exist</em></li>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-210">&#182;</a>
               </div>
+              
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-211">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-211">&#182;</a>
+              </div>
+              <p><strong>Original Backbone.Router Methods</strong></p>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-212">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-212">&#182;</a>
+              </div>
               <p>Listen to original Backbone.Router events</p>
 
             </div>
@@ -3498,11 +3512,11 @@ null if not existing, false if localStorage doesn’t exist</em></li>
         </li>
         
         
-        <li id="section-211">
+        <li id="section-213">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-211">&#182;</a>
+                <a class="pilcrow" href="#section-213">&#182;</a>
               </div>
               <p>Stop listening to original Backbone.Router events</p>
 
@@ -3515,11 +3529,11 @@ null if not existing, false if localStorage doesn’t exist</em></li>
         </li>
         
         
-        <li id="section-212">
+        <li id="section-214">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-212">&#182;</a>
+                <a class="pilcrow" href="#section-214">&#182;</a>
               </div>
               <p>Trigger event on original Backbone.Router</p>
 
@@ -3533,11 +3547,11 @@ null if not existing, false if localStorage doesn’t exist</em></li>
         </li>
         
         
-        <li id="section-213">
+        <li id="section-215">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-213">&#182;</a>
+                <a class="pilcrow" href="#section-215">&#182;</a>
               </div>
               <hr>
 
@@ -3546,11 +3560,11 @@ null if not existing, false if localStorage doesn’t exist</em></li>
         </li>
         
         
-        <li id="section-214">
+        <li id="section-216">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-214">&#182;</a>
+                <a class="pilcrow" href="#section-216">&#182;</a>
               </div>
               
             </div>
@@ -3558,11 +3572,11 @@ null if not existing, false if localStorage doesn’t exist</em></li>
         </li>
         
         
-        <li id="section-215">
+        <li id="section-217">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-215">&#182;</a>
+                <a class="pilcrow" href="#section-217">&#182;</a>
               </div>
               <p>Initialize Backbone.Highway controller instance</p>
 
@@ -3573,11 +3587,11 @@ null if not existing, false if localStorage doesn’t exist</em></li>
         </li>
         
         
-        <li id="section-216">
+        <li id="section-218">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-216">&#182;</a>
+                <a class="pilcrow" href="#section-218">&#182;</a>
               </div>
               <p>Return instance for AMD/Require environments</p>
 

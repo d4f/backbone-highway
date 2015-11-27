@@ -311,11 +311,21 @@ define([
     });
 
     describe('_sanitizeArgs', function () {
-      it.skip('should remove undesired argument values (null, undefined)', function () {});
+      it('should wrap into an array anything that is not an array or an object', function () {
+        router._sanitizeArgs(42).should.deep.equal([42]);
+        router._sanitizeArgs('something').should.deep.equal(['something']);
+      });
+      it('should remove undesired argument values (null, undefined)', function () {
+        router._sanitizeArgs([42, null, undefined]).should.deep.equal([42]);
+      });
     });
 
     describe('_isValidArgsArray', function () {
-      it.skip('should validate the structure and content of passed arguments', function () {});
+      it('should validate the structure and content of passed arguments sanitizing it before hand', function () {
+        router._isValidArgsArray(42).should.be.true;
+        router._isValidArgsArray([null, undefined]).should.be.false;
+        router._isValidArgsArray({0: 'bar'}).should.be.true;
+      });
     });
 
     describe('_stripHeadingSlash', function () {

@@ -841,9 +841,9 @@
 
     // --------------------------------
 
-    // **Check if parameter is a valid arguments array**
+    // **Check if parameter is a valid arguments array sanitizing it before hand**
     _isValidArgsArray: function (args) {
-      return _.isArray(args) && !_.isEmpty(this._sanitizeArgs(args));
+      return !_.isEmpty(this._sanitizeArgs(args));
     },
 
     // --------------------------------
