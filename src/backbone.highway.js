@@ -135,16 +135,6 @@
       // Store the event aggregator more conveniently
       this.dispatcher = this.options.dispatcher;
 
-      // Ensure that the dispatcher has the expected method.
-      // i.e. The method "trigger" of Backbone.Events
-      var hasCorrectDispatcher = this.dispatcher && _.isFunction(this.dispatcher.trigger);
-
-      // Throw an error if the given event aggregator does not seem to be compliant
-      if (!hasCorrectDispatcher) {
-        throw new ReferenceError('[Backbone.Highway.start] Missing a correct ' +
-          'dispatcher object, needs to be an instance of Backbone.Events');
-      }
-
       this.options.log('[Backbone.Highway.start] Starting router');
 
       // Extend original Backbone.Router
@@ -539,7 +529,9 @@
         });
 
         // Dispatch the event applying arguments
-        this.dispatcher.trigger.apply(this.dispatcher, args);
+        if (this.hasDispatcher) {
+          this.dispatcher.trigger.apply(this.dispatcher, args);
+        }
       }
       else if (_.isString(trigger)) {
         // Check if the trigger is actually a declared route
@@ -551,7 +543,9 @@
         }
         else {
           // Else give to the dispatcher
-          this.dispatcher.trigger.call(this.dispatcher, trigger);
+          if (this.hasDispatcher) {
+            this.dispatcher.trigger.call(this.dispatcher, trigger);
+          }
         }
       }
       else {
@@ -671,6 +665,10 @@
           this._applyStoredRoute();
         }
       }
+    },
+
+    hasDispatcher: function () {
+      return this.dispatcher && _.isFunction(this.dispatcher.trigger);
     },
 
     // --------------------------------

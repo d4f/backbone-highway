@@ -18,9 +18,16 @@ require.config({
     test: '../test/spec',
 
     jquery: '../demo/assets/vendor/jquery/dist/jquery.min',
-    underscore: '../demo/assets/vendor/underscore/underscore',
+    // underscore: '../demo/assets/vendor/underscore/underscore',
+    lodash: '../demo/assets/vendor/lodash/lodash',
     backbone: '../demo/assets/vendor/backbone/backbone',
     marionette: '../demo/assets/vendor/backbone.marionette/lib/backbone.marionette'
+  },
+
+  map: {
+    '*': {
+      underscore: 'lodash'
+    }
   },
 
   deps: [

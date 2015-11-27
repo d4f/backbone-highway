@@ -7,6 +7,9 @@ define([
 
   // jshint -W030
 
+  var RouterCopy = function () {};
+  RouterCopy.prototype = _.merge({}, router.prototype);
+
   before(function () {
     this.dispatcher = _.extend({}, Backbone.Events);
 
@@ -69,10 +72,9 @@ define([
 
   describe('Public method', function () {
     describe('start', function () {
-      it('should throw a ReferenceError if a dispatcher instance is missing', function () {
-        var fn = _.bind(router.start, router);
-        expect(fn).to.throw(ReferenceError);
-      });
+      // it('should throw a ReferenceError if a dispatcher instance is missing', function () {
+      //
+      // });
     });
 
     describe('map', function () {
@@ -330,8 +332,9 @@ define([
     describe('_isValidArgsArray', function () {
       it('should validate the structure and content of passed arguments sanitizing it before hand', function () {
         router._isValidArgsArray(42).should.be.true;
+        router._isValidArgsArray([42, 'edit', null]).should.be.true;
         router._isValidArgsArray([null, undefined]).should.be.false;
-        router._isValidArgsArray({0: 'bar'}).should.be.true;
+        router._isValidArgsArray([]).should.be.false;
       });
     });
 
