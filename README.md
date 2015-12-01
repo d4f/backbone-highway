@@ -64,7 +64,7 @@ $(function () {
 });
 ```
 
-To learn more about the routers capabilities see the full documentation.
+To learn more about the routers capabilities see the full documentation here : http://d4f.github.io/backbone-highway/
 
 ## Dependencies and structure
 
