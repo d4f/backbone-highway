@@ -5,7 +5,7 @@
     events: _.extend({}, Backbone.Events)
   };
 
-  Backbone.Highway.map(function () {
+  Backbone.Highway.define(function () {
     // Catching client-side 404s (optional)
     this.route('404', {
       action: function (path) {

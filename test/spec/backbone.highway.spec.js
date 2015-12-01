@@ -57,6 +57,14 @@ define([
       should.exist(router.map);
     });
 
+    it('should have a `define` method', function () {
+      should.exist(router.define);
+    });
+
+    it('should have a `declare` method', function () {
+      should.exist(router.declare);
+    });
+
     it('should have a `route` method', function () {
       should.exist(router.route);
     });
@@ -72,9 +80,7 @@ define([
 
   describe('Public method', function () {
     describe('start', function () {
-      // it('should throw a ReferenceError if a dispatcher instance is missing', function () {
-      //
-      // });
+      it.skip('should initialize Highway and the underlying Backbone.Router', function () {});
     });
 
     describe('map', function () {
@@ -86,6 +92,12 @@ define([
       it('should execute given definer function', function () {
         var callback = function () { return true; };
         router.map(callback).should.be.true;
+      });
+
+      it('should have `define` and `declare` as aliases', function () {
+        var callback = function () { return true; };
+        router.define(callback).should.be.true;
+        router.declare(callback).should.be.true;
       });
     });
 

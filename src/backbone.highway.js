@@ -111,6 +111,26 @@
     }
   };
 
+  // --------------------------------
+
+  // **Map a list of routes.**
+  // - *@param {Function} **method** - A method that receives the router as context*
+  //
+  // This method gets as the only parameter a function which will be executed in the router context,
+  // therefore, any methods of the router can be called from 'this' inside that function.
+  // Typically, only the 'route' method will be used.
+  var definer = function (method) {
+    if (!_.isFunction(method)) {
+      this.options.log('[Backbone.Highway.map] Missing routes definer method as the first parameter');
+      throw new TypeError(
+        '[Backbone.Highway.map] First and only argument should be a function, instead got ' +
+        (typeof method)
+      );
+    }
+
+    return method.call(this);
+  };
+
   // **Backbone.Highway commander**
   var Highway = function Highway () {};
 
@@ -121,6 +141,7 @@
     currentRoutes: [],
 
     // --------------------------------
+
     // **Initialize the Backbone.Highway router**
     // - *@param {Object} **options** - Object to override default router configuration*
     start: function (options) {
@@ -149,25 +170,14 @@
     },
 
     // --------------------------------
-    // **Map a list of routes.**
-    // - *@param {Function} **routesDefiner** - A method that receives the router as context*
-    //
-    // This method gets as the only parameter a function which will be executed in the router context,
-    // therefore, any methods of the router can be called from 'this' inside that function.
-    // Typically, only the 'route' method will be used.
-    map: function (definer) {
-      if (!_.isFunction(definer)) {
-        this.options.log('[Backbone.Highway.map] Missing routes definer method as the first param');
-        throw new TypeError(
-          '[Backbone.Highway.map] First and only argument should be a function, instead got ' +
-          (typeof defined)
-        );
-      }
 
-      return definer.call(this);
-    },
+    // Apply the definer method to Highway prototype
+    map: definer,
+    define: definer,
+    declare: definer,
 
     // --------------------------------
+
     // **Declare a route and its actions to the Router.**
     // - *@param  {String} **name** The name of the route, needs to be unique (e.g. 'user.add')*
     // - *@param  {Object} **def**  The route definition object*
