@@ -123,6 +123,13 @@
       }
     });
 
+    this.route('trailing.slash', {
+      path: '/trailing(/:param)(/)',
+      action: function (param) {
+        console.log('Trailing ' + param);
+      }
+    });
+
   });
 
   App.MenuView = Backbone.Marionette.ItemView.extend({

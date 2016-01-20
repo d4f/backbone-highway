@@ -301,6 +301,11 @@ define([
         router._parse('/article/p:id(/*options)', [5]).should.equal('/article/p5');
         router._parse('/article/p:id(/*options)', [5, 'view/details']).should.equal('/article/p5/view/details');
       });
+
+      it('should allow optional parts that do not contain any parameters', function () {
+        router._parse('/users(/:id)(/)', []).should.equal('/users');
+        router._parse('/users(/:id)(/)', [42]).should.equal('/users/42');
+      });
     });
 
     describe('_replaceArg', function () {

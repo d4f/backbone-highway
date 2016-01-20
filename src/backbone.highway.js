@@ -803,7 +803,7 @@
       });
 
       // Remove remaining parentheses and trailing slashes
-      path = path.replace(re.parentheses, '').replace(re.trailingSlash);
+      path = path.replace(re.parentheses, '').replace(re.trailingSlash, '');
 
       // Validate path
       this._checkPath(path);
