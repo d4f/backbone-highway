@@ -5,7 +5,7 @@
     events: _.extend({}, Backbone.Events)
   };
 
-  Backbone.Highway.map(function () {
+  Backbone.Highway.define(function () {
     // Catching client-side 404s (optional)
     this.route('404', {
       action: function (path) {
@@ -120,6 +120,13 @@
       path: '/splat(/p:id)(/name/*path)',
       action: function () {
         console.log('Splat route', arguments);
+      }
+    });
+
+    this.route('trailing.slash', {
+      path: '/trailing(/:param)(/)',
+      action: function (param) {
+        console.log('Trailing ' + param);
       }
     });
 

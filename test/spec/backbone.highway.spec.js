@@ -57,6 +57,14 @@ define([
       should.exist(router.map);
     });
 
+    it('should have a `define` method', function () {
+      should.exist(router.define);
+    });
+
+    it('should have a `declare` method', function () {
+      should.exist(router.declare);
+    });
+
     it('should have a `route` method', function () {
       should.exist(router.route);
     });
@@ -72,9 +80,7 @@ define([
 
   describe('Public method', function () {
     describe('start', function () {
-      // it('should throw a ReferenceError if a dispatcher instance is missing', function () {
-      //
-      // });
+      it.skip('should initialize Highway and the underlying Backbone.Router', function () {});
     });
 
     describe('map', function () {
@@ -86,6 +92,12 @@ define([
       it('should execute given definer function', function () {
         var callback = function () { return true; };
         router.map(callback).should.be.true;
+      });
+
+      it('should have `define` and `declare` as aliases', function () {
+        var callback = function () { return true; };
+        router.define(callback).should.be.true;
+        router.declare(callback).should.be.true;
       });
     });
 
@@ -288,6 +300,11 @@ define([
         router._parse('/article/*options', ['42/edit']).should.equal('/article/42/edit');
         router._parse('/article/p:id(/*options)', [5]).should.equal('/article/p5');
         router._parse('/article/p:id(/*options)', [5, 'view/details']).should.equal('/article/p5/view/details');
+      });
+
+      it('should allow optional parts that do not contain any parameters', function () {
+        router._parse('/users(/:id)(/)', []).should.equal('/users');
+        router._parse('/users(/:id)(/)', [42]).should.equal('/users/42');
       });
     });
 
