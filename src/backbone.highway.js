@@ -172,6 +172,16 @@
 
     // --------------------------------
 
+    // **Restart the router**
+    // This actually stops and starts the Backbone.history module,
+    // effectively re-executing the currently displayed route.
+    restart: function () {
+      Backbone.history.stop();
+      Backbone.history.start();
+    },
+
+    // --------------------------------
+
     // Apply the definer method to Highway prototype
     map: definer,
     define: definer,
@@ -459,6 +469,8 @@
         return false;
       }
 
+      var sameRoute = _.isEmpty(_.without(this.currentRoutes, name));
+
       // Re-initialize currentRoutes storage
       this.currentRoutes = [];
 
@@ -474,6 +486,10 @@
       if (path !== false) {
         // Navigate the Backbone.Router
         router.navigate(path, options);
+
+        if (sameRoute && options.force) {
+          this.restart();
+        }
       }
 
       return true;
