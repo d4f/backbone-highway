@@ -483,13 +483,15 @@
         path = path && this._parse(path, args);
       }
 
-      if (path !== false) {
-        // Navigate the Backbone.Router
-        router.navigate(path, options);
+      if (path === false) {
+        return false;
+      }
 
-        if (sameRoute && options.force) {
-          this.restart();
-        }
+      // Navigate the Backbone.Router
+      router.navigate(path, options);
+
+      if (sameRoute && options.force) {
+        this.restart();
       }
 
       return true;
