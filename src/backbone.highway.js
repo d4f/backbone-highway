@@ -315,6 +315,7 @@
         closeControllers[currentName] = def.close;
       }
 
+      // TODO:0 Refactor this part into a factory
       var controllerWrapper = function (args, trigger) {
         // Store the current route name if it is not a trigger
         if (!trigger) {
@@ -348,8 +349,8 @@
           return false;
         }
 
-        // Check if the route is an alias
-        // - FIXME:0 Aliasing through the action parameter will probably conflict with before/after triggers
+        // Check if the route is an alias.
+        // Aliasing through the action parameter will probably conflict with before/after triggers
         if (_.isString(def.action)) {
           self.options.log('[Backbone.Highway] Caught alias route: "' + currentName + '" >> "' + def.action + '"');
 
@@ -406,6 +407,8 @@
     // - @param  {Mixed} **name** - Route name
     // - @param  {Array} **args** - List of arguments to pass along
     // - @return {Boolean} Will return false if the routing was cancelled, else true
+    //
+    // TODO:20 issue:21 Remove root url from path
     go: function (name, args, options) {
       var route = null;
       var path = null;
@@ -477,7 +480,8 @@
       // Extend default router navigate options
       options = _.extend({trigger: true, replace: false}, options);
 
-      if (!path) {
+      // Path is still not known
+      if (path === null) {
         // Retrieve route path passing arguments
         path = this._path(name);
         path = path && this._parse(path, args);

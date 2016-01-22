@@ -157,13 +157,12 @@ define([
         router.go('home').should.be.true;
       });
 
-      // it.only('should re-execute the current controller when navigating with option force=true', function () {
-      //   router.go('settings');
-      //
-      //   router.go('home').should.be.true;
-      //   router.go('home').should.be.false;
-      //   // router.go('home', null, {force: true}).should.be.true;
-      // });
+      it.skip('should re-execute the current controller when navigating with option force=true', function () {
+        router.go('settings');
+        router.go('home').should.be.true;
+        router.go('home').should.be.false;
+        // router.go('home', null, {force: true}).should.be.true;
+      });
     });
 
     describe('clearCache', function () {
