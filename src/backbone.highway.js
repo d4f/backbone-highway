@@ -437,7 +437,7 @@
       }
 
       // Convert object args to array
-      if (_.isObject(args)) {
+      if (!_.isArray(args)) {
         var paramNames = this._getPath(name).match(re.namedParams);
         args = _.map(paramNames, function (name) {
           return args[name.substr(1)];
