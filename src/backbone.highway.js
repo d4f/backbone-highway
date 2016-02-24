@@ -437,7 +437,7 @@
 
       // Convert object args to array
       if (_.isObject(args)) {
-        var paramNames = this._path(name).match(re.namedParams);
+        var paramNames = this._getPath(name).match(re.namedParams);
         args = _.map(paramNames, function (name) {
           return args[name.substr(1)];
         });
@@ -732,11 +732,16 @@
     //
     // Pass in optional arguments to be parsed into the path.
     _path: function (routeName, args) {
+      var path = this._getPath(routeName);
+      return path && this._parse(path, args);
+    },
+
+    _getPath: function (routeName) {
       var path;
 
       for (path in routes) {
         if (routes[path] === routeName) {
-          return args ? this._parse(path, args) : path;
+          return path;
         }
       }
 
