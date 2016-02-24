@@ -435,6 +435,14 @@
         return false;
       }
 
+      // Convert object args to array
+      if (_.isObject(args)) {
+        var paramNames = this._path(name).match(re.namedParams);
+        args = _.map(paramNames, function (name) {
+          return args[name.substr(1)];
+        });
+      }
+
       var continueProcess = true;
 
       _.forEach(this.currentRoutes, _.bind(function (route) {
@@ -728,7 +736,7 @@
 
       for (path in routes) {
         if (routes[path] === routeName) {
-          return this._parse(path, args);
+          return args ? this._parse(path, args) : path;
         }
       }
 
