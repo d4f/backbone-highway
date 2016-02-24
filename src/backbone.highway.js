@@ -53,7 +53,8 @@
     parentheses: /[\(\)]/g,
     optionalParams: /\((.*?)\)/g,
     splatParams: /\*\w+/g,
-    namedParam: /(\(\?)?:\w+/
+    namedParam: /(\(\?)?:\w+/,
+    namedParams: /(\(\?)?:\w+/g
   };
 
   // --------------------------------
