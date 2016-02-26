@@ -53,7 +53,8 @@
     parentheses: /[\(\)]/g,
     optionalParams: /\((.*?)\)/g,
     splatParams: /\*\w+/g,
-    namedParam: /(\(\?)?:\w+/
+    namedParam: /(\(\?)?:\w+/,
+    namedParams: /(\(\?)?:\w+/g
   };
 
   // --------------------------------
@@ -245,10 +246,10 @@
     // }
     // ```
     route: function (name, def) {
-      var self = this,
-        routesExtension = {},
-        controllerExtension = {},
-        currentName = name;
+      var self = this;
+      var routesExtension = {};
+      var controllerExtension = {};
+      var currentName = name;
 
       if (!_.isString(name)) {
         throw new ReferenceError('[Backbone.Highway.route] Route name should be a string');
@@ -338,7 +339,7 @@
         }
 
         // Check if the route is an alias
-        // - FIXME Aliasing through the action parameter will probably conflict with before/after triggers
+        // - FIXME:0 Aliasing through the action parameter will probably conflict with before/after triggers
         if (_.isString(def.action)) {
           self.options.log('[Backbone.Highway] Caught alias route: "' + currentName + '" >> "' + def.action + '"');
 
@@ -396,8 +397,8 @@
     // - @param  {Array} **args** - List of arguments to pass along
     // - @return {Boolean} Will return false if the routing was cancelled, else true
     go: function (name, args, options) {
-      var route = null,
-          path = null;
+      var route = null;
+      var path = null;
 
       // Check if an object is given instead of a string
       if (_.isObject(name)) {
@@ -416,7 +417,7 @@
         args = route.args || args;
       }
 
-      // FIXME - go({path: '/'}) will generate an empty path string, thus full-filling this condition when it should not
+      // Check if necessary arguments are passed
       if (!name && path === null) {
         this.options.log('[Backbone.Highway.go] Missing parameters, name or path is necessary');
         return false;
@@ -433,6 +434,14 @@
         this._httpError(404);
 
         return false;
+      }
+
+      // Convert object args to array
+      if (!_.isUndefined(args) && !_.isArray(args)) {
+        var paramNames = this._path(name).match(re.namedParams);
+        args = _.map(paramNames, function (name) {
+          return args[name.substr(1)];
+        });
       }
 
       var continueProcess = true;
@@ -458,7 +467,8 @@
 
       if (!path) {
         // Retrieve route path passing arguments
-        path = this._path(name, args);
+        path = this._path(name);
+        path = path && this._parse(path, args);
       }
 
       if (path !== false) {
@@ -566,9 +576,9 @@
     //   eventually arguments to be passed to the controller*
     // - @param {Boolean} **isTrigger** Is the controller being executed as a trigger i.e. as an alias
     _processControllers: function (def, isTrigger) {
-      var self = this,
-          name = def.name,
-          args = def.args;
+      var self = this;
+      var name = def.name;
+      var args = def.args;
 
       // Do not interpret control as a trigger by default
       isTrigger = isTrigger || false;
@@ -578,6 +588,7 @@
         // Extract parameters from path if possible
         if (def.path) {
           args = this._extractParameters(name, def.path);
+
           // Backbone gives [null] for routes without arguments
           // so if there is not more than one argument use the passed arguments instead
           if (args.length === 1 && args[0] === null) {
@@ -672,7 +683,8 @@
       }
     },
 
-    hasDispatcher: function () {
+    // **Determine if a dispatcher (event aggregator) was passed with the options when the router was started.**
+    _hasDispatcher: function () {
       return this.dispatcher && _.isFunction(this.dispatcher.trigger);
     },
 
@@ -719,16 +731,13 @@
 
     // **Retrieve the path of a route by it's name.**
     // - *@param  {String} **routeName**  The route name*
-    // - *@param  {Array}  **args**       The arguments that need to be injected into the path*
-    // - *@return {String} The route path or false if the route doesn't exist*
-    //
-    // Pass in optional arguments to be parsed into the path.
-    _path: function (routeName, args) {
+    // - *@return {String} The raw route path or false if the route doesn't exist*
+    _path: function (name) {
       var path;
 
       for (path in routes) {
-        if (routes[path] === routeName) {
-          return this._parse(path, args);
+        if (routes[path] === name) {
+          return path;
         }
       }
 
