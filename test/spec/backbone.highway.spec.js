@@ -217,12 +217,7 @@ define([
       });
 
       it('should return the route url with injected parameters for an existing route', function () {
-        router._path('users.detail', [42]).should.equal('users/42');
-      });
-
-      it('should throw an error if mandatory parameters are not passed', function () {
-        var fn = _.bind(router._path, router, 'users.detail', []);
-        expect(fn).to.throw(ReferenceError, /Missing necessary arguments/);
+        router._path('users.detail').should.equal('users/:id');
       });
     });
 
@@ -277,8 +272,8 @@ define([
       });
 
       it('should remove optional parameters part from path if no or part of arguments are given', function () {
-        var simpleRoute = '/users(/:id)',
-            complicatedRoute = '/users(/:id)(/edit/:context)';
+        var simpleRoute = '/users(/:id)';
+        var complicatedRoute = '/users(/:id)(/edit/:context)';
 
         router._parse(simpleRoute).should.equal('/users');
         router._parse(simpleRoute, [null]).should.equal('/users');
@@ -312,9 +307,11 @@ define([
       it('should replace a named parameters', function () {
         router._replaceArg('/user/:id', '42').should.equal('/user/42');
       });
+
       it('should replace a splat parameter', function () {
         router._replaceArg('/user/*definition', '42/edit').should.equal('/user/42/edit');
       });
+
       it('should return path unaltered if no parameters are left to be replaced', function () {
         router._replaceArg('/user/42', 'name').should.equal('/user/42');
       });
@@ -341,6 +338,7 @@ define([
         router._sanitizeArgs(42).should.deep.equal([42]);
         router._sanitizeArgs('something').should.deep.equal(['something']);
       });
+
       it('should remove undesired argument values (null, undefined)', function () {
         router._sanitizeArgs([42, null, undefined]).should.deep.equal([42]);
       });
@@ -363,13 +361,16 @@ define([
       it('should return false if wrong parameter type is given', function () {
         router._stripHeadingSlash(777).should.be.false;
         router._stripHeadingSlash(['stuff']).should.be.false;
-        router._stripHeadingSlash({some: 'object'}).should.be.false;
+        router._stripHeadingSlash({
+          some: 'object'
+        }).should.be.false;
       });
     });
 
     describe('_getStoreKey', function () {
       it('should generate a localStorage key from options', function () {
-        var store = router.options.store, key = 'path';
+        var store = router.options.store;
+        var key = 'path';
         router._getStoreKey(key).should.equal(store.prefix + store.separator + key);
       });
     });

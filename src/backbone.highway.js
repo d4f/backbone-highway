@@ -246,10 +246,10 @@
     // }
     // ```
     route: function (name, def) {
-      var self = this,
-        routesExtension = {},
-        controllerExtension = {},
-        currentName = name;
+      var self = this;
+      var routesExtension = {};
+      var controllerExtension = {};
+      var currentName = name;
 
       if (!_.isString(name)) {
         throw new ReferenceError('[Backbone.Highway.route] Route name should be a string');
@@ -397,8 +397,8 @@
     // - @param  {Array} **args** - List of arguments to pass along
     // - @return {Boolean} Will return false if the routing was cancelled, else true
     go: function (name, args, options) {
-      var route = null,
-          path = null;
+      var route = null;
+      var path = null;
 
       // Check if an object is given instead of a string
       if (_.isObject(name)) {
@@ -467,7 +467,8 @@
 
       if (!path) {
         // Retrieve route path passing arguments
-        path = this._path(name, args);
+        path = this._path(name);
+        path = path && this._parse(path, args);
       }
 
       if (path !== false) {
@@ -575,9 +576,9 @@
     //   eventually arguments to be passed to the controller*
     // - @param {Boolean} **isTrigger** Is the controller being executed as a trigger i.e. as an alias
     _processControllers: function (def, isTrigger) {
-      var self = this,
-          name = def.name,
-          args = def.args;
+      var self = this;
+      var name = def.name;
+      var args = def.args;
 
       // Do not interpret control as a trigger by default
       isTrigger = isTrigger || false;
@@ -587,6 +588,7 @@
         // Extract parameters from path if possible
         if (def.path) {
           args = this._extractParameters(name, def.path);
+
           // Backbone gives [null] for routes without arguments
           // so if there is not more than one argument use the passed arguments instead
           if (args.length === 1 && args[0] === null) {
@@ -681,7 +683,8 @@
       }
     },
 
-    hasDispatcher: function () {
+    // **Determine if a dispatcher (event aggregator) was passed with the options when the router was started.**
+    _hasDispatcher: function () {
       return this.dispatcher && _.isFunction(this.dispatcher.trigger);
     },
 
@@ -728,20 +731,12 @@
 
     // **Retrieve the path of a route by it's name.**
     // - *@param  {String} **routeName**  The route name*
-    // - *@param  {Array}  **args**       The arguments that need to be injected into the path*
-    // - *@return {String} The route path or false if the route doesn't exist*
-    //
-    // Pass in optional arguments to be parsed into the path.
-    _path: function (routeName, args) {
-      var path = this._getPath(routeName);
-      return path && this._parse(path, args);
-    },
-
-    _getPath: function (routeName) {
+    // - *@return {String} The raw route path or false if the route doesn't exist*
+    _path: function (name) {
       var path;
 
       for (path in routes) {
-        if (routes[path] === routeName) {
+        if (routes[path] === name) {
           return path;
         }
       }
