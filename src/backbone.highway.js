@@ -339,7 +339,7 @@
         }
 
         // Check if the route is an alias
-        // - FIXME Aliasing through the action parameter will probably conflict with before/after triggers
+        // - FIXME:0 Aliasing through the action parameter will probably conflict with before/after triggers
         if (_.isString(def.action)) {
           self.options.log('[Backbone.Highway] Caught alias route: "' + currentName + '" >> "' + def.action + '"');
 
@@ -417,7 +417,7 @@
         args = route.args || args;
       }
 
-      // FIXME - go({path: '/'}) will generate an empty path string, thus full-filling this condition when it should not
+      // Check if necessary arguments are passed
       if (!name && path === null) {
         this.options.log('[Backbone.Highway.go] Missing parameters, name or path is necessary');
         return false;
