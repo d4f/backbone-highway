@@ -126,6 +126,16 @@ define([
         router.go({path: '/'}).should.be.true;
       });
 
+      it('should accept an object with named parameters as arguments', function () {
+        router.go('users.detail', {id: 42}).should.be.true;
+        Backbone.history.getFragment().should.equal('users/42');
+
+        router.go('home');
+
+        router.go({name: 'users.detail', args: {id: 42}}).should.be.true;
+        Backbone.history.getFragment().should.equal('users/42');
+      });
+
       it('should change the url fragment', function () {
         router.go('home').should.be.true;
         Backbone.history.getFragment().should.equal('');
