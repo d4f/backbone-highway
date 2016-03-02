@@ -115,14 +115,17 @@ define([
 
     describe('go', function () {
       it('should accept a route name', function () {
+        router.go('settings');
         router.go('home').should.be.true;
       });
 
       it('should accept a route object with a name', function () {
+        router.go('settings');
         router.go({name: 'home'}).should.be.true;
       });
 
       it('should accept a route object with a path', function () {
+        router.go('settings');
         router.go({path: '/'}).should.be.true;
       });
 
@@ -157,7 +160,7 @@ define([
         router.go('home').should.be.true;
       });
 
-      it.skip('should re-execute the current controller when navigating with option force=true', function () {
+      it('should re-execute the current controller when navigating with option force=true', function () {
         router.go('settings');
         router.go('home').should.be.true;
         router.go('home').should.be.false;

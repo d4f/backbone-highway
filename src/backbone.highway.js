@@ -411,6 +411,9 @@
       var route = null;
       var path = null;
 
+      // Extend default router navigate options
+      options = _.extend({trigger: true, replace: false}, options);
+
       // Check if an object is given instead of a string
       if (_.isObject(name)) {
         // Rename object
@@ -448,6 +451,19 @@
         return false;
       }
 
+      // Try to retrieve name if it is still missing
+      if (!name) {
+        name = this._name(path);
+      }
+
+      // Determine if the requested route is the same as the last one
+      var sameRoute = _.isEmpty(_.without(this.currentRoutes, name));
+
+      // If it is the same route and the force option was not passed return false
+      if (sameRoute && !options.force) {
+        return false;
+      }
+
       // Convert object args to array
       if (!_.isUndefined(args) && !_.isArray(args)) {
         var paramNames = this._path(name).match(re.namedParams);
@@ -471,14 +487,6 @@
         return false;
       }
 
-      var sameRoute = _.isEmpty(_.without(this.currentRoutes, name));
-
-      // Re-initialize currentRoutes storage
-      this.currentRoutes = [];
-
-      // Extend default router navigate options
-      options = _.extend({trigger: true, replace: false}, options);
-
       // Path is still not known
       if (path === null) {
         // Retrieve route path passing arguments
@@ -486,14 +494,19 @@
         path = path && this._parse(path, args);
       }
 
+      // If an error occured retrieving the path
       if (path === false) {
         return false;
       }
 
+      // Re-initialize currentRoutes storage
+      this.currentRoutes = [];
+
       // Navigate the Backbone.Router
       router.navigate(path, options);
 
-      if (sameRoute && options.force) {
+      // Restart Backbone.history to re-execute the same route
+      if (sameRoute) {
         this.restart();
       }
 
