@@ -214,7 +214,7 @@
         login: 'signin'
       },
       // silent: true,
-      // "root": "/admin",
+      root: '/admin',
       // "pushState": false
     });
 

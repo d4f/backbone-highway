@@ -172,6 +172,16 @@
 
     // --------------------------------
 
+    // **Restart the router**
+    // This actually stops and starts the Backbone.history module,
+    // effectively re-executing the currently displayed route.
+    restart: function () {
+      Backbone.history.stop();
+      Backbone.history.start();
+    },
+
+    // --------------------------------
+
     // Apply the definer method to Highway prototype
     map: definer,
     define: definer,
@@ -305,6 +315,7 @@
         closeControllers[currentName] = def.close;
       }
 
+      // Declare a controller wrapper
       var controllerWrapper = function (args, trigger) {
         // Store the current route name if it is not a trigger
         if (!trigger) {
@@ -338,8 +349,8 @@
           return false;
         }
 
-        // Check if the route is an alias
-        // - FIXME:0 Aliasing through the action parameter will probably conflict with before/after triggers
+        // Check if the route is an alias.
+        // Aliasing through the action parameter will probably conflict with before/after triggers
         if (_.isString(def.action)) {
           self.options.log('[Backbone.Highway] Caught alias route: "' + currentName + '" >> "' + def.action + '"');
 
@@ -395,10 +406,13 @@
     // **Route the application to a specific named route**
     // - @param  {Mixed} **name** - Route name
     // - @param  {Array} **args** - List of arguments to pass along
-    // - @return {Boolean} Will return false if the routing was cancelled, else true
+    // - @return {Boolean} Will return false if the routing was cancelled or failed, else true
     go: function (name, args, options) {
       var route = null;
       var path = null;
+
+      // Extend default router navigate options
+      options = _.extend({trigger: true, replace: false}, options);
 
       // Check if an object is given instead of a string
       if (_.isObject(name)) {
@@ -410,7 +424,8 @@
 
         // Transfer route path and remove first slash
         if (_.isString(route.path)) {
-          path = this._stripHeadingSlash(route.path);
+          path = this._removeRootUrl(route.path);
+          path = this._stripHeadingSlash(path);
         }
 
         // Transfer args
@@ -433,6 +448,19 @@
         // Execute 404 controller
         this._httpError(404);
 
+        return false;
+      }
+
+      // Try to retrieve name if it is still missing
+      if (!name) {
+        name = this._name(path);
+      }
+
+      // Determine if the requested route is the same as the last one
+      var sameRoute = _.isEmpty(_.without(this.currentRoutes, name));
+
+      // If it is the same route and the force option was not passed return false
+      if (sameRoute && !options.force) {
         return false;
       }
 
@@ -459,21 +487,27 @@
         return false;
       }
 
-      // Re-initialize currentRoutes storage
-      this.currentRoutes = [];
-
-      // Extend default router navigate options
-      options = _.extend({trigger: true, replace: false}, options);
-
-      if (!path) {
+      // Path is still not known
+      if (path === null) {
         // Retrieve route path passing arguments
         path = this._path(name);
         path = path && this._parse(path, args);
       }
 
-      if (path !== false) {
-        // Navigate the Backbone.Router
-        router.navigate(path, options);
+      // If an error occured retrieving the path
+      if (path === false) {
+        return false;
+      }
+
+      // Re-initialize currentRoutes storage
+      this.currentRoutes = [];
+
+      // Navigate the Backbone.Router
+      router.navigate(path, options);
+
+      // Restart Backbone.history to re-execute the same route
+      if (sameRoute) {
+        this.restart();
       }
 
       return true;
@@ -544,7 +578,7 @@
         });
 
         // Dispatch the event applying arguments
-        if (this.hasDispatcher()) {
+        if (this._hasDispatcher()) {
           this.dispatcher.trigger.apply(this.dispatcher, args);
         }
       }
@@ -558,7 +592,7 @@
         }
         else {
           // Else give to the dispatcher
-          if (this.hasDispatcher()) {
+          if (this._hasDispatcher()) {
             this.dispatcher.trigger.call(this.dispatcher, trigger);
           }
         }
@@ -682,6 +716,8 @@
         }
       }
     },
+
+    // --------------------------------
 
     // **Determine if a dispatcher (event aggregator) was passed with the options when the router was started.**
     _hasDispatcher: function () {
@@ -906,6 +942,13 @@
     // **Remove heading slash or pound sign from a path, if any**
     _stripHeadingSlash: function (path) {
       return _.isString(path) && path.replace(re.headingSlash, '');
+    },
+
+    // --------------------------------
+
+    // **Remove pushState root url from path**
+    _removeRootUrl: function (path) {
+      return _.isString(path) && path.replace(this.options.root, '');
     },
 
     // --------------------------------

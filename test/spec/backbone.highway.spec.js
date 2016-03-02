@@ -115,14 +115,17 @@ define([
 
     describe('go', function () {
       it('should accept a route name', function () {
+        router.go('settings');
         router.go('home').should.be.true;
       });
 
       it('should accept a route object with a name', function () {
+        router.go('settings');
         router.go({name: 'home'}).should.be.true;
       });
 
       it('should accept a route object with a path', function () {
+        router.go('settings');
         router.go({path: '/'}).should.be.true;
       });
 
@@ -155,6 +158,13 @@ define([
 
         this.options.allowClose = true;
         router.go('home').should.be.true;
+      });
+
+      it('should re-execute the current controller when navigating with option force=true', function () {
+        router.go('settings');
+        router.go('home').should.be.true;
+        router.go('home').should.be.false;
+        router.go('home', null, {force: true}).should.be.true;
       });
     });
 
@@ -417,5 +427,13 @@ define([
         expect(re instanceof RegExp).to.be.ok;
       });
     });
+
+    describe('_removeRootUrl', function () {
+      it('should remove pushState root url from path', function () {
+        router.options.root = '/root-url';
+        router._removeRootUrl('/root-url/testing').should.equal('/testing');
+        router.options.root = '';
+      });
+    })
   });
 });

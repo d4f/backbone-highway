@@ -7,3 +7,5 @@ demo/assets/vendor
 
 *.sublime-project
 *.sublime-workspace
+
+.imdone
