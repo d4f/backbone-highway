@@ -424,5 +424,13 @@ define([
         expect(re instanceof RegExp).to.be.ok;
       });
     });
+
+    describe('_removeRootUrl', function () {
+      it('should remove pushState root url from path', function () {
+        router.options.root = '/root-url';
+        router._removeRootUrl('/root-url/testing').should.equal('/testing');
+        router.options.root = '';
+      });
+    })
   });
 });

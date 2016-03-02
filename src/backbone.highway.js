@@ -315,7 +315,7 @@
         closeControllers[currentName] = def.close;
       }
 
-      // TODO:0 Refactor this part into a factory
+      // Declare a controller wrapper
       var controllerWrapper = function (args, trigger) {
         // Store the current route name if it is not a trigger
         if (!trigger) {
@@ -406,9 +406,7 @@
     // **Route the application to a specific named route**
     // - @param  {Mixed} **name** - Route name
     // - @param  {Array} **args** - List of arguments to pass along
-    // - @return {Boolean} Will return false if the routing was cancelled, else true
-    //
-    // TODO:20 issue:21 Remove root url from path
+    // - @return {Boolean} Will return false if the routing was cancelled or failed, else true
     go: function (name, args, options) {
       var route = null;
       var path = null;
@@ -423,7 +421,8 @@
 
         // Transfer route path and remove first slash
         if (_.isString(route.path)) {
-          path = this._stripHeadingSlash(route.path);
+          path = this._removeRootUrl(route.path);
+          path = this._stripHeadingSlash(path);
         }
 
         // Transfer args
@@ -566,7 +565,7 @@
         });
 
         // Dispatch the event applying arguments
-        if (this.hasDispatcher()) {
+        if (this._hasDispatcher()) {
           this.dispatcher.trigger.apply(this.dispatcher, args);
         }
       }
@@ -580,7 +579,7 @@
         }
         else {
           // Else give to the dispatcher
-          if (this.hasDispatcher()) {
+          if (this._hasDispatcher()) {
             this.dispatcher.trigger.call(this.dispatcher, trigger);
           }
         }
@@ -704,6 +703,8 @@
         }
       }
     },
+
+    // --------------------------------
 
     // **Determine if a dispatcher (event aggregator) was passed with the options when the router was started.**
     _hasDispatcher: function () {
@@ -928,6 +929,13 @@
     // **Remove heading slash or pound sign from a path, if any**
     _stripHeadingSlash: function (path) {
       return _.isString(path) && path.replace(re.headingSlash, '');
+    },
+
+    // --------------------------------
+
+    // **Remove pushState root url from path**
+    _removeRootUrl: function (path) {
+      return _.isString(path) && path.replace(this.options.root, '');
     },
 
     // --------------------------------
