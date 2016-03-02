@@ -1456,11 +1456,11 @@ matching those declared in the route path</li>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-86">&#182;</a>
               </div>
-              <p>Extend default router navigate options</p>
+              <p>Check if an object is given instead of a string</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>      options = _.extend({trigger: <span class="hljs-literal">true</span>, replace: <span class="hljs-literal">false</span>}, options);</pre></div></div>
+            <div class="content"><div class='highlight'><pre>      <span class="hljs-keyword">if</span> (_.isObject(name)) {</pre></div></div>
             
         </li>
         
@@ -1471,11 +1471,11 @@ matching those declared in the route path</li>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-87">&#182;</a>
               </div>
-              <p>Check if an object is given instead of a string</p>
+              <p>Rename object</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>      <span class="hljs-keyword">if</span> (_.isObject(name)) {</pre></div></div>
+            <div class="content"><div class='highlight'><pre>        route = name;</pre></div></div>
             
         </li>
         
@@ -1486,21 +1486,6 @@ matching those declared in the route path</li>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-88">&#182;</a>
               </div>
-              <p>Rename object</p>
-
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>        route = name;</pre></div></div>
-            
-        </li>
-        
-        
-        <li id="section-89">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-89">&#182;</a>
-              </div>
               <p>Transfer route name</p>
 
             </div>
@@ -1510,11 +1495,11 @@ matching those declared in the route path</li>
         </li>
         
         
-        <li id="section-90">
+        <li id="section-89">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-90">&#182;</a>
+                <a class="pilcrow" href="#section-89">&#182;</a>
               </div>
               <p>Transfer route path and remove first slash</p>
 
@@ -1528,17 +1513,32 @@ matching those declared in the route path</li>
         </li>
         
         
+        <li id="section-90">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-90">&#182;</a>
+              </div>
+              <p>Transfer args</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        args = route.args || args;</pre></div></div>
+            
+        </li>
+        
+        
         <li id="section-91">
             <div class="annotation">
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-91">&#182;</a>
               </div>
-              <p>Transfer args</p>
+              <p>Transfer options</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>        args = route.args || args;
+            <div class="content"><div class='highlight'><pre>        options = route.options || options;
       }</pre></div></div>
             
         </li>
@@ -1549,6 +1549,21 @@ matching those declared in the route path</li>
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-92">&#182;</a>
+              </div>
+              <p>Extend default router navigate options</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      options = _.extend({trigger: <span class="hljs-literal">true</span>, replace: <span class="hljs-literal">false</span>}, options);</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-93">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-93">&#182;</a>
               </div>
               <p>Check if necessary arguments are passed</p>
 
@@ -1562,11 +1577,11 @@ matching those declared in the route path</li>
         </li>
         
         
-        <li id="section-93">
+        <li id="section-94">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-93">&#182;</a>
+                <a class="pilcrow" href="#section-94">&#182;</a>
               </div>
               <p>Check if route exists</p>
 
@@ -1581,11 +1596,11 @@ matching those declared in the route path</li>
         </li>
         
         
-        <li id="section-94">
+        <li id="section-95">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-94">&#182;</a>
+                <a class="pilcrow" href="#section-95">&#182;</a>
               </div>
               <p>Execute 404 controller</p>
 
@@ -1599,11 +1614,11 @@ matching those declared in the route path</li>
         </li>
         
         
-        <li id="section-95">
+        <li id="section-96">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-95">&#182;</a>
+                <a class="pilcrow" href="#section-96">&#182;</a>
               </div>
               <p>Try to retrieve name if it is still missing</p>
 
@@ -1616,11 +1631,11 @@ matching those declared in the route path</li>
         </li>
         
         
-        <li id="section-96">
+        <li id="section-97">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-96">&#182;</a>
+                <a class="pilcrow" href="#section-97">&#182;</a>
               </div>
               <p>Determine if the requested route is the same as the last one</p>
 
@@ -1631,11 +1646,11 @@ matching those declared in the route path</li>
         </li>
         
         
-        <li id="section-97">
+        <li id="section-98">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-97">&#182;</a>
+                <a class="pilcrow" href="#section-98">&#182;</a>
               </div>
               <p>If it is the same route and the force option was not passed return false</p>
 
@@ -1648,11 +1663,11 @@ matching those declared in the route path</li>
         </li>
         
         
-        <li id="section-98">
+        <li id="section-99">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-98">&#182;</a>
+                <a class="pilcrow" href="#section-99">&#182;</a>
               </div>
               <p>Convert object args to array</p>
 
@@ -1672,11 +1687,11 @@ matching those declared in the route path</li>
         </li>
         
         
-        <li id="section-99">
+        <li id="section-100">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-99">&#182;</a>
+                <a class="pilcrow" href="#section-100">&#182;</a>
               </div>
               <p>Check if the previous route has a close controller</p>
 
@@ -1687,11 +1702,11 @@ matching those declared in the route path</li>
         </li>
         
         
-        <li id="section-100">
+        <li id="section-101">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-100">&#182;</a>
+                <a class="pilcrow" href="#section-101">&#182;</a>
               </div>
               <p>Execute close controller passing current route data and retrieve result</p>
 
@@ -1704,11 +1719,11 @@ matching those declared in the route path</li>
         </li>
         
         
-        <li id="section-101">
+        <li id="section-102">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-101">&#182;</a>
+                <a class="pilcrow" href="#section-102">&#182;</a>
               </div>
               <p>If controller returned false, cancel go process</p>
 
@@ -1721,11 +1736,11 @@ matching those declared in the route path</li>
         </li>
         
         
-        <li id="section-102">
+        <li id="section-103">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-102">&#182;</a>
+                <a class="pilcrow" href="#section-103">&#182;</a>
               </div>
               <p>Path is still not known</p>
 
@@ -1736,11 +1751,11 @@ matching those declared in the route path</li>
         </li>
         
         
-        <li id="section-103">
+        <li id="section-104">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-103">&#182;</a>
+                <a class="pilcrow" href="#section-104">&#182;</a>
               </div>
               <p>Retrieve route path passing arguments</p>
 
@@ -1753,11 +1768,11 @@ matching those declared in the route path</li>
         </li>
         
         
-        <li id="section-104">
+        <li id="section-105">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-104">&#182;</a>
+                <a class="pilcrow" href="#section-105">&#182;</a>
               </div>
               <p>If an error occured retrieving the path</p>
 
@@ -1770,11 +1785,11 @@ matching those declared in the route path</li>
         </li>
         
         
-        <li id="section-105">
+        <li id="section-106">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-105">&#182;</a>
+                <a class="pilcrow" href="#section-106">&#182;</a>
               </div>
               <p>Re-initialize currentRoutes storage</p>
 
@@ -1785,11 +1800,11 @@ matching those declared in the route path</li>
         </li>
         
         
-        <li id="section-106">
+        <li id="section-107">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-106">&#182;</a>
+                <a class="pilcrow" href="#section-107">&#182;</a>
               </div>
               <p>Navigate the Backbone.Router</p>
 
@@ -1800,11 +1815,11 @@ matching those declared in the route path</li>
         </li>
         
         
-        <li id="section-107">
+        <li id="section-108">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-107">&#182;</a>
+                <a class="pilcrow" href="#section-108">&#182;</a>
               </div>
               <p>Restart Backbone.history to re-execute the same route</p>
 
@@ -1820,26 +1835,14 @@ matching those declared in the route path</li>
         </li>
         
         
-        <li id="section-108">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-108">&#182;</a>
-              </div>
-              <hr>
-
-            </div>
-            
-        </li>
-        
-        
         <li id="section-109">
             <div class="annotation">
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-109">&#182;</a>
               </div>
-              
+              <hr>
+
             </div>
             
         </li>
@@ -1850,6 +1853,18 @@ matching those declared in the route path</li>
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-110">&#182;</a>
+              </div>
+              
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-111">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-111">&#182;</a>
               </div>
               <p><strong>Clear all cached triggers</strong></p>
 
@@ -1863,26 +1878,14 @@ matching those declared in the route path</li>
         </li>
         
         
-        <li id="section-111">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-111">&#182;</a>
-              </div>
-              <hr>
-
-            </div>
-            
-        </li>
-        
-        
         <li id="section-112">
             <div class="annotation">
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-112">&#182;</a>
               </div>
-              
+              <hr>
+
             </div>
             
         </li>
@@ -1893,6 +1896,18 @@ matching those declared in the route path</li>
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-113">&#182;</a>
+              </div>
+              
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-114">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-114">&#182;</a>
               </div>
               <p><strong>Process a list of triggers that can be declared as a simple string or an object</strong></p>
 <ul>
@@ -1916,26 +1931,14 @@ matching those declared in the route path</li>
         </li>
         
         
-        <li id="section-114">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-114">&#182;</a>
-              </div>
-              <hr>
-
-            </div>
-            
-        </li>
-        
-        
         <li id="section-115">
             <div class="annotation">
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-115">&#182;</a>
               </div>
-              
+              <hr>
+
             </div>
             
         </li>
@@ -1946,6 +1949,18 @@ matching those declared in the route path</li>
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-116">&#182;</a>
+              </div>
+              
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-117">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-117">&#182;</a>
               </div>
               <p><strong>Process a single trigger</strong></p>
 <ul>
@@ -1960,11 +1975,11 @@ matching those declared in the route path</li>
         </li>
         
         
-        <li id="section-117">
+        <li id="section-118">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-117">&#182;</a>
+                <a class="pilcrow" href="#section-118">&#182;</a>
               </div>
               <p>Retrieve the name of the trigger if it’s declared using a path</p>
 
@@ -1977,11 +1992,11 @@ matching those declared in the route path</li>
         </li>
         
         
-        <li id="section-118">
+        <li id="section-119">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-118">&#182;</a>
+                <a class="pilcrow" href="#section-119">&#182;</a>
               </div>
               <p>Check if the trigger is marked for caching</p>
 
@@ -1994,11 +2009,11 @@ matching those declared in the route path</li>
         </li>
         
         
-        <li id="section-119">
+        <li id="section-120">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-119">&#182;</a>
+                <a class="pilcrow" href="#section-120">&#182;</a>
               </div>
               <p>Wrap the given parameter in an array</p>
 
@@ -2011,11 +2026,11 @@ matching those declared in the route path</li>
         </li>
         
         
-        <li id="section-120">
+        <li id="section-121">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-120">&#182;</a>
+                <a class="pilcrow" href="#section-121">&#182;</a>
               </div>
               <p>If no arguments were passed to the trigger pass along route arguments</p>
 
@@ -2028,11 +2043,11 @@ matching those declared in the route path</li>
         </li>
         
         
-        <li id="section-121">
+        <li id="section-122">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-121">&#182;</a>
+                <a class="pilcrow" href="#section-122">&#182;</a>
               </div>
               <p>If the trigger is actually a controller execute it</p>
 
@@ -2046,11 +2061,11 @@ matching those declared in the route path</li>
         </li>
         
         
-        <li id="section-122">
+        <li id="section-123">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-122">&#182;</a>
+                <a class="pilcrow" href="#section-123">&#182;</a>
               </div>
               <p>Create a dispatcher format object</p>
 
@@ -2061,11 +2076,11 @@ matching those declared in the route path</li>
         </li>
         
         
-        <li id="section-123">
+        <li id="section-124">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-123">&#182;</a>
+                <a class="pilcrow" href="#section-124">&#182;</a>
               </div>
               <p>Finish formatting trigger arguments for the dispatcher</p>
 
@@ -2078,11 +2093,11 @@ matching those declared in the route path</li>
         </li>
         
         
-        <li id="section-124">
+        <li id="section-125">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-124">&#182;</a>
+                <a class="pilcrow" href="#section-125">&#182;</a>
               </div>
               <p>Dispatch the event applying arguments</p>
 
@@ -2097,11 +2112,11 @@ matching those declared in the route path</li>
         </li>
         
         
-        <li id="section-125">
+        <li id="section-126">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-125">&#182;</a>
+                <a class="pilcrow" href="#section-126">&#182;</a>
               </div>
               <p>Check if the trigger is actually a declared route</p>
 
@@ -2118,11 +2133,11 @@ matching those declared in the route path</li>
         </li>
         
         
-        <li id="section-126">
+        <li id="section-127">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-126">&#182;</a>
+                <a class="pilcrow" href="#section-127">&#182;</a>
               </div>
               <p>Else give to the dispatcher</p>
 
@@ -2142,26 +2157,14 @@ matching those declared in the route path</li>
         </li>
         
         
-        <li id="section-127">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-127">&#182;</a>
-              </div>
-              <hr>
-
-            </div>
-            
-        </li>
-        
-        
         <li id="section-128">
             <div class="annotation">
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-128">&#182;</a>
               </div>
-              
+              <hr>
+
             </div>
             
         </li>
@@ -2172,6 +2175,18 @@ matching those declared in the route path</li>
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-129">&#182;</a>
+              </div>
+              
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-130">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-130">&#182;</a>
               </div>
               <p><strong>Process a list of controllers</strong></p>
 <ul>
@@ -2190,11 +2205,11 @@ eventually arguments to be passed to the controller*</li>
         </li>
         
         
-        <li id="section-130">
+        <li id="section-131">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-130">&#182;</a>
+                <a class="pilcrow" href="#section-131">&#182;</a>
               </div>
               <p>Do not interpret control as a trigger by default</p>
 
@@ -2205,11 +2220,11 @@ eventually arguments to be passed to the controller*</li>
         </li>
         
         
-        <li id="section-131">
+        <li id="section-132">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-131">&#182;</a>
+                <a class="pilcrow" href="#section-132">&#182;</a>
               </div>
               <p>Check if the given controller actually exists</p>
 
@@ -2220,11 +2235,11 @@ eventually arguments to be passed to the controller*</li>
         </li>
         
         
-        <li id="section-132">
+        <li id="section-133">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-132">&#182;</a>
+                <a class="pilcrow" href="#section-133">&#182;</a>
               </div>
               <p>Extract parameters from path if possible</p>
 
@@ -2236,11 +2251,11 @@ eventually arguments to be passed to the controller*</li>
         </li>
         
         
-        <li id="section-133">
+        <li id="section-134">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-133">&#182;</a>
+                <a class="pilcrow" href="#section-134">&#182;</a>
               </div>
               <p>Backbone gives [null] for routes without arguments
 so if there is not more than one argument use the passed arguments instead</p>
@@ -2255,11 +2270,11 @@ so if there is not more than one argument use the passed arguments instead</p>
         </li>
         
         
-        <li id="section-134">
+        <li id="section-135">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-134">&#182;</a>
+                <a class="pilcrow" href="#section-135">&#182;</a>
               </div>
               <p>Ensure args is properly declared and remove unwanted values</p>
 
@@ -2270,11 +2285,11 @@ so if there is not more than one argument use the passed arguments instead</p>
         </li>
         
         
-        <li id="section-135">
+        <li id="section-136">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-135">&#182;</a>
+                <a class="pilcrow" href="#section-136">&#182;</a>
               </div>
               <p>Loop through each defined route controller</p>
 
@@ -2285,11 +2300,11 @@ so if there is not more than one argument use the passed arguments instead</p>
         </li>
         
         
-        <li id="section-136">
+        <li id="section-137">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-136">&#182;</a>
+                <a class="pilcrow" href="#section-137">&#182;</a>
               </div>
               <p>Execute controller wrapper</p>
 
@@ -2308,26 +2323,14 @@ so if there is not more than one argument use the passed arguments instead</p>
         </li>
         
         
-        <li id="section-137">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-137">&#182;</a>
-              </div>
-              <hr>
-
-            </div>
-            
-        </li>
-        
-        
         <li id="section-138">
             <div class="annotation">
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-138">&#182;</a>
               </div>
-              
+              <hr>
+
             </div>
             
         </li>
@@ -2338,6 +2341,18 @@ so if there is not more than one argument use the passed arguments instead</p>
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-139">&#182;</a>
+              </div>
+              
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-140">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-140">&#182;</a>
               </div>
               <p><strong>Find a cached trigger</strong></p>
 <ul>
@@ -2352,11 +2367,11 @@ so if there is not more than one argument use the passed arguments instead</p>
         </li>
         
         
-        <li id="section-140">
+        <li id="section-141">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-140">&#182;</a>
+                <a class="pilcrow" href="#section-141">&#182;</a>
               </div>
               <p>Try to check if it already exists</p>
 
@@ -2369,11 +2384,11 @@ so if there is not more than one argument use the passed arguments instead</p>
         </li>
         
         
-        <li id="section-141">
+        <li id="section-142">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-141">&#182;</a>
+                <a class="pilcrow" href="#section-142">&#182;</a>
               </div>
               <p>If it doesn’t, create it and retrieve it again</p>
 
@@ -2390,26 +2405,14 @@ so if there is not more than one argument use the passed arguments instead</p>
         </li>
         
         
-        <li id="section-142">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-142">&#182;</a>
-              </div>
-              <hr>
-
-            </div>
-            
-        </li>
-        
-        
         <li id="section-143">
             <div class="annotation">
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-143">&#182;</a>
               </div>
-              
+              <hr>
+
             </div>
             
         </li>
@@ -2420,6 +2423,18 @@ so if there is not more than one argument use the passed arguments instead</p>
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-144">&#182;</a>
+              </div>
+              
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-145">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-145">&#182;</a>
               </div>
               <p><strong>Set a triggers cache state</strong></p>
 <ul>
@@ -2434,11 +2449,11 @@ so if there is not more than one argument use the passed arguments instead</p>
         </li>
         
         
-        <li id="section-145">
+        <li id="section-146">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-145">&#182;</a>
+                <a class="pilcrow" href="#section-146">&#182;</a>
               </div>
               <p>Find cached trigger object</p>
 
@@ -2449,11 +2464,11 @@ so if there is not more than one argument use the passed arguments instead</p>
         </li>
         
         
-        <li id="section-146">
+        <li id="section-147">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-146">&#182;</a>
+                <a class="pilcrow" href="#section-147">&#182;</a>
               </div>
               <p>Has it already been executed ?</p>
 
@@ -2468,11 +2483,11 @@ so if there is not more than one argument use the passed arguments instead</p>
         </li>
         
         
-        <li id="section-147">
+        <li id="section-148">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-147">&#182;</a>
+                <a class="pilcrow" href="#section-148">&#182;</a>
               </div>
               <p>Mark it done</p>
 
@@ -2486,26 +2501,14 @@ so if there is not more than one argument use the passed arguments instead</p>
         </li>
         
         
-        <li id="section-148">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-148">&#182;</a>
-              </div>
-              <hr>
-
-            </div>
-            
-        </li>
-        
-        
         <li id="section-149">
             <div class="annotation">
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-149">&#182;</a>
               </div>
-              
+              <hr>
+
             </div>
             
         </li>
@@ -2517,6 +2520,18 @@ so if there is not more than one argument use the passed arguments instead</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-150">&#182;</a>
               </div>
+              
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-151">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-151">&#182;</a>
+              </div>
               <p><strong>Start Backbone.History if it hasn’t been done yet.</strong>
 Will trigger a client-side 404 if the loading route doesn’t exist</p>
 
@@ -2527,11 +2542,11 @@ Will trigger a client-side 404 if the loading route doesn’t exist</p>
         </li>
         
         
-        <li id="section-151">
+        <li id="section-152">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-151">&#182;</a>
+                <a class="pilcrow" href="#section-152">&#182;</a>
               </div>
               <p>Check if Backbone.History is already enabled</p>
 
@@ -2544,11 +2559,11 @@ Will trigger a client-side 404 if the loading route doesn’t exist</p>
         </li>
         
         
-        <li id="section-152">
+        <li id="section-153">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-152">&#182;</a>
+                <a class="pilcrow" href="#section-153">&#182;</a>
               </div>
               <p>Initialize Backbone.history</p>
 
@@ -2564,11 +2579,11 @@ Will trigger a client-side 404 if the loading route doesn’t exist</p>
         </li>
         
         
-        <li id="section-153">
+        <li id="section-154">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-153">&#182;</a>
+                <a class="pilcrow" href="#section-154">&#182;</a>
               </div>
               <p>Trigger a 404 if the current route doesn’t exist.
 Ensure the ‘silent’ options isn’t activated</p>
@@ -2587,26 +2602,14 @@ Ensure the ‘silent’ options isn’t activated</p>
         </li>
         
         
-        <li id="section-154">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-154">&#182;</a>
-              </div>
-              <hr>
-
-            </div>
-            
-        </li>
-        
-        
         <li id="section-155">
             <div class="annotation">
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-155">&#182;</a>
               </div>
-              
+              <hr>
+
             </div>
             
         </li>
@@ -2617,6 +2620,18 @@ Ensure the ‘silent’ options isn’t activated</p>
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-156">&#182;</a>
+              </div>
+              
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-157">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-157">&#182;</a>
               </div>
               <p><strong>Determine if a dispatcher (event aggregator) was passed with the options when the router was started.</strong></p>
 
@@ -2629,26 +2644,14 @@ Ensure the ‘silent’ options isn’t activated</p>
         </li>
         
         
-        <li id="section-157">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-157">&#182;</a>
-              </div>
-              <hr>
-
-            </div>
-            
-        </li>
-        
-        
         <li id="section-158">
             <div class="annotation">
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-158">&#182;</a>
               </div>
-              
+              <hr>
+
             </div>
             
         </li>
@@ -2659,6 +2662,18 @@ Ensure the ‘silent’ options isn’t activated</p>
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-159">&#182;</a>
+              </div>
+              
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-160">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-160">&#182;</a>
               </div>
               <p><strong>Trigger an error controller</strong></p>
 <ul>
@@ -2684,26 +2699,14 @@ Ensure the ‘silent’ options isn’t activated</p>
         </li>
         
         
-        <li id="section-160">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-160">&#182;</a>
-              </div>
-              <hr>
-
-            </div>
-            
-        </li>
-        
-        
         <li id="section-161">
             <div class="annotation">
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-161">&#182;</a>
               </div>
-              
+              <hr>
+
             </div>
             
         </li>
@@ -2715,11 +2718,8 @@ Ensure the ‘silent’ options isn’t activated</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-162">&#182;</a>
               </div>
-              <p><strong>Reload the route that was stored before redirecting to login controller</strong></p>
-
+              
             </div>
-            
-            <div class="content"><div class='highlight'><pre>    _applyStoredRoute: <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{</pre></div></div>
             
         </li>
         
@@ -2730,11 +2730,11 @@ Ensure the ‘silent’ options isn’t activated</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-163">&#182;</a>
               </div>
-              <p>Check if a route was stored while requiring a user login</p>
+              <p><strong>Reload the route that was stored before redirecting to login controller</strong></p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>      <span class="hljs-keyword">var</span> storedRoute = <span class="hljs-keyword">this</span>._getStoredRoute();</pre></div></div>
+            <div class="content"><div class='highlight'><pre>    _applyStoredRoute: <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{</pre></div></div>
             
         </li>
         
@@ -2744,6 +2744,21 @@ Ensure the ‘silent’ options isn’t activated</p>
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-164">&#182;</a>
+              </div>
+              <p>Check if a route was stored while requiring a user login</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      <span class="hljs-keyword">var</span> storedRoute = <span class="hljs-keyword">this</span>._getStoredRoute();</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-165">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-165">&#182;</a>
               </div>
               <p>If a route is stored, use it!</p>
 
@@ -2755,11 +2770,11 @@ Ensure the ‘silent’ options isn’t activated</p>
         </li>
         
         
-        <li id="section-165">
+        <li id="section-166">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-165">&#182;</a>
+                <a class="pilcrow" href="#section-166">&#182;</a>
               </div>
               <p>Clear stored route</p>
 
@@ -2770,11 +2785,11 @@ Ensure the ‘silent’ options isn’t activated</p>
         </li>
         
         
-        <li id="section-166">
+        <li id="section-167">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-166">&#182;</a>
+                <a class="pilcrow" href="#section-167">&#182;</a>
               </div>
               <p>Redirect to stored route</p>
 
@@ -2789,26 +2804,14 @@ Ensure the ‘silent’ options isn’t activated</p>
         </li>
         
         
-        <li id="section-167">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-167">&#182;</a>
-              </div>
-              <hr>
-
-            </div>
-            
-        </li>
-        
-        
         <li id="section-168">
             <div class="annotation">
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-168">&#182;</a>
               </div>
-              
+              <hr>
+
             </div>
             
         </li>
@@ -2819,6 +2822,18 @@ Ensure the ‘silent’ options isn’t activated</p>
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-169">&#182;</a>
+              </div>
+              
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-170">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-170">&#182;</a>
               </div>
               <p><strong>Retrieve the path of a route by it’s name.</strong></p>
 <ul>
@@ -2843,26 +2858,14 @@ Ensure the ‘silent’ options isn’t activated</p>
         </li>
         
         
-        <li id="section-170">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-170">&#182;</a>
-              </div>
-              <hr>
-
-            </div>
-            
-        </li>
-        
-        
         <li id="section-171">
             <div class="annotation">
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-171">&#182;</a>
               </div>
-              
+              <hr>
+
             </div>
             
         </li>
@@ -2873,6 +2876,18 @@ Ensure the ‘silent’ options isn’t activated</p>
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-172">&#182;</a>
+              </div>
+              
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-173">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-173">&#182;</a>
               </div>
               <p><strong>Retrieve the name of a route by it’s path</strong></p>
 <ul>
@@ -2888,11 +2903,11 @@ Ensure the ‘silent’ options isn’t activated</p>
         </li>
         
         
-        <li id="section-173">
+        <li id="section-174">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-173">&#182;</a>
+                <a class="pilcrow" href="#section-174">&#182;</a>
               </div>
               <p>Remove first slash</p>
 
@@ -2903,11 +2918,11 @@ Ensure the ‘silent’ options isn’t activated</p>
         </li>
         
         
-        <li id="section-174">
+        <li id="section-175">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-174">&#182;</a>
+                <a class="pilcrow" href="#section-175">&#182;</a>
               </div>
               <p>Loop through all the controllers</p>
 
@@ -2918,11 +2933,11 @@ Ensure the ‘silent’ options isn’t activated</p>
         </li>
         
         
-        <li id="section-175">
+        <li id="section-176">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-175">&#182;</a>
+                <a class="pilcrow" href="#section-176">&#182;</a>
               </div>
               <p>Check if given path validates against controller regular expression</p>
 
@@ -2939,26 +2954,14 @@ Ensure the ‘silent’ options isn’t activated</p>
         </li>
         
         
-        <li id="section-176">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-176">&#182;</a>
-              </div>
-              <hr>
-
-            </div>
-            
-        </li>
-        
-        
         <li id="section-177">
             <div class="annotation">
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-177">&#182;</a>
               </div>
-              
+              <hr>
+
             </div>
             
         </li>
@@ -2969,6 +2972,18 @@ Ensure the ‘silent’ options isn’t activated</p>
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-178">&#182;</a>
+              </div>
+              
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-179">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-179">&#182;</a>
               </div>
               <p><strong>Check if a route exists by its name or its path</strong></p>
 <ul>
@@ -2988,26 +3003,14 @@ Will also return false when wrong type of parameter is passed</em></li>
         </li>
         
         
-        <li id="section-179">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-179">&#182;</a>
-              </div>
-              <hr>
-
-            </div>
-            
-        </li>
-        
-        
         <li id="section-180">
             <div class="annotation">
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-180">&#182;</a>
               </div>
-              
+              <hr>
+
             </div>
             
         </li>
@@ -3018,6 +3021,18 @@ Will also return false when wrong type of parameter is passed</em></li>
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-181">&#182;</a>
+              </div>
+              
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-182">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-182">&#182;</a>
               </div>
               <p><strong>Parse a path to inject a list of arguments into the path.</strong></p>
 <ul>
@@ -3033,11 +3048,11 @@ Will also return false when wrong type of parameter is passed</em></li>
         </li>
         
         
-        <li id="section-182">
+        <li id="section-183">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-182">&#182;</a>
+                <a class="pilcrow" href="#section-183">&#182;</a>
               </div>
               <p>Check if any arguments were passed to the parser</p>
 
@@ -3048,11 +3063,11 @@ Will also return false when wrong type of parameter is passed</em></li>
         </li>
         
         
-        <li id="section-183">
+        <li id="section-184">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-183">&#182;</a>
+                <a class="pilcrow" href="#section-184">&#182;</a>
               </div>
               <p>Remove optional parameters from the path</p>
 
@@ -3063,11 +3078,11 @@ Will also return false when wrong type of parameter is passed</em></li>
         </li>
         
         
-        <li id="section-184">
+        <li id="section-185">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-184">&#182;</a>
+                <a class="pilcrow" href="#section-185">&#182;</a>
               </div>
               <p>Validate path</p>
 
@@ -3083,11 +3098,11 @@ Will also return false when wrong type of parameter is passed</em></li>
         </li>
         
         
-        <li id="section-185">
+        <li id="section-186">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-185">&#182;</a>
+                <a class="pilcrow" href="#section-186">&#182;</a>
               </div>
               <p>Replace named/splat parameters with actual arguments</p>
 
@@ -3100,11 +3115,11 @@ Will also return false when wrong type of parameter is passed</em></li>
         </li>
         
         
-        <li id="section-186">
+        <li id="section-187">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-186">&#182;</a>
+                <a class="pilcrow" href="#section-187">&#182;</a>
               </div>
               <p>Remove remaining optional components from the path</p>
 
@@ -3115,11 +3130,11 @@ Will also return false when wrong type of parameter is passed</em></li>
         </li>
         
         
-        <li id="section-187">
+        <li id="section-188">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-187">&#182;</a>
+                <a class="pilcrow" href="#section-188">&#182;</a>
               </div>
               <p>Only remove components for which arguments where missing</p>
 
@@ -3133,11 +3148,11 @@ Will also return false when wrong type of parameter is passed</em></li>
         </li>
         
         
-        <li id="section-188">
+        <li id="section-189">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-188">&#182;</a>
+                <a class="pilcrow" href="#section-189">&#182;</a>
               </div>
               <p>Remove remaining parentheses and trailing slashes</p>
 
@@ -3148,11 +3163,11 @@ Will also return false when wrong type of parameter is passed</em></li>
         </li>
         
         
-        <li id="section-189">
+        <li id="section-190">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-189">&#182;</a>
+                <a class="pilcrow" href="#section-190">&#182;</a>
               </div>
               <p>Validate path</p>
 
@@ -3166,26 +3181,14 @@ Will also return false when wrong type of parameter is passed</em></li>
         </li>
         
         
-        <li id="section-190">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-190">&#182;</a>
-              </div>
-              <hr>
-
-            </div>
-            
-        </li>
-        
-        
         <li id="section-191">
             <div class="annotation">
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-191">&#182;</a>
               </div>
-              
+              <hr>
+
             </div>
             
         </li>
@@ -3196,6 +3199,18 @@ Will also return false when wrong type of parameter is passed</em></li>
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-192">&#182;</a>
+              </div>
+              
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-193">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-193">&#182;</a>
               </div>
               <p><strong>Replace a named argument or a splat parameter in a path</strong></p>
 
@@ -3208,26 +3223,14 @@ Will also return false when wrong type of parameter is passed</em></li>
         </li>
         
         
-        <li id="section-193">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-193">&#182;</a>
-              </div>
-              <hr>
-
-            </div>
-            
-        </li>
-        
-        
         <li id="section-194">
             <div class="annotation">
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-194">&#182;</a>
               </div>
-              
+              <hr>
+
             </div>
             
         </li>
@@ -3239,11 +3242,8 @@ Will also return false when wrong type of parameter is passed</em></li>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-195">&#182;</a>
               </div>
-              <p><strong>Validate parsed path</strong></p>
-
+              
             </div>
-            
-            <div class="content"><div class='highlight'><pre>    _checkPath: <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">path</span>) </span>{</pre></div></div>
             
         </li>
         
@@ -3253,6 +3253,21 @@ Will also return false when wrong type of parameter is passed</em></li>
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-196">&#182;</a>
+              </div>
+              <p><strong>Validate parsed path</strong></p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    _checkPath: <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">path</span>) </span>{</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-197">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-197">&#182;</a>
               </div>
               <p>Throw an error if mandatory parameters are missing</p>
 
@@ -3267,26 +3282,14 @@ Will also return false when wrong type of parameter is passed</em></li>
         </li>
         
         
-        <li id="section-197">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-197">&#182;</a>
-              </div>
-              <hr>
-
-            </div>
-            
-        </li>
-        
-        
         <li id="section-198">
             <div class="annotation">
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-198">&#182;</a>
               </div>
-              
+              <hr>
+
             </div>
             
         </li>
@@ -3298,11 +3301,8 @@ Will also return false when wrong type of parameter is passed</em></li>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-199">&#182;</a>
               </div>
-              <p><strong>Clean arguments array</strong></p>
-
+              
             </div>
-            
-            <div class="content"><div class='highlight'><pre>    _sanitizeArgs: <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">args</span>) </span>{</pre></div></div>
             
         </li>
         
@@ -3312,6 +3312,21 @@ Will also return false when wrong type of parameter is passed</em></li>
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-200">&#182;</a>
+              </div>
+              <p><strong>Clean arguments array</strong></p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    _sanitizeArgs: <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">args</span>) </span>{</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-201">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-201">&#182;</a>
               </div>
               <p>Ensure args is an array or an arguments object</p>
 
@@ -3326,26 +3341,14 @@ Will also return false when wrong type of parameter is passed</em></li>
         </li>
         
         
-        <li id="section-201">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-201">&#182;</a>
-              </div>
-              <hr>
-
-            </div>
-            
-        </li>
-        
-        
         <li id="section-202">
             <div class="annotation">
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-202">&#182;</a>
               </div>
-              
+              <hr>
+
             </div>
             
         </li>
@@ -3356,6 +3359,18 @@ Will also return false when wrong type of parameter is passed</em></li>
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-203">&#182;</a>
+              </div>
+              
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-204">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-204">&#182;</a>
               </div>
               <p><strong>Check if parameter is a valid arguments array sanitizing it before hand</strong></p>
 
@@ -3368,26 +3383,14 @@ Will also return false when wrong type of parameter is passed</em></li>
         </li>
         
         
-        <li id="section-204">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-204">&#182;</a>
-              </div>
-              <hr>
-
-            </div>
-            
-        </li>
-        
-        
         <li id="section-205">
             <div class="annotation">
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-205">&#182;</a>
               </div>
-              
+              <hr>
+
             </div>
             
         </li>
@@ -3399,11 +3402,8 @@ Will also return false when wrong type of parameter is passed</em></li>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-206">&#182;</a>
               </div>
-              <p><strong>Store the current pathname in the local storage</strong></p>
-
+              
             </div>
-            
-            <div class="content"><div class='highlight'><pre>    _storeCurrentRoute: <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{</pre></div></div>
             
         </li>
         
@@ -3413,6 +3413,21 @@ Will also return false when wrong type of parameter is passed</em></li>
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-207">&#182;</a>
+              </div>
+              <p><strong>Store the current pathname in the local storage</strong></p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    _storeCurrentRoute: <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-208">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-208">&#182;</a>
               </div>
               <p>Retrieve current path</p>
 
@@ -3425,11 +3440,11 @@ Will also return false when wrong type of parameter is passed</em></li>
         </li>
         
         
-        <li id="section-208">
+        <li id="section-209">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-208">&#182;</a>
+                <a class="pilcrow" href="#section-209">&#182;</a>
               </div>
               <p>Store the path for next init after page reload</p>
 
@@ -3445,26 +3460,14 @@ Will also return false when wrong type of parameter is passed</em></li>
         </li>
         
         
-        <li id="section-209">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-209">&#182;</a>
-              </div>
-              <hr>
-
-            </div>
-            
-        </li>
-        
-        
         <li id="section-210">
             <div class="annotation">
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-210">&#182;</a>
               </div>
-              
+              <hr>
+
             </div>
             
         </li>
@@ -3476,11 +3479,8 @@ Will also return false when wrong type of parameter is passed</em></li>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-211">&#182;</a>
               </div>
-              <p><strong>Generate a complete store key using the prefix in the options</strong></p>
-
+              
             </div>
-            
-            <div class="content"><div class='highlight'><pre>    _getStoreKey: <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">key</span>) </span>{</pre></div></div>
             
         </li>
         
@@ -3490,6 +3490,21 @@ Will also return false when wrong type of parameter is passed</em></li>
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-212">&#182;</a>
+              </div>
+              <p><strong>Generate a complete store key using the prefix in the options</strong></p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    _getStoreKey: <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">key</span>) </span>{</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-213">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-213">&#182;</a>
               </div>
               <p>Concatenate prefix, separator and key</p>
 
@@ -3501,26 +3516,14 @@ Will also return false when wrong type of parameter is passed</em></li>
         </li>
         
         
-        <li id="section-213">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-213">&#182;</a>
-              </div>
-              <hr>
-
-            </div>
-            
-        </li>
-        
-        
         <li id="section-214">
             <div class="annotation">
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-214">&#182;</a>
               </div>
-              
+              <hr>
+
             </div>
             
         </li>
@@ -3531,6 +3534,18 @@ Will also return false when wrong type of parameter is passed</em></li>
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-215">&#182;</a>
+              </div>
+              
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-216">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-216">&#182;</a>
               </div>
               <p><strong>Retrieve the stored route if any</strong></p>
 <ul>
@@ -3547,26 +3562,14 @@ null if not existing, false if localStorage doesn’t exist</em></li>
         </li>
         
         
-        <li id="section-216">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-216">&#182;</a>
-              </div>
-              <hr>
-
-            </div>
-            
-        </li>
-        
-        
         <li id="section-217">
             <div class="annotation">
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-217">&#182;</a>
               </div>
-              
+              <hr>
+
             </div>
             
         </li>
@@ -3577,6 +3580,18 @@ null if not existing, false if localStorage doesn’t exist</em></li>
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-218">&#182;</a>
+              </div>
+              
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-219">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-219">&#182;</a>
               </div>
               <p><strong>Clear the stored route</strong></p>
 
@@ -3593,26 +3608,14 @@ null if not existing, false if localStorage doesn’t exist</em></li>
         </li>
         
         
-        <li id="section-219">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-219">&#182;</a>
-              </div>
-              <hr>
-
-            </div>
-            
-        </li>
-        
-        
         <li id="section-220">
             <div class="annotation">
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-220">&#182;</a>
               </div>
-              
+              <hr>
+
             </div>
             
         </li>
@@ -3623,6 +3626,18 @@ null if not existing, false if localStorage doesn’t exist</em></li>
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-221">&#182;</a>
+              </div>
+              
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-222">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-222">&#182;</a>
               </div>
               <p><strong>Remove heading slash or pound sign from a path, if any</strong></p>
 
@@ -3635,26 +3650,14 @@ null if not existing, false if localStorage doesn’t exist</em></li>
         </li>
         
         
-        <li id="section-222">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-222">&#182;</a>
-              </div>
-              <hr>
-
-            </div>
-            
-        </li>
-        
-        
         <li id="section-223">
             <div class="annotation">
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-223">&#182;</a>
               </div>
-              
+              <hr>
+
             </div>
             
         </li>
@@ -3665,6 +3668,18 @@ null if not existing, false if localStorage doesn’t exist</em></li>
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-224">&#182;</a>
+              </div>
+              
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-225">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-225">&#182;</a>
               </div>
               <p><strong>Remove pushState root url from path</strong></p>
 
@@ -3677,26 +3692,14 @@ null if not existing, false if localStorage doesn’t exist</em></li>
         </li>
         
         
-        <li id="section-225">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-225">&#182;</a>
-              </div>
-              <hr>
-
-            </div>
-            
-        </li>
-        
-        
         <li id="section-226">
             <div class="annotation">
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-226">&#182;</a>
               </div>
-              
+              <hr>
+
             </div>
             
         </li>
@@ -3707,6 +3710,18 @@ null if not existing, false if localStorage doesn’t exist</em></li>
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-227">&#182;</a>
+              </div>
+              
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-228">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-228">&#182;</a>
               </div>
               <p><strong>Extract parameters from the path of a route</strong></p>
 
@@ -3722,26 +3737,14 @@ null if not existing, false if localStorage doesn’t exist</em></li>
         </li>
         
         
-        <li id="section-228">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-228">&#182;</a>
-              </div>
-              <hr>
-
-            </div>
-            
-        </li>
-        
-        
         <li id="section-229">
             <div class="annotation">
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-229">&#182;</a>
               </div>
-              
+              <hr>
+
             </div>
             
         </li>
@@ -3752,6 +3755,18 @@ null if not existing, false if localStorage doesn’t exist</em></li>
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-230">&#182;</a>
+              </div>
+              
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-231">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-231">&#182;</a>
               </div>
               <p><strong>Transform a route path to a regular expression</strong></p>
 
@@ -3764,26 +3779,14 @@ null if not existing, false if localStorage doesn’t exist</em></li>
         </li>
         
         
-        <li id="section-231">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-231">&#182;</a>
-              </div>
-              <hr>
-
-            </div>
-            
-        </li>
-        
-        
         <li id="section-232">
             <div class="annotation">
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-232">&#182;</a>
               </div>
-              
+              <hr>
+
             </div>
             
         </li>
@@ -3795,8 +3798,7 @@ null if not existing, false if localStorage doesn’t exist</em></li>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-233">&#182;</a>
               </div>
-              <p><strong>Original Backbone.Router Methods</strong></p>
-
+              
             </div>
             
         </li>
@@ -3807,6 +3809,19 @@ null if not existing, false if localStorage doesn’t exist</em></li>
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-234">&#182;</a>
+              </div>
+              <p><strong>Original Backbone.Router Methods</strong></p>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-235">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-235">&#182;</a>
               </div>
               <p>Listen to original Backbone.Router events</p>
 
@@ -3819,11 +3834,11 @@ null if not existing, false if localStorage doesn’t exist</em></li>
         </li>
         
         
-        <li id="section-235">
+        <li id="section-236">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-235">&#182;</a>
+                <a class="pilcrow" href="#section-236">&#182;</a>
               </div>
               <p>Stop listening to original Backbone.Router events</p>
 
@@ -3836,11 +3851,11 @@ null if not existing, false if localStorage doesn’t exist</em></li>
         </li>
         
         
-        <li id="section-236">
+        <li id="section-237">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-236">&#182;</a>
+                <a class="pilcrow" href="#section-237">&#182;</a>
               </div>
               <p>Trigger event on original Backbone.Router</p>
 
@@ -3854,26 +3869,14 @@ null if not existing, false if localStorage doesn’t exist</em></li>
         </li>
         
         
-        <li id="section-237">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-237">&#182;</a>
-              </div>
-              <hr>
-
-            </div>
-            
-        </li>
-        
-        
         <li id="section-238">
             <div class="annotation">
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-238">&#182;</a>
               </div>
-              
+              <hr>
+
             </div>
             
         </li>
@@ -3885,11 +3888,8 @@ null if not existing, false if localStorage doesn’t exist</em></li>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-239">&#182;</a>
               </div>
-              <p>Initialize Backbone.Highway controller instance</p>
-
+              
             </div>
-            
-            <div class="content"><div class='highlight'><pre>  Backbone.Highway = <span class="hljs-keyword">new</span> Highway();</pre></div></div>
             
         </li>
         
@@ -3899,6 +3899,21 @@ null if not existing, false if localStorage doesn’t exist</em></li>
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-240">&#182;</a>
+              </div>
+              <p>Initialize Backbone.Highway controller instance</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  Backbone.Highway = <span class="hljs-keyword">new</span> Highway();</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-241">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-241">&#182;</a>
               </div>
               <p>Return instance for AMD/Require environments</p>
 
