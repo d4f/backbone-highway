@@ -418,7 +418,7 @@ html {
 body {
   margin: 0;
   padding: 0;
-  background: #151515 url("/backbone-highway/images/bkg.png") 0 0;
+  background: #151515 url("../images/bkg.png") 0 0;
   color: #eaeaea;
   font: 16px;
   line-height: 1.5;
@@ -459,7 +459,7 @@ header {
   width: 100%;
   border-bottom: 1px dashed #80bd01;
   margin: 0 0 40px 0;
-  background: #151515 url("/backbone-highway/images/bkg.png") 0 0;
+  background: #151515 url("../images/bkg.png") 0 0;
 }
 header .container {
   padding: 20px 0;
@@ -484,6 +484,10 @@ header h1 {
   letter-spacing: -1px;
   -webkit-font-smoothing: antialiased;
   position: relative;
+}
+header h1 .version {
+  color: #666;
+  font-size: 0.6em;
 }
 header h2 {
   font-size: 18px;
@@ -514,7 +518,7 @@ footer {
   bottom: 0;
   width: 100%;
   border-top: 1px dashed #80bd01;
-  background: #151515 url("/backbone-highway/images/bkg.png") 0 0;
+  background: #151515 url("../images/bkg.png") 0 0;
 }
 footer .container {
   padding: 5px;
@@ -678,10 +682,6 @@ hr {
   height: 16px;
   margin: 1px 8px 0 0;
   float: left;
-}
-.btn-github .icon {
-  opacity: 0.6;
-  background: url("../backbone-highway/images/blacktocat.png") 0 0 no-repeat;
 }
 /* Links
    a, a:hover, a:visited
