@@ -767,8 +767,8 @@ of depending on a deep extend method</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-48">&#182;</a>
               </div>
-              <p><strong>Restart the router</strong>
-This actually stops and starts the Backbone.history module,
+              <p><strong>Restart the router</strong></p>
+<p>This actually stops and starts the Backbone.history module,
 effectively re-executing the currently displayed route.</p>
 
             </div>
@@ -1230,7 +1230,6 @@ and the route.authenticated option being set to true or false</p>
                 <a class="pilcrow" href="#section-73">&#182;</a>
               </div>
               <p>Execute 403 controller</p>
-<p>@todo Apply better/finer logic for when the 403 controller should be executed</p>
 
             </div>
             
@@ -1437,7 +1436,8 @@ Adding the new controller to the given route controllers list</p>
               <p><strong>Route the application to a specific named route</strong></p>
 <ul>
 <li>@param  {Mixed} <strong>name</strong> - Route name</li>
-<li>@param  {Array} <strong>args</strong> - List of arguments to pass along</li>
+<li>@param  {Mixed} <strong>args</strong> - Array of arguments or object with named parameters
+matching those declared in the route path</li>
 <li>@return {Boolean} Will return false if the routing was cancelled or failed, else true</li>
 </ul>
 

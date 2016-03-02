@@ -173,6 +173,7 @@
     // --------------------------------
 
     // **Restart the router**
+    //
     // This actually stops and starts the Backbone.history module,
     // effectively re-executing the currently displayed route.
     restart: function () {
@@ -342,8 +343,6 @@
               '", ' + (self.options.authenticated ? 'already ' : 'not ') + 'logged in');
 
             // Execute 403 controller
-            //
-            // @todo Apply better/finer logic for when the 403 controller should be executed
             this._httpError(403);
           }
           return false;
@@ -405,14 +404,12 @@
 
     // **Route the application to a specific named route**
     // - @param  {Mixed} **name** - Route name
-    // - @param  {Array} **args** - List of arguments to pass along
+    // - @param  {Mixed} **args** - Array of arguments or object with named parameters
+    //   matching those declared in the route path
     // - @return {Boolean} Will return false if the routing was cancelled or failed, else true
     go: function (name, args, options) {
       var route = null;
       var path = null;
-
-      // Extend default router navigate options
-      options = _.extend({trigger: true, replace: false}, options);
 
       // Check if an object is given instead of a string
       if (_.isObject(name)) {
@@ -430,7 +427,13 @@
 
         // Transfer args
         args = route.args || args;
+
+        // Transfer options
+        options = route.options || options;
       }
+
+      // Extend default router navigate options
+      options = _.extend({trigger: true, replace: false}, options);
 
       // Check if necessary arguments are passed
       if (!name && path === null) {

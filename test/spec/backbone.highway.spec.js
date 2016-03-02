@@ -165,6 +165,10 @@ define([
         router.go('home').should.be.true;
         router.go('home').should.be.false;
         router.go('home', null, {force: true}).should.be.true;
+        router.go({
+          name: 'home',
+          options: {force: true}
+        }).should.be.true;
       });
     });
 
