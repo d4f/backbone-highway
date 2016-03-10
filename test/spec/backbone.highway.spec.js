@@ -143,7 +143,7 @@ define([
         router.go('home').should.be.true;
         Backbone.history.getFragment().should.equal('');
 
-        router.go({path: '/users/42'}).should.be.true;
+        router.go({path: 'users/42'}).should.be.true;
         Backbone.history.getFragment().should.equal('users/42');
 
         router.go('users.action', [42, 'edit', 'profile']).should.be.true;
@@ -438,6 +438,15 @@ define([
         router._removeRootUrl('/root-url/testing').should.equal('/testing');
         router.options.root = '';
       });
-    })
+    });
+
+    describe('_convertArgObjectToArray', function () {
+      it('should convert named arguments object to an ordered array', function () {
+        router._convertArgObjectToArray(
+          '/user/:id/edit/:section',
+          {section: 'profile', id: 42}
+        ).should.deep.equal([42, 'profile']);
+      });
+    });
   });
 });

@@ -469,10 +469,7 @@
 
       // Convert object args to array
       if (!_.isUndefined(args) && !_.isArray(args)) {
-        var paramNames = this._path(name).match(re.namedParams);
-        args = _.map(paramNames, function (name) {
-          return args[name.substr(1)];
-        });
+        args = this._convertArgObjectToArray(this._path(name), args);
       }
 
       var continueProcess = true;
@@ -824,6 +821,11 @@
     // - *@param  {Array}  **args** List of arguments to inject into the path*
     // - *@return {String}      The path with the arguments injected*
     _parse: function (path, args) {
+      // Convert object argument to ordered array
+      if (!_.isUndefined(args) && !_.isArray(args)) {
+        args = this._convertArgObjectToArray(path, args);
+      }
+
       // Check if any arguments were passed to the parser
       if (!this._isValidArgsArray(args)) {
         // Remove optional parameters from the path
@@ -857,6 +859,16 @@
       this._checkPath(path);
 
       return path;
+    },
+
+    // --------------------------------
+
+    // **Convert object with named parameters to ordered array**
+    _convertArgObjectToArray: function (path, args) {
+      var paramNames = path.match(re.namedParams);
+      return _.map(paramNames, function (name) {
+        return args[name.substr(1)];
+      });
     },
 
     // --------------------------------
