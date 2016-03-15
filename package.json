@@ -3,6 +3,7 @@
   "version": "0.6.1",
   "description": "Routing Backbone with style \\o/",
   "author": "Carl OGREN <rascarlito@gmail.com>",
+  "main": "dist/backbone.highway.min.js",
   "keywords": [
     "backbone",
     "router",
