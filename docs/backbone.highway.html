@@ -30,7 +30,7 @@
               
             </div>
             
-            <div class="content"><div class='highlight'><pre>(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">window, factory</span>) </span>{
+            <div class="content"><div class='highlight'><pre>(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">root, factory</span>) </span>{
 <span class="hljs-pi">  'use strict'</span>;
 
   <span class="hljs-keyword">if</span> (<span class="hljs-keyword">typeof</span> define === <span class="hljs-string">'function'</span> &amp;&amp; define.amd) {</pre></div></div>
@@ -64,7 +64,7 @@ they are undefined locally</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>      <span class="hljs-keyword">return</span> factory(<span class="hljs-built_in">window</span>, Backbone || <span class="hljs-built_in">window</span>.Backbone, _ || <span class="hljs-built_in">window</span>._);
+            <div class="content"><div class='highlight'><pre>      <span class="hljs-keyword">return</span> factory(root, Backbone || root.Backbone, _ || root._);
     });
   }
   <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (<span class="hljs-keyword">typeof</span> exports === <span class="hljs-string">'object'</span>) {</pre></div></div>
@@ -84,7 +84,7 @@ like Node.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>    <span class="hljs-built_in">module</span>.exports = factory(<span class="hljs-built_in">window</span>, <span class="hljs-built_in">require</span>(<span class="hljs-string">'backbone'</span>), <span class="hljs-built_in">require</span>(<span class="hljs-string">'underscore'</span>));
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-built_in">module</span>.exports = factory(root, <span class="hljs-built_in">require</span>(<span class="hljs-string">'backbone'</span>), <span class="hljs-built_in">require</span>(<span class="hljs-string">'underscore'</span>));
   }
   <span class="hljs-keyword">else</span> {</pre></div></div>
             
@@ -101,9 +101,9 @@ like Node.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>    factory(<span class="hljs-built_in">window</span>, <span class="hljs-built_in">window</span>.Backbone, <span class="hljs-built_in">window</span>._);
+            <div class="content"><div class='highlight'><pre>    factory(root, root.Backbone, root._);
   }
-}(<span class="hljs-keyword">this</span>, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">window, Backbone, _</span>) </span>{
+}(<span class="hljs-keyword">this</span>, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">root, Backbone, _</span>) </span>{
 <span class="hljs-pi">  'use strict'</span>;</pre></div></div>
             
         </li>
@@ -119,7 +119,7 @@ like Node.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  <span class="hljs-keyword">var</span> localStorage = <span class="hljs-built_in">window</span>.localStorage;</pre></div></div>
+            <div class="content"><div class='highlight'><pre>  <span class="hljs-keyword">var</span> localStorage = root.localStorage;</pre></div></div>
             
         </li>
         
@@ -487,8 +487,8 @@ like Node.</p>
             </div>
             
             <div class="content"><div class='highlight'><pre>    log: <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
-      <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.debug &amp;&amp; <span class="hljs-built_in">window</span>.console &amp;&amp; <span class="hljs-built_in">window</span>.console.log) {
-        <span class="hljs-built_in">window</span>.console.log.apply(<span class="hljs-built_in">window</span>.console, <span class="hljs-built_in">arguments</span>);
+      <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.debug &amp;&amp; root.console &amp;&amp; root.console.log) {
+        root.console.log.apply(root.console, <span class="hljs-built_in">arguments</span>);
       }
     }
   };</pre></div></div>
