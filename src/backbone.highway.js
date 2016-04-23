@@ -1,4 +1,4 @@
-(function (window, factory) {
+(function (root, factory) {
   'use strict';
 
   if (typeof define === 'function' && define.amd) {
@@ -6,24 +6,24 @@
     define(['backbone', 'underscore'], function (Backbone, _) {
       // Use globals variables in case that
       // they are undefined locally
-      return factory(window, Backbone || window.Backbone, _ || window._);
+      return factory(root, Backbone || root.Backbone, _ || root._);
     });
   }
   else if (typeof exports === 'object') {
     // Note. Does not work with strict CommonJS, but
     // only CommonJS-like environments that support module.exports,
     // like Node.
-    module.exports = factory(window, require('backbone'), require('underscore'));
+    module.exports = factory(root, require('backbone'), require('underscore'));
   }
   else {
     // Browser globals
-    factory(window, window.Backbone, window._);
+    factory(root, root.Backbone, root._);
   }
-}(this, function (window, Backbone, _) {
+}(this, function (root, Backbone, _) {
   'use strict';
 
   // Import globals
-  var localStorage = window.localStorage;
+  var localStorage = root.localStorage;
 
   // Instance holder for the actual Backbone.Router
   var router = null;
@@ -53,7 +53,8 @@
     parentheses: /[\(\)]/g,
     optionalParams: /\((.*?)\)/g,
     splatParams: /\*\w+/g,
-    namedParam: /(\(\?)?:\w+/
+    namedParam: /(\(\?)?:\w+/,
+    namedParams: /(\(\?)?:\w+/g
   };
 
   // --------------------------------
@@ -105,8 +106,8 @@
 
     // Override log method
     log: function () {
-      if (this.debug && window.console && window.console.log) {
-        window.console.log.apply(window.console, arguments);
+      if (this.debug && root.console && root.console.log) {
+        root.console.log.apply(root.console, arguments);
       }
     }
   };
@@ -167,6 +168,17 @@
 
       // Start Backbone.History
       this._startHistory();
+    },
+
+    // --------------------------------
+
+    // **Restart the router**
+    //
+    // This actually stops and starts the Backbone.history module,
+    // effectively re-executing the currently displayed route.
+    restart: function () {
+      Backbone.history.stop();
+      Backbone.history.start();
     },
 
     // --------------------------------
@@ -245,10 +257,10 @@
     // }
     // ```
     route: function (name, def) {
-      var self = this,
-        routesExtension = {},
-        controllerExtension = {},
-        currentName = name;
+      var self = this;
+      var routesExtension = {};
+      var controllerExtension = {};
+      var currentName = name;
 
       if (!_.isString(name)) {
         throw new ReferenceError('[Backbone.Highway.route] Route name should be a string');
@@ -304,6 +316,7 @@
         closeControllers[currentName] = def.close;
       }
 
+      // Declare a controller wrapper
       var controllerWrapper = function (args, trigger) {
         // Store the current route name if it is not a trigger
         if (!trigger) {
@@ -330,15 +343,13 @@
               '", ' + (self.options.authenticated ? 'already ' : 'not ') + 'logged in');
 
             // Execute 403 controller
-            //
-            // @todo Apply better/finer logic for when the 403 controller should be executed
             this._httpError(403);
           }
           return false;
         }
 
-        // Check if the route is an alias
-        // - FIXME Aliasing through the action parameter will probably conflict with before/after triggers
+        // Check if the route is an alias.
+        // Aliasing through the action parameter will probably conflict with before/after triggers
         if (_.isString(def.action)) {
           self.options.log('[Backbone.Highway] Caught alias route: "' + currentName + '" >> "' + def.action + '"');
 
@@ -393,11 +404,12 @@
 
     // **Route the application to a specific named route**
     // - @param  {Mixed} **name** - Route name
-    // - @param  {Array} **args** - List of arguments to pass along
-    // - @return {Boolean} Will return false if the routing was cancelled, else true
+    // - @param  {Mixed} **args** - Array of arguments or object with named parameters
+    //   matching those declared in the route path
+    // - @return {Boolean} Will return false if the routing was cancelled or failed, else true
     go: function (name, args, options) {
-      var route = null,
-          path = null;
+      var route = null;
+      var path = null;
 
       // Check if an object is given instead of a string
       if (_.isObject(name)) {
@@ -409,14 +421,21 @@
 
         // Transfer route path and remove first slash
         if (_.isString(route.path)) {
-          path = this._stripHeadingSlash(route.path);
+          path = this._removeRootUrl(route.path);
+          path = this._stripHeadingSlash(path);
         }
 
         // Transfer args
         args = route.args || args;
+
+        // Transfer options
+        options = route.options || options;
       }
 
-      // FIXME - go({path: '/'}) will generate an empty path string, thus full-filling this condition when it should not
+      // Extend default router navigate options
+      options = _.extend({trigger: true, replace: false}, options);
+
+      // Check if necessary arguments are passed
       if (!name && path === null) {
         this.options.log('[Backbone.Highway.go] Missing parameters, name or path is necessary');
         return false;
@@ -435,6 +454,24 @@
         return false;
       }
 
+      // Try to retrieve name if it is still missing
+      if (!name) {
+        name = this._name(path);
+      }
+
+      // Determine if the requested route is the same as the last one
+      var sameRoute = _.isEmpty(_.without(this.currentRoutes, name));
+
+      // If it is the same route and the force option was not passed return false
+      if (sameRoute && !options.force) {
+        return false;
+      }
+
+      // Convert object args to array
+      if (!_.isUndefined(args) && !_.isArray(args)) {
+        args = this._convertArgObjectToArray(this._path(name), args);
+      }
+
       var continueProcess = true;
 
       _.forEach(this.currentRoutes, _.bind(function (route) {
@@ -450,20 +487,27 @@
         return false;
       }
 
+      // Path is still not known
+      if (path === null) {
+        // Retrieve route path passing arguments
+        path = this._path(name);
+        path = path && this._parse(path, args);
+      }
+
+      // If an error occured retrieving the path
+      if (path === false) {
+        return false;
+      }
+
       // Re-initialize currentRoutes storage
       this.currentRoutes = [];
 
-      // Extend default router navigate options
-      options = _.extend({trigger: true, replace: false}, options);
+      // Navigate the Backbone.Router
+      router.navigate(path, options);
 
-      if (!path) {
-        // Retrieve route path passing arguments
-        path = this._path(name, args);
-      }
-
-      if (path !== false) {
-        // Navigate the Backbone.Router
-        router.navigate(path, options);
+      // Restart Backbone.history to re-execute the same route
+      if (sameRoute) {
+        this.restart();
       }
 
       return true;
@@ -534,7 +578,7 @@
         });
 
         // Dispatch the event applying arguments
-        if (this.hasDispatcher()) {
+        if (this._hasDispatcher()) {
           this.dispatcher.trigger.apply(this.dispatcher, args);
         }
       }
@@ -548,7 +592,7 @@
         }
         else {
           // Else give to the dispatcher
-          if (this.hasDispatcher()) {
+          if (this._hasDispatcher()) {
             this.dispatcher.trigger.call(this.dispatcher, trigger);
           }
         }
@@ -566,9 +610,9 @@
     //   eventually arguments to be passed to the controller*
     // - @param {Boolean} **isTrigger** Is the controller being executed as a trigger i.e. as an alias
     _processControllers: function (def, isTrigger) {
-      var self = this,
-          name = def.name,
-          args = def.args;
+      var self = this;
+      var name = def.name;
+      var args = def.args;
 
       // Do not interpret control as a trigger by default
       isTrigger = isTrigger || false;
@@ -578,6 +622,7 @@
         // Extract parameters from path if possible
         if (def.path) {
           args = this._extractParameters(name, def.path);
+
           // Backbone gives [null] for routes without arguments
           // so if there is not more than one argument use the passed arguments instead
           if (args.length === 1 && args[0] === null) {
@@ -672,7 +717,10 @@
       }
     },
 
-    hasDispatcher: function () {
+    // --------------------------------
+
+    // **Determine if a dispatcher (event aggregator) was passed with the options when the router was started.**
+    _hasDispatcher: function () {
       return this.dispatcher && _.isFunction(this.dispatcher.trigger);
     },
 
@@ -719,16 +767,13 @@
 
     // **Retrieve the path of a route by it's name.**
     // - *@param  {String} **routeName**  The route name*
-    // - *@param  {Array}  **args**       The arguments that need to be injected into the path*
-    // - *@return {String} The route path or false if the route doesn't exist*
-    //
-    // Pass in optional arguments to be parsed into the path.
-    _path: function (routeName, args) {
+    // - *@return {String} The raw route path or false if the route doesn't exist*
+    _path: function (name) {
       var path;
 
       for (path in routes) {
-        if (routes[path] === routeName) {
-          return this._parse(path, args);
+        if (routes[path] === name) {
+          return path;
         }
       }
 
@@ -776,6 +821,11 @@
     // - *@param  {Array}  **args** List of arguments to inject into the path*
     // - *@return {String}      The path with the arguments injected*
     _parse: function (path, args) {
+      // Convert object argument to ordered array
+      if (!_.isUndefined(args) && !_.isArray(args)) {
+        args = this._convertArgObjectToArray(path, args);
+      }
+
       // Check if any arguments were passed to the parser
       if (!this._isValidArgsArray(args)) {
         // Remove optional parameters from the path
@@ -809,6 +859,16 @@
       this._checkPath(path);
 
       return path;
+    },
+
+    // --------------------------------
+
+    // **Convert object with named parameters to ordered array**
+    _convertArgObjectToArray: function (path, args) {
+      var paramNames = path.match(re.namedParams);
+      return _.map(paramNames, function (name) {
+        return args[name.substr(1)];
+      });
     },
 
     // --------------------------------
@@ -897,6 +957,13 @@
     // **Remove heading slash or pound sign from a path, if any**
     _stripHeadingSlash: function (path) {
       return _.isString(path) && path.replace(re.headingSlash, '');
+    },
+
+    // --------------------------------
+
+    // **Remove pushState root url from path**
+    _removeRootUrl: function (path) {
+      return _.isString(path) && path.replace(this.options.root, '');
     },
 
     // --------------------------------

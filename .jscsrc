@@ -141,6 +141,12 @@
   "validateIndentation": 2,
 
   "requireSpaceAfterLineComment": true,
+  "requireTrailingComma": false,
+  "requirePaddingNewLinesAfterBlocks": false,
+  "requireSpacesInsideObjectBrackets": false,
+
+  "disallowKeywordsOnNewLine": false,
+  "disallowSpacesInNamedFunctionExpression": false,
 
   "excludeFiles": ["node_modules/**", "app/bower_components/**", "**/*.html" ]
 

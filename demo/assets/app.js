@@ -150,7 +150,10 @@
         id = $el.attr('data-id');
 
       if (id !== undefined) {
-        Backbone.Highway.go(route, [id]);
+        Backbone.Highway.go({
+          name: route,
+          args: {id: id}
+        });
       }
       else {
         Backbone.Highway.go(route);
@@ -214,7 +217,7 @@
         login: 'signin'
       },
       // silent: true,
-      // "root": "/admin",
+      root: '/admin',
       // "pushState": false
     });
 

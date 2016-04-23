@@ -115,22 +115,35 @@ define([
 
     describe('go', function () {
       it('should accept a route name', function () {
+        router.go('settings');
         router.go('home').should.be.true;
       });
 
       it('should accept a route object with a name', function () {
+        router.go('settings');
         router.go({name: 'home'}).should.be.true;
       });
 
       it('should accept a route object with a path', function () {
+        router.go('settings');
         router.go({path: '/'}).should.be.true;
+      });
+
+      it('should accept an object with named parameters as arguments', function () {
+        router.go('users.detail', {id: 42}).should.be.true;
+        Backbone.history.getFragment().should.equal('users/42');
+
+        router.go('home');
+
+        router.go({name: 'users.detail', args: {id: 42}}).should.be.true;
+        Backbone.history.getFragment().should.equal('users/42');
       });
 
       it('should change the url fragment', function () {
         router.go('home').should.be.true;
         Backbone.history.getFragment().should.equal('');
 
-        router.go({path: '/users/42'}).should.be.true;
+        router.go({path: 'users/42'}).should.be.true;
         Backbone.history.getFragment().should.equal('users/42');
 
         router.go('users.action', [42, 'edit', 'profile']).should.be.true;
@@ -145,6 +158,17 @@ define([
 
         this.options.allowClose = true;
         router.go('home').should.be.true;
+      });
+
+      it('should re-execute the current controller when navigating with option force=true', function () {
+        router.go('settings');
+        router.go('home').should.be.true;
+        router.go('home').should.be.false;
+        router.go('home', null, {force: true}).should.be.true;
+        router.go({
+          name: 'home',
+          options: {force: true}
+        }).should.be.true;
       });
     });
 
@@ -217,12 +241,7 @@ define([
       });
 
       it('should return the route url with injected parameters for an existing route', function () {
-        router._path('users.detail', [42]).should.equal('users/42');
-      });
-
-      it('should throw an error if mandatory parameters are not passed', function () {
-        var fn = _.bind(router._path, router, 'users.detail', []);
-        expect(fn).to.throw(ReferenceError, /Missing necessary arguments/);
+        router._path('users.detail').should.equal('users/:id');
       });
     });
 
@@ -277,8 +296,8 @@ define([
       });
 
       it('should remove optional parameters part from path if no or part of arguments are given', function () {
-        var simpleRoute = '/users(/:id)',
-            complicatedRoute = '/users(/:id)(/edit/:context)';
+        var simpleRoute = '/users(/:id)';
+        var complicatedRoute = '/users(/:id)(/edit/:context)';
 
         router._parse(simpleRoute).should.equal('/users');
         router._parse(simpleRoute, [null]).should.equal('/users');
@@ -312,9 +331,11 @@ define([
       it('should replace a named parameters', function () {
         router._replaceArg('/user/:id', '42').should.equal('/user/42');
       });
+
       it('should replace a splat parameter', function () {
         router._replaceArg('/user/*definition', '42/edit').should.equal('/user/42/edit');
       });
+
       it('should return path unaltered if no parameters are left to be replaced', function () {
         router._replaceArg('/user/42', 'name').should.equal('/user/42');
       });
@@ -341,6 +362,7 @@ define([
         router._sanitizeArgs(42).should.deep.equal([42]);
         router._sanitizeArgs('something').should.deep.equal(['something']);
       });
+
       it('should remove undesired argument values (null, undefined)', function () {
         router._sanitizeArgs([42, null, undefined]).should.deep.equal([42]);
       });
@@ -363,13 +385,16 @@ define([
       it('should return false if wrong parameter type is given', function () {
         router._stripHeadingSlash(777).should.be.false;
         router._stripHeadingSlash(['stuff']).should.be.false;
-        router._stripHeadingSlash({some: 'object'}).should.be.false;
+        router._stripHeadingSlash({
+          some: 'object'
+        }).should.be.false;
       });
     });
 
     describe('_getStoreKey', function () {
       it('should generate a localStorage key from options', function () {
-        var store = router.options.store, key = 'path';
+        var store = router.options.store;
+        var key = 'path';
         router._getStoreKey(key).should.equal(store.prefix + store.separator + key);
       });
     });
@@ -404,6 +429,23 @@ define([
       it('should generate a regular expression from a path', function () {
         var re = router._routeToRegExp('users/:id');
         expect(re instanceof RegExp).to.be.ok;
+      });
+    });
+
+    describe('_removeRootUrl', function () {
+      it('should remove pushState root url from path', function () {
+        router.options.root = '/root-url';
+        router._removeRootUrl('/root-url/testing').should.equal('/testing');
+        router.options.root = '';
+      });
+    });
+
+    describe('_convertArgObjectToArray', function () {
+      it('should convert named arguments object to an ordered array', function () {
+        router._convertArgObjectToArray(
+          '/user/:id/edit/:section',
+          {section: 'profile', id: 42}
+        ).should.deep.equal([42, 'profile']);
       });
     });
   });
