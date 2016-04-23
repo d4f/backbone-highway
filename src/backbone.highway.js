@@ -1,4 +1,4 @@
-(function (window, factory) {
+(function (root, factory) {
   'use strict';
 
   if (typeof define === 'function' && define.amd) {
@@ -6,24 +6,24 @@
     define(['backbone', 'underscore'], function (Backbone, _) {
       // Use globals variables in case that
       // they are undefined locally
-      return factory(window, Backbone || window.Backbone, _ || window._);
+      return factory(root, Backbone || root.Backbone, _ || root._);
     });
   }
   else if (typeof exports === 'object') {
     // Note. Does not work with strict CommonJS, but
     // only CommonJS-like environments that support module.exports,
     // like Node.
-    module.exports = factory(window, require('backbone'), require('underscore'));
+    module.exports = factory(root, require('backbone'), require('underscore'));
   }
   else {
     // Browser globals
-    factory(window, window.Backbone, window._);
+    factory(root, root.Backbone, root._);
   }
-}(this, function (window, Backbone, _) {
+}(this, function (root, Backbone, _) {
   'use strict';
 
   // Import globals
-  var localStorage = window.localStorage;
+  var localStorage = root.localStorage;
 
   // Instance holder for the actual Backbone.Router
   var router = null;
@@ -106,8 +106,8 @@
 
     // Override log method
     log: function () {
-      if (this.debug && window.console && window.console.log) {
-        window.console.log.apply(window.console, arguments);
+      if (this.debug && root.console && root.console.log) {
+        root.console.log.apply(root.console, arguments);
       }
     }
   };
