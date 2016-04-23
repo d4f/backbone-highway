@@ -1,6 +1,6 @@
 {
   "name": "backbone-highway",
-  "version": "0.7.0-rc2",
+  "version": "0.7.0",
   "description": "Routing Backbone with style \\o/",
   "author": "Carl OGREN <rascarlito@gmail.com>",
   "keywords": [
