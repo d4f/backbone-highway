@@ -1,9 +1,9 @@
 {
   "name": "backbone-highway",
-  "version": "0.7.0",
+  "version": "0.7.1",
   "description": "Routing Backbone with style \\o/",
   "author": "Carl OGREN <rascarlito@gmail.com>",
-  "main": "dist/backbone.highway.min.js",
+  "main": "src/backbone.highway.js",
   "keywords": [
     "backbone",
     "router",
@@ -22,7 +22,6 @@
     "test-once": "grunt test",
     "test": "grunt test-ci"
   },
-  "main": "src/backbone.highway.js",
   "devDependencies": {
     "chai": "^3.2.0",
     "chalk": "^1.1.1",
@@ -57,7 +56,7 @@
     "node": ">= 0.10.x"
   },
   "dependencies": {
-    "backbone": "^1.2.3",
+    "backbone": "1.0.0 - 1.3.2",
     "underscore": "^1.8.3"
   }
 }
