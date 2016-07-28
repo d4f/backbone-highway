@@ -1,8 +1,6 @@
 # Routing Backbone with style \o/
 
-[![Build Status](https://travis-ci.org/d4f/backbone-highway.svg?branch=dev)](https://travis-ci.org/d4f/backbone-highway)
-
-[![No Maintenance Intended](http://unmaintained.tech/badge.svg)](http://unmaintained.tech/)
+[![Build Status](https://travis-ci.org/d4f/backbone-highway.svg?branch=dev)](https://travis-ci.org/d4f/backbone-highway) [![No Maintenance Intended](http://unmaintained.tech/badge.svg)](http://unmaintained.tech/)
 ----
 
 ## New Highway
