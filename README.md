@@ -9,19 +9,19 @@ This is a simplified version of the previous ```Backbone.Highway``` library comp
 Added functionalities compared to the ```Backbone.Router``` are:
 
  * Named routes
- * Special error routes 404
+ * Catching client-size 404
  * Event triggers distributed using an event aggregator
 
 ## Installation
 
 ```
-npm i --save backbone-highway
+npm install --save backbone-highway
 ```
 
 or
 
 ```
-bower i --save backbone-highway
+bower install --save backbone-highway
 ```
 
 ## Getting started
