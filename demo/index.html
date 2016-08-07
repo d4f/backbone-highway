@@ -1,50 +1,10 @@
 <!DOCTYPE html>
 <html>
-<head>
-  <link rel="stylesheet" href="/assets/style.css">
-  <link href='//fonts.googleapis.com/css?family=Lobster' rel='stylesheet' type='text/css'>
-  <title>Backbone.Highway Test</title>
-</head>
-<body>
-
-  <header>
-    <h1>
-      <img src="/assets/img/backbone-highway-logo.png" alt="Backbone.Highway logo">
-      <span class="title">Backbone.Highway Test</span>
-    </h1>
-
-    <nav>
-      <ul>
-        <li class="home"><a href="/" data-route="home">Home</a></li>
-        <li class="users"><a href="/users" data-route="users_list">Users</a></li>
-        <li class="users-alias"><a href="/some-alias" data-route="users_alias">Users Alias</a></li>
-        <li class="user_42"><a href="/users/42" data-route="user_show" data-id="42">Secured: User #42</a></li>
-        <li><a href="/some-random-inexisting-route" data-route="some_random_inexisting_route">Testing 404</a></li>
-        <li class="login"><a href="/signin" data-route="signin">Login</a></li>
-        <li class="logout"><a href="/logout" data-route="logout">Logout</a></li>
-      </ul>
-    </nav>
-  </header>
-
-  <div id="main">
-    <h4>
-      <div class="user">
-        User: <span class="username"></span>
-      </div>
-      <div class="content"></div>
-    </h4>
-  </div>
-
-  <!-- Include Libs -->
-  <script type="text/javascript" src="/assets/vendor/jquery/dist/jquery.min.js"></script>
-  <script type="text/javascript" src="/assets/vendor/underscore/underscore-min.js"></script>
-  <script type="text/javascript" src="/assets/vendor/backbone/backbone-min.js"></script>
-  <script type="text/javascript" src="/assets/vendor/backbone.marionette/lib/backbone.marionette.min.js"></script>
-
-  <!-- Include Backbone.Highway -->
-  <script type="text/javascript" src="/backbone.highway.js"></script>
-
-  <!-- Include app script -->
-  <script type="text/javascript" src="/assets/app.js"></script>
-</body>
+  <head>
+    <meta charset="utf-8">
+    <title>Test Highway</title>
+  </head>
+  <body>
+    <script src="/main.js" charset="utf-8"></script>
+  </body>
 </html>
