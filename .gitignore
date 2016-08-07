@@ -1,11 +1,118 @@
-node_modules
-npm-debug.log
+############################
+# OS X
+############################
 
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+.Spotlight-V100
+.Trashes
+._*
+
+
+############################
+# Linux
+############################
+
+*~
+
+
+############################
+# Windows
+############################
+
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+*.cab
+*.msi
+*.msm
+*.msp
+
+
+############################
+# Packages
+############################
+
+*.7z
+*.csv
+*.dat
+*.dmg
+*.gz
+*.iso
+*.jar
+*.rar
+*.tar
+*.zip
+*.com
+*.class
+*.dll
+*.exe
+*.o
+*.seed
+*.so
+*.swo
+*.swp
+*.swn
+*.swm
+*.out
+*.pid
+
+
+############################
+# Logs and databases
+############################
+
+.tmp
+*.log
+*.sql
+data/development
+data/production
+
+
+############################
+# Misc.
+############################
+
+*#
+ssl
+.idea
+nbproject
+
+
+############################
+# Node.js
+############################
+
+lib-cov
+lcov.info
+pids
+logs
+results
+build
+node_modules
+.node_history
+
+
+############################
+# Tests
+############################
+
+testApp
 coverage
 
-demo/assets/vendor
 
-*.sublime-project
-*.sublime-workspace
+############################
+# Front-end workflow
+############################
 
-.imdone
+bower_components
+
+
+############################
+# Strapi Studio
+############################
+
+config/studio.json
