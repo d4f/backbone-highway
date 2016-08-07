@@ -1,5 +1,7 @@
 # Backbone.Highway - Routing Backbone with style \o/
 
+[![JavaScript Style Guide](https://img.shields.io/badge/code%20style-standard-brightgreen.svg)](http://standardjs.com/)
+
 ```Backbone.Highway``` wraps the ```Backbone.Router``` to simplify its use and bring new functionalities.
 
 This is a simplified version of the previous ```Backbone.Highway``` library completely re-written in ES2015.
@@ -13,13 +15,13 @@ Added functionalities compared to the ```Backbone.Router``` are:
 ## Installation
 
 ```
-npm i --save backbone-highway2
+npm i --save backbone-highway
 ```
 
 or
 
 ```
-bower i --save backbone-highway2
+bower i --save backbone-highway
 ```
 
 ## Getting started
@@ -28,8 +30,8 @@ Simply declare some routes using the ```highway.route()``` method
 and then start the router with the ```highway.start()``` method.
 
 ```javascript
-import $ from 'jquery';
-import highway from 'backbone-highway2';
+import $ from 'jquery'
+import highway from 'backbone-highway'
 
 // Declare a home route
 highway.route({
@@ -40,7 +42,7 @@ highway.route({
   action() {
     // Do something fantastic \o/
   }
-});
+})
 
 // Declare a user profile route
 highway.route({
@@ -49,13 +51,46 @@ highway.route({
   action(id) {
     // Render user profile page using id parameter
   }
-});
+})
 
 // Wait for document ready event
 $(() => {
   // Start the router
-  highway.start();
-});
+  highway.start()
+})
+```
+
+## Start options
+
+```Backbone.Highway``` uses sensible defaults that can be overriden by passing an options object to the start method.
+
+Here are the default options provided by the library :
+
+```javascript
+highway.start({
+  // # Backbone History options
+  // Docs: http://backbonejs.org/#History
+
+  // Use html5 pushState
+  pushState: true,
+
+  // Root url for pushState
+  root: '',
+
+  // Set to false to force page reloads for old browsers
+  hashChange: true,
+
+  // Don't trigger the initial route
+  silent: false,
+
+  // # Backbone.Highway specific options
+
+  // Print out debug information
+  debug: true,
+
+  // Event aggregator instance
+  dispatcher: null
+})
 ```
 
 ## Navigating
@@ -64,15 +99,15 @@ Use the ```go``` method to navigate to a declared route
 
 ```javascript
 // Navigate to simple route using its name
-highway.go('home');
+highway.go('home')
 
 // Navigate to route with parameters
-highway.go({ name: 'profile', params: [42] });
+highway.go({ name: 'profile', params: [42] })
 // `params` can be called `args` aswell
-highway.go({ name: 'profile', args: [42] });
+highway.go({ name: 'profile', args: [42] })
 
 // Navigate using url
-highway.go({ path: '/users/42' });
+highway.go({ path: '/users/42' })
 ```
 
 ## Catching client-side 404
@@ -85,7 +120,7 @@ highway.route({
   action() {
     // Display 404 error page
   }
-});
+})
 ```
 
 ## Events
@@ -93,14 +128,14 @@ highway.route({
 Each route can trigger events using an event aggregator like ```Backbone.Events``` or ```Backbone.Radio```
 
 ```javascript
-import $ from 'jquery';
-import highway from 'backbone-highway2';
-import { Events } from 'backbone';
+import $ from 'jquery'
+import highway from 'backbone-highway'
+import { Events } from 'backbone'
 
 // Listen to 'core:render' event
-Events.on('core:render', (name) => {
-  console.log(`Hello ${name} from 'core:render' event!`);
-});
+Events.on('core:render', name => {
+  console.log(`Hello ${name} from 'core:render' event!`)
+})
 
 // Declare a profile route
 highway.route({
@@ -113,18 +148,18 @@ highway.route({
     { name: 'core:render', args: ['Arg World'] } // Same as above with `args` instead of `params`
   ],
   action(name) {
-    console.log(`Hello ${name} from route action!`);
+    console.log(`Hello ${name} from route action!`)
   }
-});
+})
 
 // Wait for document ready
 $(() => {
   // Start the router passing the event aggregator instance in the `dispatcher` option
-  highway.start({ dispatcher: Events });
+  highway.start({ dispatcher: Events })
 
   // Navigate to the route
-  highway.go({ name: profile, params: ['Highway'] });
-});
+  highway.go({ name: profile, params: ['Highway'] })
+})
 ```
 
 In this example, the route parameter ```:name``` will be passed to the event,
@@ -147,22 +182,4 @@ npm install && npm start
 
 The MIT License (MIT)
 
-Copyright (c) 2015 d4f
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+Copyright (c) 2016 d4f
