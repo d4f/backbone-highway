@@ -1,6 +1,5 @@
 import { Events } from 'backbone'
 import highway from '../dist/backbone-highway'
-import $ from 'jquery'
 import _ from 'lodash'
 
 const AppEvents = _.extend({}, Events)
@@ -42,17 +41,15 @@ highway.route({
   }
 })
 
-$(() => {
-  console.log('Document ready, starting highway')
-  highway.start({
-    dispatcher: AppEvents
-  })
+console.log('Starting highway')
+highway.start({
+  dispatcher: AppEvents
+})
 
-  highway.route({
-    name: 'dynamic',
-    path: '/dynamic',
-    action () {
-      console.log("Hello! I'm a dynamically declared route!")
-    }
-  })
+highway.route({
+  name: 'dynamic',
+  path: '/dynamic',
+  action () {
+    console.log("Hello! I'm a dynamically declared route!")
+  }
 })
