@@ -309,7 +309,7 @@
     // #### Backbone.Highway specific options
 
     // Print out debug information
-    debug: true,
+    debug: false,
 
     // Event aggregator instance
     dispatcher: null
