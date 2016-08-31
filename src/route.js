@@ -51,7 +51,7 @@ Route.prototype = {
     const { name, path } = this.definition
 
     // Check if a path was defined and that the route is not a special error route
-    if (path && !_.contains(errorRouteNames, name)) {
+    if (path && !_.includes(errorRouteNames, name)) {
       // Remove heading slash from path
       this.set('path', utils.stripHeadingSlash(this.get('path')))
 
