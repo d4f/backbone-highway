@@ -9,73 +9,12 @@
 
   // Path parsing regular expressions
   var re = {
-    headingSlash: /^(\/|#)/,
-    trailingSlash: /\/$/,
-    parentheses: /[\(\)]/g,
-    optionalParams: /\((.*?)\)/g,
-    splatParams: /\*\w+/g,
-    namedParam: /(\(\?)?:\w+/,
-    namedParams: /(\(\?)?:\w+/g
+    headingSlash: /^(\/|#)/
   }
 
   var utils = {
-    re: re,
-
-    stripHeadingSlash: function stripHeadingSlash (path) {
-      return _.isString(path) && path.replace(re.headingSlash, '')
-    },
-
-    routeToRegExp: function routeToRegExp (path) {
-      return Backbone.Router.prototype._routeToRegExp(path)
-    },
-
-    isValidArgsArray: function isValidArgsArray (args) {
-      return !_.isEmpty(utils.sanitizeArgs(args))
-    },
-
-    sanitizeArgs: function sanitizeArgs (args) {
-      if (!_.isObject(args) && !_.isArray(args)) {
-        args = [args]
-      }
-      return _.without(args, null, undefined)
-    },
-
-    removeOptionalParams: function removeOptionalParams (path) {
-      return path.replace(re.optionalParams, '')
-    },
-
-    replaceArgs: function replaceArgs (path, args) {
-      _.forEach(utils.sanitizeArgs(args), function (arg) {
-        path = utils.replaceArg(path, arg)
-      })
-
-      _.forEach(path.match(re.optionalParams), function (part) {
-        if (utils.isNamedOrSplatParam(part)) {
-          path = path.replace(part, '')
-        }
-      })
-
-      return path
-    },
-
-    replaceArg: function replaceArg (path, arg) {
-      return path.indexOf(':') !== -1 ? path.replace(re.namedParam, arg) : path.replace(re.splatParams, arg)
-    },
-
-    isNamedOrSplatParam: function isNamedOrSplatParam (param) {
-      return re.namedParam.test(param) || re.splatParams.test(param)
-    },
-
-    removeTrailingSlash: function removeTrailingSlash (path) {
-      return path.replace(re.trailingSlash, '')
-    },
-
     removeHeadingSlash: function removeHeadingSlash (path) {
       return _.isString(path) && path.replace(re.headingSlash, '')
-    },
-
-    removeParentheses: function removeParentheses (path) {
-      return path.replace(re.parentheses, '')
     },
 
     removeRootUrl: function removeRootUrl (path, rootUrl) {
@@ -199,6 +138,172 @@
     }
   }
 
+  /**
+   * url-composer.js - Building dynamic URLs
+   */
+
+  //
+  // Path analysis regular expressions
+  //
+
+  var TRAILING_SLASH = /\/$/
+  var PARENTHESES = /[\(\)]/g
+  var OPTIONAL_PARAMS = /\((.*?)\)/g
+  var SPLAT_PARAMS = /\*\w+/g
+  var NAMED_PARAM = /(\(\?)?:\w+/
+  var NAMED_PARAMS = /(\(\?)?:\w+/g
+  var ESCAPE = /[\-{}\[\]+?.,\\\^$|#\s]/g
+
+  //
+  // Helper functions
+  //
+
+  function isArray (obj) {
+    return Object.prototype.toString.call(obj) === '[object Array]'
+  }
+
+  function isEmpty (obj) {
+    if (obj == null) return true
+    if (obj.length > 0) return false
+    if (obj.length === 0) return true
+    if (typeof obj !== 'object') return true
+
+    for (var key in obj) {
+      if (hasOwnProperty.call(obj, key)) return false
+    }
+
+    return true
+  }
+
+  //
+  // Path parsing functions
+  //
+
+  function parse (path, args) {
+    path = path || ''
+    args = args || []
+
+    if (isEmpty(args)) {
+      return removeOptionalParams(path)
+    }
+
+    path = replaceArgs(path, args)
+
+    return removeTrailingSlash(
+      removeParentheses(path)
+    )
+  }
+
+  function replaceArgs (path, args) {
+    args = args || []
+
+    if (!isArray(args)) {
+      var paramNames = path.match(NAMED_PARAMS)
+      args = paramNames.map(function (name) { return args[name.substr(1)]; })
+    }
+
+    args.forEach(function (arg) {
+      path = replaceArg(path, arg)
+    })
+
+    var matches = path.match(OPTIONAL_PARAMS)
+
+    if (matches) {
+      matches.forEach(function (part) {
+        if (isNamedOrSplatParam(part)) {
+          path = path.replace(part, '')
+        }
+      })
+    }
+
+    return path
+  }
+
+  function replaceArg (path, arg) {
+    var hasNamedParam = path.indexOf(':') !== -1
+    arg = encodeURIComponent(arg)
+
+    if (hasNamedParam) {
+      return path.replace(NAMED_PARAM, arg)
+    }
+
+    return path.replace(SPLAT_PARAMS, arg)
+  }
+
+  function isNamedOrSplatParam (param) {
+    return NAMED_PARAM.test(param) || SPLAT_PARAMS.test(param)
+  }
+
+  function removeOptionalParams (path) {
+    return path.replace(OPTIONAL_PARAMS, '')
+  }
+
+  function removeTrailingSlash (path) {
+    return path.replace(TRAILING_SLASH, '')
+  }
+
+  function removeParentheses (path) {
+    return path.replace(PARENTHESES, '')
+  }
+
+  function routeToRegex (route) {
+    route = route.replace(ESCAPE, '\\$&')
+      .replace(OPTIONAL_PARAMS, '(?:$1)?')
+      .replace(NAMED_PARAMS, function (match, optional) { return optional ? match : '([^/?]+)'; })
+      .replace(SPLAT_PARAMS, '([^?]*?)')
+
+    return new RegExp('^' + route + '(?:\\?([\\s\\S]*))?$')
+  }
+
+  //
+  // Public API functions
+  //
+
+  function buildPath (options) {
+    options = options || {}
+
+    return parse(options.path, options.params)
+  }
+
+  function buildQuery (options) {
+    var query = []
+    options = options || {}
+
+    for (var key in options.query) {
+      var param = options.query[key]
+      query.push((key + "=" + (encodeURIComponent(param))))
+    }
+
+    return query.length ? query.join('&') : ''
+  }
+
+  function test (options) {
+    options = options || {}
+
+    var re = routeToRegex(options.path)
+
+    return re.test(options.url)
+  }
+
+  function build (options) {
+    options = options || {}
+    options.host = options.host || ''
+    options.hash = options.hash ? ("#" + (options.hash)) : ''
+
+    var query = buildQuery(options)
+    query = query ? ("?" + query) : ''
+
+    return ("" + (options.host) + (buildPath(options)) + query + (options.hash))
+  }
+
+  var urlComposer = {
+    build: build,
+    test: test,
+    path: buildPath,
+    query: buildQuery,
+    regex: routeToRegex
+  }
+
   var errorRouteNames = ['403', '404']
 
   var defaultDefinition = {
@@ -228,20 +333,10 @@
       this.definition[property] = value
     },
 
-    parse: function parse (args) {
+    parse: function parse (params) {
       var path = this.get('path')
 
-      if (!utils.isValidArgsArray(args)) {
-        return utils.removeOptionalParams(path)
-      }
-
-      path = utils.replaceArgs(path, args)
-
-      path = utils.removeTrailingSlash(
-        utils.removeParentheses(path)
-      )
-
-      return path
+      return urlComposer.build({ path: path, params: params })
     },
 
     configure: function configure () {
@@ -252,10 +347,10 @@
       // Check if a path was defined and that the route is not a special error route
       if (path && !_.includes(errorRouteNames, name)) {
         // Remove heading slash from path
-        this.set('path', utils.stripHeadingSlash(this.get('path')))
+        this.set('path', utils.removeHeadingSlash(this.get('path')))
 
         // Create regex from path
-        this.pathRegExp = utils.routeToRegExp(this.get('path'))
+        this.pathRegExp = urlComposer.regex(this.get('path'))
       }
 
       // Override the given action with the wrapped action

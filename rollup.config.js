@@ -1,9 +1,18 @@
 import buble from 'rollup-plugin-buble'
 import uglify from 'rollup-plugin-uglify'
+import nodeResolve from 'rollup-plugin-node-resolve'
 
 const env = process.env.NODE_ENV || 'development'
 
-const plugins = [buble()]
+const plugins = [
+  nodeResolve({
+    jsnext: true,
+    main: true,
+    skip: ['backbone', 'underscore']
+  }),
+  buble()
+]
+
 const dest = {
   development: 'dist/backbone-highway.js',
   production: 'dist/backbone-highway.min.js'
@@ -22,5 +31,6 @@ export default {
   globals: {
     underscore: '_',
     backbone: 'Backbone'
+    // 'url-composer': 'urlComposer'
   }
 }
