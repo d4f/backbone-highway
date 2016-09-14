@@ -1,5 +1,4 @@
 import _ from 'underscore'
-import utils from './utils'
 
 const data = {}
 const keys = {}
@@ -29,9 +28,7 @@ const store = {
   find (search) {
     if (search.path) {
       const options = this.get('options')
-      search.path = utils.removeHeadingSlash(
-        utils.removeRootUrl(search.path, options.root)
-      )
+      search.path = search.path.replace(options.root, '').replace(/^(\/|#)/, '')
     }
 
     return this.findByName(search.name) || this.findByPath(search.path)

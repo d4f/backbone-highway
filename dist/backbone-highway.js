@@ -7,21 +7,6 @@
   _ = 'default' in _ ? _['default'] : _;
   Backbone = 'default' in Backbone ? Backbone['default'] : Backbone;
 
-  // Path parsing regular expressions
-  var re = {
-    headingSlash: /^(\/|#)/
-  }
-
-  var utils = {
-    removeHeadingSlash: function removeHeadingSlash (path) {
-      return _.isString(path) && path.replace(re.headingSlash, '')
-    },
-
-    removeRootUrl: function removeRootUrl (path, rootUrl) {
-      return _.isString(path) && path.replace(rootUrl, '')
-    }
-  }
-
   var data = {}
   var keys = {}
 
@@ -50,9 +35,7 @@
     find: function find (search) {
       if (search.path) {
         var options = this.get('options')
-        search.path = utils.removeHeadingSlash(
-          utils.removeRootUrl(search.path, options.root)
-        )
+        search.path = search.path.replace(options.root, '').replace(/^(\/|#)/, '')
       }
 
       return this.findByName(search.name) || this.findByPath(search.path)
@@ -347,10 +330,14 @@
       // Check if a path was defined and that the route is not a special error route
       if (path && !_.includes(errorRouteNames, name)) {
         // Remove heading slash from path
-        this.set('path', utils.removeHeadingSlash(this.get('path')))
+        if (_.isString(path)) {
+          path = path.replace(/^(\/|#)/, '')
+        }
 
         // Create regex from path
-        this.pathRegExp = urlComposer.regex(this.get('path'))
+        this.pathRegExp = urlComposer.regex(path)
+
+        this.set('path', path)
       }
 
       // Override the given action with the wrapped action

@@ -1,5 +1,4 @@
 import _ from 'underscore'
-import utils from './utils'
 import trigger from './trigger'
 import urlComposer from 'url-composer'
 
@@ -39,15 +38,19 @@ Route.prototype = {
   },
 
   configure () {
-    const { name, path } = this.definition
+    let { name, path } = this.definition
 
     // Check if a path was defined and that the route is not a special error route
     if (path && !_.includes(errorRouteNames, name)) {
       // Remove heading slash from path
-      this.set('path', utils.removeHeadingSlash(this.get('path')))
+      if (_.isString(path)) {
+        path = path.replace(/^(\/|#)/, '')
+      }
 
       // Create regex from path
-      this.pathRegExp = urlComposer.regex(this.get('path'))
+      this.pathRegExp = urlComposer.regex(path)
+
+      this.set('path', path)
     }
 
     // Override the given action with the wrapped action
