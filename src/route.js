@@ -2,7 +2,7 @@ import _ from 'underscore'
 import trigger from './trigger'
 import urlComposer from 'url-composer'
 
-const errorRouteNames = ['403', '404']
+const errorRouteNames = ['404']
 
 const defaultDefinition = {
   name: null,

@@ -1,18 +1,18 @@
 import _ from 'underscore'
 
-const data = {}
-const keys = {}
+function createStore () {
+  const data = {}
+  const keys = {}
 
-const store = {
-  get (key) {
+  function get (key) {
     return keys[key]
-  },
+  }
 
-  set (key, value) {
+  function set (key, value) {
     keys[key] = value
-  },
+  }
 
-  save (route) {
+  function save (route) {
     // Retrieve route name
     const name = route.get('name')
 
@@ -23,26 +23,21 @@ const store = {
 
     // Store new route
     data[name] = route
-  },
+  }
 
-  find (search) {
+  function find (search) {
     if (search.path) {
       const options = this.get('options')
       search.path = search.path.replace(options.root, '').replace(/^(\/|#)/, '')
     }
 
-    return this.findByName(search.name) || this.findByPath(search.path)
-  },
+    return _.find(data, route => {
+      return search.name === route.get('name') ||
+        (route.pathRegExp && route.pathRegExp.test(search.path))
+    })
+  }
 
-  findByName (name) {
-    return name && _.find(data, route => name === route.get('name'))
-  },
-
-  findByPath (path) {
-    return path && _.find(data, route => route.pathRegExp.test(path))
-  },
-
-  getDefinitions () {
+  function getDefinitions () {
     const routes = {}
     const controllers = {}
 
@@ -56,6 +51,14 @@ const store = {
 
     return _.extend({ routes }, controllers)
   }
+
+  return {
+    get,
+    set,
+    save,
+    find,
+    getDefinitions
+  }
 }
 
-export default store
+export default createStore()

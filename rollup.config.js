@@ -1,15 +1,15 @@
 import buble from 'rollup-plugin-buble'
 import uglify from 'rollup-plugin-uglify'
-import nodeResolve from 'rollup-plugin-node-resolve'
+// import nodeResolve from 'rollup-plugin-node-resolve'
 
 const env = process.env.NODE_ENV || 'development'
 
 const plugins = [
-  nodeResolve({
-    jsnext: true,
-    main: true,
-    skip: ['backbone', 'underscore']
-  }),
+  // nodeResolve({
+  //   jsnext: true,
+  //   main: true,
+  //   skip: ['backbone', 'underscore']
+  // }),
   buble()
 ]
 
@@ -30,7 +30,7 @@ export default {
   ],
   globals: {
     underscore: '_',
-    backbone: 'Backbone'
-    // 'url-composer': 'urlComposer'
+    backbone: 'Backbone',
+    'url-composer': 'urlComposer'
   }
 }

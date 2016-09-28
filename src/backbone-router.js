@@ -2,13 +2,6 @@ import _ from 'underscore'
 import Backbone from 'backbone'
 import store from './store'
 
-const historyOptions = [
-  'pushState',
-  'hashChange',
-  'silent',
-  'root'
-]
-
 export default {
   create () {
     const Router = Backbone.Router.extend(
@@ -19,7 +12,9 @@ export default {
 
   start (options) {
     if (!Backbone.History.started) {
-      return Backbone.history.start(_.pick(options, historyOptions))
+      return Backbone.history.start(
+        _.pick(options, ['pushState', 'hashChange', 'silent', 'root'])
+      )
     }
 
     return null

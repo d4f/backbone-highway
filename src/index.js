@@ -31,15 +31,12 @@ const defaultOptions = {
 // Method to execute the 404 controller
 const error404 = () => {
   // Retrieve the 404 controller
-  const error = store.findByName('404')
+  const error = store.find({ name: '404' })
 
   // Check if it was actually defined
   if (error) {
     // Execute a 404 controller
     error.execute()
-  } else {
-    // If no 404 controller is defined throw an error
-    throw new Error('[ highway ] 404! Landing route is not registered')
   }
 }
 
