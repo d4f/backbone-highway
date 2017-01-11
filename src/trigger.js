@@ -2,27 +2,41 @@ import _ from 'underscore'
 import store from './store'
 
 export default {
-  send (routeName, events, args) {
-    if (!_.isArray(events)) {
-      throw new Error(`[ highway ] Route events definition for ${routeName} needs to be an Array`)
-    }
-
+  dispatch (evt, args) {
     const { dispatcher } = store.get('options')
 
-    if (!dispatcher) {
-      throw new Error('[ highway ] No dispatcher has been declared to trigger events')
+    if (_.isString(evt)) {
+      evt = { name: evt }
     }
 
-    events.forEach(event => {
-      if (_.isString(event)) {
-        event = { name: event }
-      }
+    args = evt.args || evt.params || args
 
-      args = event.args || event.params || args
+    console.log(`Trigger event ${evt.name}, args:`, args)
 
-      console.log(`Trigger event ${event.name}, args:`, args)
+    dispatcher.trigger(evt.name, ...args)
+  },
 
-      dispatcher.trigger(event.name, ...args)
-    })
+  exec (options) {
+    let { name, events, args } = options
+
+    if (!_.isEmpty && !_.isArray(events)) {
+      throw new Error(`[ highway ] Route events definition for ${name} needs to be an Array`)
+    }
+
+    if (!_.isArray(events)) events = [events]
+
+    return Promise.all(
+      _.map(events, (evt) => {
+        if (_.isFunction(evt)) {
+          return new Promise((resolve, reject) => {
+            evt({ resolve, reject, args })
+            return null
+          })
+        }
+
+        this.dispatch(evt, args)
+        return Promise.resolve()
+      })
+    )
   }
 }

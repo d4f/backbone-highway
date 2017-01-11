@@ -21,13 +21,28 @@ highway.route({
 highway.route({
   name: 'home',
   path: '/',
-  events: [{
-    name: 'test-event',
-    params: [1, 2, 3, 4]
-  }],
-  action () {
+  before: [
+    { name: 'test-event', params: [1, 2, 3, 4] },
+    (state) => {
+      console.log('before middleware')
+      setTimeout(() => {
+        console.log('resolve before middleware')
+        state.reject()
+      }, 2000)
+    }
+  ],
+  action (state) {
     console.log('home controller')
-  }
+
+    setTimeout(() => {
+      state.resolve('youhou!')
+    }, 2000)
+  },
+  after: [
+    () => {
+      console.log('after middleware')
+    }
+  ]
 })
 
 highway.route({

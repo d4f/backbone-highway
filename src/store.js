@@ -3,6 +3,7 @@ import _ from 'underscore'
 function createStore () {
   const data = {}
   const keys = {}
+  let lastRoute = null
 
   function get (key) {
     return keys[key]
@@ -52,12 +53,22 @@ function createStore () {
     return _.extend({ routes }, controllers)
   }
 
+  function getLastRoute () {
+    return lastRoute
+  }
+
+  function setLastRoute (route) {
+    lastRoute = route
+  }
+
   return {
     get,
     set,
     save,
     find,
-    getDefinitions
+    getDefinitions,
+    getLastRoute,
+    setLastRoute
   }
 }
 

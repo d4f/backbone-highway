@@ -11,6 +11,7 @@
   function createStore () {
     var data = {}
     var keys = {}
+    var lastRoute = null
 
     function get (key) {
       return keys[key]
@@ -60,12 +61,22 @@
       return _.extend({ routes: routes }, controllers)
     }
 
+    function getLastRoute () {
+      return lastRoute
+    }
+
+    function setLastRoute (route) {
+      lastRoute = route
+    }
+
     return {
       get: get,
       set: set,
       save: save,
       find: find,
-      getDefinitions: getDefinitions
+      getDefinitions: getDefinitions,
+      getLastRoute: getLastRoute,
+      setLastRoute: setLastRoute
     }
   }
 
@@ -96,29 +107,47 @@
   }
 
   var trigger = {
-    send: function send (routeName, events, args) {
-      if (!_.isArray(events)) {
-        throw new Error(("[ highway ] Route events definition for " + routeName + " needs to be an Array"))
-      }
-
+    dispatch: function dispatch (evt, args) {
       var ref = store.get('options');
       var dispatcher = ref.dispatcher;
 
-      if (!dispatcher) {
-        throw new Error('[ highway ] No dispatcher has been declared to trigger events')
+      if (_.isString(evt)) {
+        evt = { name: evt }
       }
 
-      events.forEach(function (event) {
-        if (_.isString(event)) {
-          event = { name: event }
-        }
+      args = evt.args || evt.params || args
 
-        args = event.args || event.params || args
+      console.log(("Trigger event " + (evt.name) + ", args:"), args)
 
-        console.log(("Trigger event " + (event.name) + ", args:"), args)
+      dispatcher.trigger.apply(dispatcher, [ evt.name ].concat( args ))
+    },
 
-        dispatcher.trigger.apply(dispatcher, [ event.name ].concat( args ))
-      })
+    exec: function exec (options) {
+      var this$1 = this;
+
+      var name = options.name;
+      var events = options.events;
+      var args = options.args;
+
+      if (!_.isEmpty && !_.isArray(events)) {
+        throw new Error(("[ highway ] Route events definition for " + name + " needs to be an Array"))
+      }
+
+      if (!_.isArray(events)) events = [events]
+
+      return Promise.all(
+        _.map(events, function (evt) {
+          if (_.isFunction(evt)) {
+            return new Promise(function (resolve, reject) {
+              evt({ resolve: resolve, reject: reject, args: args })
+              return null
+            })
+          }
+
+          this$1.dispatch(evt, args)
+          return Promise.resolve()
+        })
+      )
     }
   }
 
@@ -158,6 +187,7 @@
     },
 
     configure: function configure () {
+      // Extract relevant parameters from route definition
       var ref = this.definition;
       var name = ref.name;
       var path = ref.path;
@@ -172,6 +202,7 @@
         // Create regex from path
         this.pathRegExp = urlComposer.regex(path)
 
+        // Reset path after modifying it
         this.set('path', path)
       }
 
@@ -183,22 +214,48 @@
       var args = [], len = arguments.length;
       while ( len-- ) args[ len ] = arguments[ len ];
 
-      this.get('action').apply(void 0, args)
+      return this.get('action').apply(void 0, args)
     },
 
     getActionWrapper: function getActionWrapper () {
+      // Extract relevant parameters from route definition
       var ref = this.definition;
       var name = ref.name;
       var action = ref.action;
-      var events = ref.events;
+      var before = ref.before;
+      var after = ref.after;
 
       // Wrap the route action
       return function actionWrapper () {
         var args = [], len = arguments.length;
         while ( len-- ) args[ len ] = arguments[ len ];
 
-        if (events) trigger.send(name, events, args)
-        action.apply(void 0, args)
+        // Create promise for async handling of controller execution
+        return new Promise(function (resolve, reject) {
+          // Trigger bound events through event dispatcher
+          // if (events) trigger.send(name, events, args)
+
+          return trigger.exec({ name: name, events: before, args: args })
+            .then(
+              function onFulfilled () {
+                // Execute original route action passing route args and promise flow controls
+                return action({ resolve: resolve, reject: reject, args: args })
+              },
+              function onRejected () {
+                return reject()
+              }
+            )
+        })
+        // Wait for promise resolve
+        .then(function (result) {
+          // TODO What should we do when the action is resolved
+          console.info('resolved action', result)
+
+          return trigger.exec({ name: name, events: after, args: args })
+        }).catch(function (err) {
+          // TODO What should we do when the action is rejected
+          console.error('caught action error', err)
+        })
       }
     },
 
@@ -243,8 +300,6 @@
       error.execute()
     }
   }
-
-  var lastRoute = null
 
   // #### Highway public API definition
   var highway = {
@@ -319,13 +374,16 @@
       // Execute Backbone.Router navigate
       this.router.navigate(to.path, route.getNavigateOptions(to))
 
+      // Retrieve last executed route
+      var lastRoute = store.getLastRoute()
+
       // Force re-executing of the same route
       if (to.force && lastRoute && route.get('name') === lastRoute.get('name')) {
         this.reload()
       }
 
       // Store the last executed route
-      lastRoute = route
+      store.setLastRoute(route)
 
       return true
     },

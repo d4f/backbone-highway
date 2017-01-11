@@ -38,6 +38,7 @@ Route.prototype = {
   },
 
   configure () {
+    // Extract relevant parameters from route definition
     let { name, path } = this.definition
 
     // Check if a path was defined and that the route is not a special error route
@@ -50,6 +51,7 @@ Route.prototype = {
       // Create regex from path
       this.pathRegExp = urlComposer.regex(path)
 
+      // Reset path after modifying it
       this.set('path', path)
     }
 
@@ -58,16 +60,41 @@ Route.prototype = {
   },
 
   execute (...args) {
-    this.get('action')(...args)
+    return this.get('action')(...args)
   },
 
   getActionWrapper () {
-    const { name, action, events } = this.definition
+    // Extract relevant parameters from route definition
+    const { name, action, before, after } = this.definition
 
     // Wrap the route action
     return function actionWrapper (...args) {
-      if (events) trigger.send(name, events, args)
-      action(...args)
+      // Create promise for async handling of controller execution
+      return new Promise((resolve, reject) => {
+        // Trigger bound events through event dispatcher
+        // if (events) trigger.send(name, events, args)
+
+        return trigger.exec({ name, events: before, args })
+          .then(
+            function onFulfilled () {
+              // Execute original route action passing route args and promise flow controls
+              return action({ resolve, reject, args })
+            },
+            function onRejected () {
+              return reject()
+            }
+          )
+      })
+      // Wait for promise resolve
+      .then(result => {
+        // TODO What should we do when the action is resolved
+        console.info('resolved action', result)
+
+        return trigger.exec({ name, events: after, args })
+      }).catch(err => {
+        // TODO What should we do when the action is rejected
+        console.error('caught action error', err)
+      })
     }
   },
 

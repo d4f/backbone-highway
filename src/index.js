@@ -40,8 +40,6 @@ const error404 = () => {
   }
 }
 
-let lastRoute = null
-
 // #### Highway public API definition
 const highway = {
   // **Initialize the Backbone.Highway router**
@@ -115,13 +113,16 @@ const highway = {
     // Execute Backbone.Router navigate
     this.router.navigate(to.path, route.getNavigateOptions(to))
 
+    // Retrieve last executed route
+    const lastRoute = store.getLastRoute()
+
     // Force re-executing of the same route
     if (to.force && lastRoute && route.get('name') === lastRoute.get('name')) {
       this.reload()
     }
 
     // Store the last executed route
-    lastRoute = route
+    store.setLastRoute(route)
 
     return true
   },
