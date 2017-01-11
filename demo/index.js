@@ -27,7 +27,7 @@ highway.route({
       console.log('before middleware')
       setTimeout(() => {
         console.log('resolve before middleware')
-        state.reject()
+        state.resolve()
       }, 2000)
     }
   ],
@@ -48,11 +48,12 @@ highway.route({
 highway.route({
   name: 'login',
   path: '/users/:id',
-  events: [{
+  before: [{
     name: 'test-event'
   }],
-  action (id) {
-    console.log(`user controller for user #${id}`)
+  action (state) {
+    console.log(`user controller for user #${state.args.id}`)
+    state.resolve()
   }
 })
 

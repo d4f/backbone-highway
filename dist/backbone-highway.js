@@ -235,23 +235,31 @@
           // Trigger bound events through event dispatcher
           // if (events) trigger.send(name, events, args)
 
-          return trigger.exec({ name: name, events: before, args: args })
-            .then(
-              function onFulfilled () {
-                // Execute original route action passing route args and promise flow controls
-                return action({ resolve: resolve, reject: reject, args: args })
-              },
-              function onRejected () {
-                return reject()
-              }
-            )
+          if (before) {
+            return trigger.exec({ name: name, events: before, args: args })
+              .then(
+                function onFulfilled () {
+                  // Execute original route action passing route args and promise flow controls
+                  return action({ resolve: resolve, reject: reject, args: args })
+                },
+                function onRejected () {
+                  return reject()
+                }
+              )
+          }
+
+          return action({ resolve: resolve, reject: reject, args: args })
         })
         // Wait for promise resolve
         .then(function (result) {
           // TODO What should we do when the action is resolved
           console.info('resolved action', result)
 
-          return trigger.exec({ name: name, events: after, args: args })
+          if (after) {
+            return trigger.exec({ name: name, events: after, args: args })
+          }
+
+          return true
         }).catch(function (err) {
           // TODO What should we do when the action is rejected
           console.error('caught action error', err)

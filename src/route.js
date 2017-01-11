@@ -74,23 +74,31 @@ Route.prototype = {
         // Trigger bound events through event dispatcher
         // if (events) trigger.send(name, events, args)
 
-        return trigger.exec({ name, events: before, args })
-          .then(
-            function onFulfilled () {
-              // Execute original route action passing route args and promise flow controls
-              return action({ resolve, reject, args })
-            },
-            function onRejected () {
-              return reject()
-            }
-          )
+        if (before) {
+          return trigger.exec({ name, events: before, args })
+            .then(
+              function onFulfilled () {
+                // Execute original route action passing route args and promise flow controls
+                return action({ resolve, reject, args })
+              },
+              function onRejected () {
+                return reject()
+              }
+            )
+        }
+
+        return action({ resolve, reject, args })
       })
       // Wait for promise resolve
       .then(result => {
         // TODO What should we do when the action is resolved
         console.info('resolved action', result)
 
-        return trigger.exec({ name, events: after, args })
+        if (after) {
+          return trigger.exec({ name, events: after, args })
+        }
+
+        return true
       }).catch(err => {
         // TODO What should we do when the action is rejected
         console.error('caught action error', err)
