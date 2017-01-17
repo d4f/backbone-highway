@@ -41,8 +41,7 @@
       }
 
       return _.find(data, function (route) {
-        return search.name === route.get('name') ||
-          (route.pathRegExp && route.pathRegExp.test(search.path))
+        return search.name === route.get('name') || (route.pathRegExp && route.pathRegExp.test(search.path))
       })
     }
 
@@ -107,7 +106,7 @@
   }
 
   var trigger = {
-    dispatch: function dispatch (evt, args) {
+    dispatch: function dispatch (evt, params) {
       var ref = store.get('options');
       var dispatcher = ref.dispatcher;
 
@@ -115,11 +114,15 @@
         evt = { name: evt }
       }
 
-      args = evt.args || evt.params || args
+      if (!dispatcher) {
+        throw new Error(("[ highway ] Event '" + (evt.name) + "' could not be triggered, missing dispatcher"))
+      }
 
-      console.log(("Trigger event " + (evt.name) + ", args:"), args)
+      params = evt.params || params
 
-      dispatcher.trigger.apply(dispatcher, [ evt.name ].concat( args ))
+      console.log(("Trigger event " + (evt.name) + ", params:"), params)
+
+      dispatcher.trigger(evt.name, { params: params })
     },
 
     exec: function exec (options) {
@@ -127,7 +130,7 @@
 
       var name = options.name;
       var events = options.events;
-      var args = options.args;
+      var params = options.params;
 
       if (!_.isEmpty && !_.isArray(events)) {
         throw new Error(("[ highway ] Route events definition for " + name + " needs to be an Array"))
@@ -139,12 +142,12 @@
         _.map(events, function (evt) {
           if (_.isFunction(evt)) {
             return new Promise(function (resolve, reject) {
-              evt({ resolve: resolve, reject: reject, args: args })
+              evt({ resolve: resolve, reject: reject, params: params })
               return null
             })
           }
 
-          this$1.dispatch(evt, args)
+          this$1.dispatch(evt, params)
           return Promise.resolve()
         })
       )
@@ -181,9 +184,7 @@
     },
 
     parse: function parse (params) {
-      var path = this.get('path')
-
-      return urlComposer.build({ path: path, params: params })
+      return urlComposer.build({ path: this.get('path'), params: params })
     },
 
     configure: function configure () {
@@ -221,6 +222,7 @@
       // Extract relevant parameters from route definition
       var ref = this.definition;
       var name = ref.name;
+      var path = ref.path;
       var action = ref.action;
       var before = ref.before;
       var after = ref.after;
@@ -230,17 +232,18 @@
         var args = [], len = arguments.length;
         while ( len-- ) args[ len ] = arguments[ len ];
 
+        // Convert args to object
+        var params = urlComposer.params(path, args)
+
         // Create promise for async handling of controller execution
         return new Promise(function (resolve, reject) {
-          // Trigger bound events through event dispatcher
-          // if (events) trigger.send(name, events, args)
-
+          // Trigger `before` events/middlewares
           if (before) {
-            return trigger.exec({ name: name, events: before, args: args })
+            return trigger.exec({ name: name, events: before, params: params })
               .then(
                 function onFulfilled () {
-                  // Execute original route action passing route args and promise flow controls
-                  return action({ resolve: resolve, reject: reject, args: args })
+                  // Execute original route action passing route params and promise flow controls
+                  return action({ resolve: resolve, reject: reject, params: params })
                 },
                 function onRejected () {
                   return reject()
@@ -248,15 +251,16 @@
               )
           }
 
-          return action({ resolve: resolve, reject: reject, args: args })
+          // Just execute action if no `before` events are declared
+          return Promise.resolve(
+            action({ resolve: resolve, reject: reject, params: params })
+          )
         })
         // Wait for promise resolve
         .then(function (result) {
-          // TODO What should we do when the action is resolved
-          console.info('resolved action', result)
-
+          // Trigger `after` events/middlewares
           if (after) {
-            return trigger.exec({ name: name, events: after, args: args })
+            return trigger.exec({ name: name, events: after, params: params })
           }
 
           return true
@@ -400,7 +404,10 @@
     reload: BackboneRouter.restart,
 
     // Alias for `reload` method.
-    restart: BackboneRouter.restart
+    restart: BackboneRouter.restart,
+
+    // Export the highway store
+    store: store
   }
 
   return highway;

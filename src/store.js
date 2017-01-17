@@ -33,8 +33,7 @@ function createStore () {
     }
 
     return _.find(data, route => {
-      return search.name === route.get('name') ||
-        (route.pathRegExp && route.pathRegExp.test(search.path))
+      return search.name === route.get('name') || (route.pathRegExp && route.pathRegExp.test(search.path))
     })
   }
 

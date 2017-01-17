@@ -2,22 +2,26 @@ import _ from 'underscore'
 import store from './store'
 
 export default {
-  dispatch (evt, args) {
+  dispatch (evt, params) {
     const { dispatcher } = store.get('options')
 
     if (_.isString(evt)) {
       evt = { name: evt }
     }
 
-    args = evt.args || evt.params || args
+    if (!dispatcher) {
+      throw new Error(`[ highway ] Event '${evt.name}' could not be triggered, missing dispatcher`)
+    }
 
-    console.log(`Trigger event ${evt.name}, args:`, args)
+    params = evt.params || params
 
-    dispatcher.trigger(evt.name, ...args)
+    console.log(`Trigger event ${evt.name}, params:`, params)
+
+    dispatcher.trigger(evt.name, { params })
   },
 
   exec (options) {
-    let { name, events, args } = options
+    let { name, events, params } = options
 
     if (!_.isEmpty && !_.isArray(events)) {
       throw new Error(`[ highway ] Route events definition for ${name} needs to be an Array`)
@@ -29,12 +33,12 @@ export default {
       _.map(events, (evt) => {
         if (_.isFunction(evt)) {
           return new Promise((resolve, reject) => {
-            evt({ resolve, reject, args })
+            evt({ resolve, reject, params })
             return null
           })
         }
 
-        this.dispatch(evt, args)
+        this.dispatch(evt, params)
         return Promise.resolve()
       })
     )

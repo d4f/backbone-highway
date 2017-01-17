@@ -131,7 +131,10 @@ const highway = {
   reload: BackboneRouter.restart,
 
   // Alias for `reload` method.
-  restart: BackboneRouter.restart
+  restart: BackboneRouter.restart,
+
+  // Export the highway store
+  store
 }
 
 export default highway

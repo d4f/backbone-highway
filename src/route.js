@@ -32,9 +32,7 @@ Route.prototype = {
   },
 
   parse (params) {
-    let path = this.get('path')
-
-    return urlComposer.build({ path, params })
+    return urlComposer.build({ path: this.get('path'), params })
   },
 
   configure () {
@@ -65,21 +63,22 @@ Route.prototype = {
 
   getActionWrapper () {
     // Extract relevant parameters from route definition
-    const { name, action, before, after } = this.definition
+    const { name, path, action, before, after } = this.definition
 
     // Wrap the route action
     return function actionWrapper (...args) {
+      // Convert args to object
+      const params = urlComposer.params(path, args)
+
       // Create promise for async handling of controller execution
       return new Promise((resolve, reject) => {
-        // Trigger bound events through event dispatcher
-        // if (events) trigger.send(name, events, args)
-
+        // Trigger `before` events/middlewares
         if (before) {
-          return trigger.exec({ name, events: before, args })
+          return trigger.exec({ name, events: before, params })
             .then(
               function onFulfilled () {
-                // Execute original route action passing route args and promise flow controls
-                return action({ resolve, reject, args })
+                // Execute original route action passing route params and promise flow controls
+                return action({ resolve, reject, params })
               },
               function onRejected () {
                 return reject()
@@ -87,15 +86,16 @@ Route.prototype = {
             )
         }
 
-        return action({ resolve, reject, args })
+        // Just execute action if no `before` events are declared
+        return Promise.resolve(
+          action({ resolve, reject, params })
+        )
       })
       // Wait for promise resolve
       .then(result => {
-        // TODO What should we do when the action is resolved
-        console.info('resolved action', result)
-
+        // Trigger `after` events/middlewares
         if (after) {
-          return trigger.exec({ name, events: after, args })
+          return trigger.exec({ name, events: after, params })
         }
 
         return true

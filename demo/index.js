@@ -47,12 +47,13 @@ highway.route({
 
 highway.route({
   name: 'login',
-  path: '/users/:id',
+  path: '/users(/:id)(/)',
   before: [{
     name: 'test-event'
   }],
   action (state) {
-    console.log(`user controller for user #${state.args.id}`)
+    console.log(state)
+    console.log(`user controller for user #${state.params.id}`)
     state.resolve()
   }
 })
