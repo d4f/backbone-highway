@@ -39,7 +39,7 @@ highway.route({
   path: '/', // The url to which the route will respond
 
   // Method to be executed when the given path is intercepted
-  action() {
+  action () {
     // Do something fantastic \o/
   }
 })
@@ -48,8 +48,12 @@ highway.route({
 highway.route({
   name: 'profile',
   path: '/users/:id',
-  action(id) {
-    // Render user profile page using id parameter
+  action (state) {
+    // Render user profile page using `state.params.id` parameter
+    console.log(`Executing profile controller for user#${state.params.id}`)
+
+    // Resolve state when execution is done
+    state.resolve()
   }
 })
 
@@ -86,7 +90,7 @@ highway.start({
   // # Backbone.Highway specific options
 
   // Print out debug information
-  debug: true,
+  debug: false,
 
   // Event aggregator instance
   dispatcher: null
@@ -102,9 +106,7 @@ Use the ```go``` method to navigate to a declared route
 highway.go('home')
 
 // Navigate to route with parameters
-highway.go({ name: 'profile', params: [42] })
-// `params` can be called `args` aswell
-highway.go({ name: 'profile', args: [42] })
+highway.go({ name: 'profile', params: { id: 42 } })
 
 // Navigate using url
 highway.go({ path: '/users/42' })
@@ -117,7 +119,7 @@ You can declare a special route named ```404``` to catch inexisting routes
 ```javascript
 highway.route({
   name: '404',
-  action() {
+  action () {
     // Display 404 error page
   }
 })
@@ -133,8 +135,8 @@ import highway from 'backbone-highway'
 import { Events } from 'backbone'
 
 // Listen to 'core:render' event
-Events.on('core:render', name => {
-  console.log(`Hello ${name} from 'core:render' event!`)
+Events.on('core:render', state => {
+  console.log(`Hello ${state.params.name} from 'core:render' event!`)
 })
 
 // Declare a profile route
@@ -142,13 +144,15 @@ highway.route({
   name: 'profile',
   path: '/users/:name',
   // Declare events that will be triggered before the `action`
-  events: [
+  before: [
     'core:render' // An event can be a simple string
-    { name: 'core:render', params: ['World'] } // Or an object to pass in specific parameters
-    { name: 'core:render', args: ['Arg World'] } // Same as above with `args` instead of `params`
+    { name: 'core:render', params: { name: 'World' } }, // Or an object to pass in specific parameters
+    (state) => { // Or even a function that will be executed instead of being passed to the `dispatcher`
+      setTimeout(() => state.resolve(), 1000)
+    }
   ],
-  action(name) {
-    console.log(`Hello ${name} from route action!`)
+  action (state) {
+    console.log(`Hello ${state.params.name} from route action!`)
   }
 })
 
@@ -158,7 +162,7 @@ $(() => {
   highway.start({ dispatcher: Events })
 
   // Navigate to the route
-  highway.go({ name: profile, params: ['Highway'] })
+  highway.go({ name: profile, params: { name: 'Highway' } })
 })
 ```
 
