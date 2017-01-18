@@ -243,7 +243,9 @@
               .then(
                 function onFulfilled () {
                   // Execute original route action passing route params and promise flow controls
-                  return action({ resolve: resolve, reject: reject, params: params })
+                  return Promise.resolve(
+                    action({ resolve: resolve, reject: reject, params: params })
+                  )
                 },
                 function onRejected () {
                   return reject()

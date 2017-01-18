@@ -78,7 +78,9 @@ Route.prototype = {
             .then(
               function onFulfilled () {
                 // Execute original route action passing route params and promise flow controls
-                return action({ resolve, reject, params })
+                return Promise.resolve(
+                  action({ resolve, reject, params })
+                )
               },
               function onRejected () {
                 return reject()
