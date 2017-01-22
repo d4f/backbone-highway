@@ -4,8 +4,6 @@
 
 `Backbone.Highway` wraps the `Backbone.Router` to simplify its use and bring new functionalities.
 
-This is a simplified version of the previous `Backbone.Highway` library completely re-written in ES2015.
-
 Added functionalities compared to the `Backbone.Router` are:
 
  * Named routes
