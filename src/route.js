@@ -1,8 +1,8 @@
 import _ from 'underscore'
-import utils from './utils'
 import trigger from './trigger'
+import urlComposer from 'url-composer'
 
-const errorRouteNames = ['403', '404']
+const errorRouteNames = ['404']
 
 const defaultDefinition = {
   name: null,
@@ -31,32 +31,26 @@ Route.prototype = {
     this.definition[property] = value
   },
 
-  parse (args) {
-    let path = this.get('path')
-
-    if (!utils.isValidArgsArray(args)) {
-      return utils.removeOptionalParams(path)
-    }
-
-    path = utils.replaceArgs(path, args)
-
-    path = utils.removeTrailingSlash(
-      utils.removeParentheses(path)
-    )
-
-    return path
+  parse (params) {
+    return urlComposer.build({ path: this.get('path'), params })
   },
 
   configure () {
-    const { name, path } = this.definition
+    // Extract relevant parameters from route definition
+    let { name, path } = this.definition
 
     // Check if a path was defined and that the route is not a special error route
     if (path && !_.includes(errorRouteNames, name)) {
       // Remove heading slash from path
-      this.set('path', utils.stripHeadingSlash(this.get('path')))
+      if (_.isString(path)) {
+        path = path.replace(/^(\/|#)/, '')
+      }
 
       // Create regex from path
-      this.pathRegExp = utils.routeToRegExp(this.get('path'))
+      this.pathRegExp = urlComposer.regex(path)
+
+      // Reset path after modifying it
+      this.set('path', path)
     }
 
     // Override the given action with the wrapped action
@@ -64,16 +58,53 @@ Route.prototype = {
   },
 
   execute (...args) {
-    this.get('action')(...args)
+    return this.get('action')(...args)
   },
 
   getActionWrapper () {
-    const { name, action, events } = this.definition
+    // Extract relevant parameters from route definition
+    const { name, path, action, before, after } = this.definition
 
     // Wrap the route action
     return function actionWrapper (...args) {
-      if (events) trigger.send(name, events, args)
-      action(...args)
+      // Convert args to object
+      const params = urlComposer.params(path, args)
+
+      // Create promise for async handling of controller execution
+      return new Promise((resolve, reject) => {
+        // Trigger `before` events/middlewares
+        if (before) {
+          return trigger.exec({ name, events: before, params })
+            .then(
+              function onFulfilled () {
+                // Execute original route action passing route params and promise flow controls
+                return Promise.resolve(
+                  action({ resolve, reject, params })
+                )
+              },
+              function onRejected () {
+                return reject()
+              }
+            )
+        }
+
+        // Just execute action if no `before` events are declared
+        return Promise.resolve(
+          action({ resolve, reject, params })
+        )
+      })
+      // Wait for promise resolve
+      .then(result => {
+        // Trigger `after` events/middlewares
+        if (after) {
+          return trigger.exec({ name, events: after, params })
+        }
+
+        return true
+      }).catch(err => {
+        // TODO What should we do when the action is rejected
+        console.error('caught action error', err)
+      })
     }
   },
 

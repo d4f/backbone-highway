@@ -31,19 +31,14 @@ const defaultOptions = {
 // Method to execute the 404 controller
 const error404 = () => {
   // Retrieve the 404 controller
-  const error = store.findByName('404')
+  const error = store.find({ name: '404' })
 
   // Check if it was actually defined
   if (error) {
     // Execute a 404 controller
     error.execute()
-  } else {
-    // If no 404 controller is defined throw an error
-    throw new Error('[ highway ] 404! Landing route is not registered')
   }
 }
-
-let lastRoute = null
 
 // #### Highway public API definition
 const highway = {
@@ -118,13 +113,16 @@ const highway = {
     // Execute Backbone.Router navigate
     this.router.navigate(to.path, route.getNavigateOptions(to))
 
+    // Retrieve last executed route
+    const lastRoute = store.getLastRoute()
+
     // Force re-executing of the same route
     if (to.force && lastRoute && route.get('name') === lastRoute.get('name')) {
       this.reload()
     }
 
     // Store the last executed route
-    lastRoute = route
+    store.setLastRoute(route)
 
     return true
   },
@@ -133,7 +131,10 @@ const highway = {
   reload: BackboneRouter.restart,
 
   // Alias for `reload` method.
-  restart: BackboneRouter.restart
+  restart: BackboneRouter.restart,
+
+  // Export the highway store
+  store
 }
 
 export default highway

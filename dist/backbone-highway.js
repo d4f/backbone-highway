@@ -1,101 +1,27 @@
 (function (global, factory) {
-  typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('underscore'), require('backbone')) :
-  typeof define === 'function' && define.amd ? define(['underscore', 'backbone'], factory) :
-  (global.Backbone = global.Backbone || {}, global.Backbone.Highway = factory(global._,global.Backbone));
-}(this, function (_,Backbone) { 'use strict';
+  typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('underscore'), require('backbone'), require('url-composer')) :
+  typeof define === 'function' && define.amd ? define(['underscore', 'backbone', 'url-composer'], factory) :
+  (global.Backbone = global.Backbone || {}, global.Backbone.Highway = factory(global._,global.Backbone,global.urlComposer));
+}(this, function (_,Backbone,urlComposer) { 'use strict';
 
   _ = 'default' in _ ? _['default'] : _;
   Backbone = 'default' in Backbone ? Backbone['default'] : Backbone;
+  urlComposer = 'default' in urlComposer ? urlComposer['default'] : urlComposer;
 
-  // Path parsing regular expressions
-  var re = {
-    headingSlash: /^(\/|#)/,
-    trailingSlash: /\/$/,
-    parentheses: /[\(\)]/g,
-    optionalParams: /\((.*?)\)/g,
-    splatParams: /\*\w+/g,
-    namedParam: /(\(\?)?:\w+/,
-    namedParams: /(\(\?)?:\w+/g
-  }
+  function createStore () {
+    var data = {}
+    var keys = {}
+    var lastRoute = null
 
-  var utils = {
-    re: re,
-
-    stripHeadingSlash: function stripHeadingSlash (path) {
-      return _.isString(path) && path.replace(re.headingSlash, '')
-    },
-
-    routeToRegExp: function routeToRegExp (path) {
-      return Backbone.Router.prototype._routeToRegExp(path)
-    },
-
-    isValidArgsArray: function isValidArgsArray (args) {
-      return !_.isEmpty(utils.sanitizeArgs(args))
-    },
-
-    sanitizeArgs: function sanitizeArgs (args) {
-      if (!_.isObject(args) && !_.isArray(args)) {
-        args = [args]
-      }
-      return _.without(args, null, undefined)
-    },
-
-    removeOptionalParams: function removeOptionalParams (path) {
-      return path.replace(re.optionalParams, '')
-    },
-
-    replaceArgs: function replaceArgs (path, args) {
-      _.forEach(utils.sanitizeArgs(args), function (arg) {
-        path = utils.replaceArg(path, arg)
-      })
-
-      _.forEach(path.match(re.optionalParams), function (part) {
-        if (utils.isNamedOrSplatParam(part)) {
-          path = path.replace(part, '')
-        }
-      })
-
-      return path
-    },
-
-    replaceArg: function replaceArg (path, arg) {
-      return path.indexOf(':') !== -1 ? path.replace(re.namedParam, arg) : path.replace(re.splatParams, arg)
-    },
-
-    isNamedOrSplatParam: function isNamedOrSplatParam (param) {
-      return re.namedParam.test(param) || re.splatParams.test(param)
-    },
-
-    removeTrailingSlash: function removeTrailingSlash (path) {
-      return path.replace(re.trailingSlash, '')
-    },
-
-    removeHeadingSlash: function removeHeadingSlash (path) {
-      return _.isString(path) && path.replace(re.headingSlash, '')
-    },
-
-    removeParentheses: function removeParentheses (path) {
-      return path.replace(re.parentheses, '')
-    },
-
-    removeRootUrl: function removeRootUrl (path, rootUrl) {
-      return _.isString(path) && path.replace(rootUrl, '')
-    }
-  }
-
-  var data = {}
-  var keys = {}
-
-  var store = {
-    get: function get (key) {
+    function get (key) {
       return keys[key]
-    },
+    }
 
-    set: function set (key, value) {
+    function set (key, value) {
       keys[key] = value
-    },
+    }
 
-    save: function save (route) {
+    function save (route) {
       // Retrieve route name
       var name = route.get('name')
 
@@ -106,28 +32,20 @@
 
       // Store new route
       data[name] = route
-    },
+    }
 
-    find: function find (search) {
+    function find (search) {
       if (search.path) {
         var options = this.get('options')
-        search.path = utils.removeHeadingSlash(
-          utils.removeRootUrl(search.path, options.root)
-        )
+        search.path = search.path.replace(options.root, '').replace(/^(\/|#)/, '')
       }
 
-      return this.findByName(search.name) || this.findByPath(search.path)
-    },
+      return _.find(data, function (route) {
+        return search.name === route.get('name') || (route.pathRegExp && route.pathRegExp.test(search.path))
+      })
+    }
 
-    findByName: function findByName (name) {
-      return name && _.find(data, function (route) { return name === route.get('name'); })
-    },
-
-    findByPath: function findByPath (path) {
-      return path && _.find(data, function (route) { return route.pathRegExp.test(path); })
-    },
-
-    getDefinitions: function getDefinitions () {
+    function getDefinitions () {
       var routes = {}
       var controllers = {}
 
@@ -141,14 +59,27 @@
 
       return _.extend({ routes: routes }, controllers)
     }
+
+    function getLastRoute () {
+      return lastRoute
+    }
+
+    function setLastRoute (route) {
+      lastRoute = route
+    }
+
+    return {
+      get: get,
+      set: set,
+      save: save,
+      find: find,
+      getDefinitions: getDefinitions,
+      getLastRoute: getLastRoute,
+      setLastRoute: setLastRoute
+    }
   }
 
-  var historyOptions = [
-    'pushState',
-    'hashChange',
-    'silent',
-    'root'
-  ]
+  var store = createStore()
 
   var BackboneRouter = {
     create: function create () {
@@ -160,7 +91,9 @@
 
     start: function start (options) {
       if (!Backbone.History.started) {
-        return Backbone.history.start(_.pick(options, historyOptions))
+        return Backbone.history.start(
+          _.pick(options, ['pushState', 'hashChange', 'silent', 'root'])
+        )
       }
 
       return null
@@ -173,33 +106,55 @@
   }
 
   var trigger = {
-    send: function send (routeName, events, args) {
-      if (!_.isArray(events)) {
-        throw new Error(("[ highway ] Route events definition for " + routeName + " needs to be an Array"))
-      }
-
+    dispatch: function dispatch (evt, params) {
       var ref = store.get('options');
       var dispatcher = ref.dispatcher;
 
-      if (!dispatcher) {
-        throw new Error('[ highway ] No dispatcher has been declared to trigger events')
+      if (_.isString(evt)) {
+        evt = { name: evt }
       }
 
-      events.forEach(function (event) {
-        if (_.isString(event)) {
-          event = { name: event }
-        }
+      if (!dispatcher) {
+        throw new Error(("[ highway ] Event '" + (evt.name) + "' could not be triggered, missing dispatcher"))
+      }
 
-        args = event.args || event.params || args
+      params = evt.params || params
 
-        console.log(("Trigger event " + (event.name) + ", args:"), args)
+      console.log(("Trigger event " + (evt.name) + ", params:"), params)
 
-        dispatcher.trigger.apply(dispatcher, [ event.name ].concat( args ))
-      })
+      dispatcher.trigger(evt.name, { params: params })
+    },
+
+    exec: function exec (options) {
+      var this$1 = this;
+
+      var name = options.name;
+      var events = options.events;
+      var params = options.params;
+
+      if (!_.isEmpty && !_.isArray(events)) {
+        throw new Error(("[ highway ] Route events definition for " + name + " needs to be an Array"))
+      }
+
+      if (!_.isArray(events)) events = [events]
+
+      return Promise.all(
+        _.map(events, function (evt) {
+          if (_.isFunction(evt)) {
+            return new Promise(function (resolve, reject) {
+              evt({ resolve: resolve, reject: reject, params: params })
+              return null
+            })
+          }
+
+          this$1.dispatch(evt, params)
+          return Promise.resolve()
+        })
+      )
     }
   }
 
-  var errorRouteNames = ['403', '404']
+  var errorRouteNames = ['404']
 
   var defaultDefinition = {
     name: null,
@@ -228,23 +183,12 @@
       this.definition[property] = value
     },
 
-    parse: function parse (args) {
-      var path = this.get('path')
-
-      if (!utils.isValidArgsArray(args)) {
-        return utils.removeOptionalParams(path)
-      }
-
-      path = utils.replaceArgs(path, args)
-
-      path = utils.removeTrailingSlash(
-        utils.removeParentheses(path)
-      )
-
-      return path
+    parse: function parse (params) {
+      return urlComposer.build({ path: this.get('path'), params: params })
     },
 
     configure: function configure () {
+      // Extract relevant parameters from route definition
       var ref = this.definition;
       var name = ref.name;
       var path = ref.path;
@@ -252,10 +196,15 @@
       // Check if a path was defined and that the route is not a special error route
       if (path && !_.includes(errorRouteNames, name)) {
         // Remove heading slash from path
-        this.set('path', utils.stripHeadingSlash(this.get('path')))
+        if (_.isString(path)) {
+          path = path.replace(/^(\/|#)/, '')
+        }
 
         // Create regex from path
-        this.pathRegExp = utils.routeToRegExp(this.get('path'))
+        this.pathRegExp = urlComposer.regex(path)
+
+        // Reset path after modifying it
+        this.set('path', path)
       }
 
       // Override the given action with the wrapped action
@@ -266,22 +215,61 @@
       var args = [], len = arguments.length;
       while ( len-- ) args[ len ] = arguments[ len ];
 
-      this.get('action').apply(void 0, args)
+      return this.get('action').apply(void 0, args)
     },
 
     getActionWrapper: function getActionWrapper () {
+      // Extract relevant parameters from route definition
       var ref = this.definition;
       var name = ref.name;
+      var path = ref.path;
       var action = ref.action;
-      var events = ref.events;
+      var before = ref.before;
+      var after = ref.after;
 
       // Wrap the route action
       return function actionWrapper () {
         var args = [], len = arguments.length;
         while ( len-- ) args[ len ] = arguments[ len ];
 
-        if (events) trigger.send(name, events, args)
-        action.apply(void 0, args)
+        // Convert args to object
+        var params = urlComposer.params(path, args)
+
+        // Create promise for async handling of controller execution
+        return new Promise(function (resolve, reject) {
+          // Trigger `before` events/middlewares
+          if (before) {
+            return trigger.exec({ name: name, events: before, params: params })
+              .then(
+                function onFulfilled () {
+                  // Execute original route action passing route params and promise flow controls
+                  return Promise.resolve(
+                    action({ resolve: resolve, reject: reject, params: params })
+                  )
+                },
+                function onRejected () {
+                  return reject()
+                }
+              )
+          }
+
+          // Just execute action if no `before` events are declared
+          return Promise.resolve(
+            action({ resolve: resolve, reject: reject, params: params })
+          )
+        })
+        // Wait for promise resolve
+        .then(function (result) {
+          // Trigger `after` events/middlewares
+          if (after) {
+            return trigger.exec({ name: name, events: after, params: params })
+          }
+
+          return true
+        }).catch(function (err) {
+          // TODO What should we do when the action is rejected
+          console.error('caught action error', err)
+        })
       }
     },
 
@@ -318,19 +306,14 @@
   // Method to execute the 404 controller
   var error404 = function () {
     // Retrieve the 404 controller
-    var error = store.findByName('404')
+    var error = store.find({ name: '404' })
 
     // Check if it was actually defined
     if (error) {
       // Execute a 404 controller
       error.execute()
-    } else {
-      // If no 404 controller is defined throw an error
-      throw new Error('[ highway ] 404! Landing route is not registered')
     }
   }
-
-  var lastRoute = null
 
   // #### Highway public API definition
   var highway = {
@@ -405,13 +388,16 @@
       // Execute Backbone.Router navigate
       this.router.navigate(to.path, route.getNavigateOptions(to))
 
+      // Retrieve last executed route
+      var lastRoute = store.getLastRoute()
+
       // Force re-executing of the same route
       if (to.force && lastRoute && route.get('name') === lastRoute.get('name')) {
         this.reload()
       }
 
       // Store the last executed route
-      lastRoute = route
+      store.setLastRoute(route)
 
       return true
     },
@@ -420,7 +406,10 @@
     reload: BackboneRouter.restart,
 
     // Alias for `reload` method.
-    restart: BackboneRouter.restart
+    restart: BackboneRouter.restart,
+
+    // Export the highway store
+    store: store
   }
 
   return highway;
