@@ -4,7 +4,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin')
 
 const cwd = process.cwd()
 
-module.exports = {
+const config = {
   entry: ['./demo/index.js'],
   output: {
     path: path.join(cwd, '.tmp'),
@@ -35,3 +35,5 @@ module.exports = {
   target: 'web',
   devtool: 'inline-source-map'
 }
+
+module.exports = config
