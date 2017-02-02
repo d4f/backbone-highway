@@ -8,5 +8,17 @@ describe('Backbone.Highway', () => {
     assert.ok(isFunction(highway.start))
     assert.ok(isFunction(highway.route))
     assert.ok(isFunction(highway.go))
+    assert.ok(isFunction(highway.reload))
+    assert.ok(isFunction(highway.restart))
+  })
+
+  it('should register routes using the `route` method', () => {
+    highway.route({
+      name: 'home',
+      path: '/',
+      action (state) {
+        state.resolve()
+      }
+    })
   })
 })

@@ -16,6 +16,8 @@ const defaultNavigateOptions = {
 }
 
 function Route (definition) {
+  // TODO Verify definition, throw errors if it's not compliant
+
   // Store route definition
   this.definition = _.extend({}, defaultDefinition, definition)
 
