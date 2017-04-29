@@ -12,8 +12,8 @@
   "scripts": {
     "start": "rollup -c rollup.config.js --watch & webpack-dev-server",
     "build": "rollup -c rollup.config.js && NODE_ENV=production rollup -c rollup.config.js",
-    "lint": "standard --verbose src/**/*.js | snazzy",
-    "lint-fix": "standard --fix src/**/*.js",
+    "lint": "standard --verbose src/**/*.js test/**/*.js | snazzy",
+    "lint-fix": "standard --fix src/**/*.js test/**/*.js",
     "test": "karma start karma.conf.js"
   },
   "dependencies": {
