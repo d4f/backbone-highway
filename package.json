@@ -10,7 +10,7 @@
   ],
   "main": "dist/backbone-highway.js",
   "scripts": {
-    "start": "rollup -c rollup.config.js --watch & webpack",
+    "start": "rollup -c rollup.config.js --watch & webpack-dev-server",
     "build": "rollup -c rollup.config.js && NODE_ENV=production rollup -c rollup.config.js",
     "lint": "standard --verbose src/**/*.js | snazzy",
     "lint-fix": "standard --fix src/**/*.js",

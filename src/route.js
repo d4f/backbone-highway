@@ -76,15 +76,13 @@ Route.prototype = {
         if (before) {
           return trigger.exec({ name, events: before, params })
             .then(
-              function onFulfilled () {
-                // Execute original route action passing route params and promise flow controls
-                return Promise.resolve(
-                  action({ resolve, reject, params })
-                )
-              },
-              function onRejected () {
-                return reject()
-              }
+              // Execute original route action passing route params and promise flow controls
+              () => Promise.resolve(
+                action({ resolve, reject, params })
+              ),
+              () => reject(
+                new Error(`[ backbone-highway ] Route "${name}" was rejected by a "before" middleware`)
+              )
             )
         }
 
