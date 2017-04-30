@@ -4,7 +4,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin')
 
 const cwd = process.cwd()
 
-module.exports = {
+const config = {
   entry: ['./demo/index.js'],
   output: {
     path: path.join(cwd, '.tmp'),
@@ -30,8 +30,11 @@ module.exports = {
     historyApiFallback: true, // true for index.html upon 404, object for multiple paths
     hot: true, // hot module replacement. Depends on HotModuleReplacementPlugin
     https: false, // true for self-signed, object for cert authority
-    noInfo: true // only errors & warns on hot reload
+    noInfo: true, // only errors & warns on hot reload
+    port: 3000
   },
   target: 'web',
   devtool: 'inline-source-map'
 }
+
+module.exports = config

@@ -80,6 +80,8 @@ const highway = {
         route.get('action')
       )
     }
+
+    return route
   },
 
   // **Navigate to a declared route using its name or path**
