@@ -1,6 +1,8 @@
 # Backbone.Highway - Routing Backbone with style \o/
 
 [![JavaScript Style Guide](https://img.shields.io/badge/code%20style-standard-brightgreen.svg)](http://standardjs.com/)
+[![Build Status](https://travis-ci.org/d4f/backbone-highway.svg?branch=master)](https://travis-ci.org/d4f/backbone-highway)
+[![bitHound Overall Score](https://www.bithound.io/github/d4f/backbone-highway/badges/score.svg)](https://www.bithound.io/github/d4f/backbone-highway)
 
 `Backbone.Highway` wraps the `Backbone.Router` to simplify its use and bring new functionalities.
 
