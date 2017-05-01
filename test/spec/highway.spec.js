@@ -1,7 +1,5 @@
-/* globals describe it */
-
 const assert = require('assert')
-const defer = require('lodash/defer')
+// const defer = require('lodash/defer')
 const isFunction = require('lodash/isFunction')
 const isObject = require('lodash/isObject')
 
@@ -22,6 +20,13 @@ const definitions = {
     path: '/users/:id',
     action (state) {
       return state.resolve(state.params.id)
+    }
+  },
+  optional: {
+    name: 'optional',
+    path: '/optional(/path/:param)',
+    action (state) {
+      return state.resolve(state.params.param)
     }
   }
 }
@@ -47,6 +52,7 @@ describe('Backbone.Highway', () => {
     // Declare some routes
     const homeRoute = highway.route(definitions.home)
     const profileRoute = highway.route(definitions.profile)
+    const optionalRoute = highway.route(definitions.optional)
 
     assert.ok(isFunction(homeRoute.get))
     assert.ok(isFunction(homeRoute.set))
@@ -63,6 +69,10 @@ describe('Backbone.Highway', () => {
     assert.equal(profileRoute.get('name'), 'profile')
     assert.equal(profileRoute.get('path'), 'users/:id')
     assert.ok(isFunction(profileRoute.get('action')))
+
+    assert.equal(optionalRoute.get('name'), 'optional')
+    assert.equal(optionalRoute.get('path'), 'optional(/path/:param)')
+    assert.ok(isFunction(optionalRoute.get('action')))
   })
 
   it('should start the router using `start` method', () => {
@@ -70,7 +80,33 @@ describe('Backbone.Highway', () => {
   })
 
   it('should execute routes using the `go` method', () => {
-    highway.go({ name: 'profile', params: { id: 42 } })
-    defer(() => assert.ok(location.pathname === '/users/42'))
+    assert.ok(
+      highway.go({ name: 'profile', params: { id: 42 } })
+    )
+    assert.equal(location.pathname, '/users/42')
+
+    assert.ok(
+      highway.go({ name: 'home' })
+    )
+    assert.equal(location.pathname, '/')
+
+    assert.ok(
+      highway.go({ name: 'optional', params: { param: 'param' } })
+    )
+    assert.equal(location.pathname, '/optional/path/param')
+
+    assert.ok(
+      !highway.go({ name: 'inexisting-route' })
+    )
+
+    assert.ok(
+      highway.go({ name: 'optional' })
+    )
+    assert.equal(location.pathname, '/optional')
+
+    assert.ok(
+      highway.go({ path: '/users/42' })
+    )
+    assert.equal(location.pathname, '/users/42')
   })
 })
