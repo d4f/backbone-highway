@@ -130,7 +130,7 @@ const highway = {
   },
   
   // return the current route
-  cr () {
+  currentRoute () {
     return Backbone.history.getFragment()
   },
 
