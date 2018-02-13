@@ -128,6 +128,11 @@ const highway = {
 
     return true
   },
+  
+  // return the current route
+  currentRoute () {
+    return Backbone.history.getFragment()
+  },
 
   // Reload current route by restarting `Backbone.history`.
   reload: BackboneRouter.restart,
