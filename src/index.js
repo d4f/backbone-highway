@@ -1,4 +1,5 @@
 import _ from 'underscore'
+import Backbone from 'backbone'
 import BackboneRouter from './backbone-router'
 import Route from './route'
 import store from './store'
@@ -84,6 +85,24 @@ const highway = {
     return route
   },
 
+  // **Remove a registered route from the router**
+  // - *@param {Object} **search** - Object containing the route `name` or a `path` which will be matched against defined routes*
+  remove (definition) {
+    // Remove route from store
+    const route = store.remove(definition)
+
+    if (!route) return
+
+    // Unregister route from Backbone.Router
+    delete this.router.routes[route.get('path')]
+    delete this.router[route.get('name')]
+
+    // Create new router instance from modified route definitions
+    this.router = BackboneRouter.create()
+
+    return route
+  },
+
   // **Navigate to a declared route using its name or path**
   // - *@param {Mixed} **to** - Route name or Object describing where to navigate*
   go (to) {
@@ -128,7 +147,7 @@ const highway = {
 
     return true
   },
-  
+
   // return the current route
   currentRoute () {
     return Backbone.history.getFragment()

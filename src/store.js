@@ -28,13 +28,23 @@ function createStore () {
 
   function find (search) {
     if (search.path) {
-      const options = this.get('options')
+      const options = get('options')
       search.path = search.path.replace(options.root, '').replace(/^(\/|#)/, '')
     }
 
     return _.find(data, route => {
       return search.name === route.get('name') || (route.pathRegExp && route.pathRegExp.test(search.path))
     })
+  }
+
+  function remove (search) {
+    const route = find(search)
+
+    if (!route) return
+
+    delete data[route.get('name')]
+
+    return route
   }
 
   function getDefinitions () {
@@ -65,6 +75,7 @@ function createStore () {
     set,
     save,
     find,
+    remove,
     getDefinitions,
     getLastRoute,
     setLastRoute

@@ -36,13 +36,23 @@ function createStore () {
 
   function find (search) {
     if (search.path) {
-      var options = this.get('options');
+      var options = get('options');
       search.path = search.path.replace(options.root, '').replace(/^(\/|#)/, '');
     }
 
     return _.find(data, function (route) {
       return search.name === route.get('name') || (route.pathRegExp && route.pathRegExp.test(search.path))
     })
+  }
+
+  function remove (search) {
+    var route = find(search);
+
+    if (!route) { return }
+
+    delete data[route.get('name')];
+
+    return route
   }
 
   function getDefinitions () {
@@ -73,6 +83,7 @@ function createStore () {
     set: set,
     save: save,
     find: find,
+    remove: remove,
     getDefinitions: getDefinitions,
     getLastRoute: getLastRoute,
     setLastRoute: setLastRoute
@@ -359,6 +370,24 @@ var highway = {
     return route
   },
 
+  // **Remove a registered route from the router**
+  // - *@param {Object} **search** - Object containing the route `name` or a `path` which will be matched against defined routes*
+  remove: function remove (definition) {
+    // Remove route from store
+    var route = store.remove(definition);
+
+    if (!route) { return }
+
+    // Unregister route from Backbone.Router
+    delete this.router.routes[route.get('path')];
+    delete this.router[route.get('name')];
+
+    // Create new router instance from modified route definitions
+    this.router = BackboneRouter.create();
+
+    return route
+  },
+
   // **Navigate to a declared route using its name or path**
   // - *@param {Mixed} **to** - Route name or Object describing where to navigate*
   go: function go (to) {
@@ -402,6 +431,11 @@ var highway = {
     store.setLastRoute(route);
 
     return true
+  },
+
+  // return the current route
+  currentRoute: function currentRoute () {
+    return Backbone.history.getFragment()
   },
 
   // Reload current route by restarting `Backbone.history`.

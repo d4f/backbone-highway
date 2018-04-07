@@ -109,4 +109,35 @@ describe('Backbone.Highway', () => {
     )
     assert.equal(location.pathname, '/users/42')
   })
+
+  it('should remove an existing route using the `remove` method', () => {
+    highway.route({
+      name: 'simple',
+      path: '/simple',
+      action () {}
+    })
+
+    const simpleRoute = highway.remove({ name: 'simple' })
+    checkRoute(simpleRoute, 'simple')
+
+    highway.route({
+      name: 'params',
+      path: '/path/:control/params',
+      action () {}
+    })
+
+    const paramsRoute = highway.remove({ path: '/path/with/params' })
+    checkRoute(paramsRoute, 'params')
+
+    function checkRoute (route, name) {
+      assert.ok(route)
+
+      const routeName = route.get('name')
+      const routePath = route.get('path')
+
+      assert.equal(routeName, name)
+      assert.equal(highway.router[routeName], undefined)
+      assert.equal(highway.router.routes[routePath], undefined)
+    }
+  })
 })
