@@ -94,6 +94,7 @@ results
 build
 node_modules
 .node_history
+yarn.lock
 
 
 ############################

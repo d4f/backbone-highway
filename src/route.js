@@ -93,18 +93,18 @@ Route.prototype = {
           action({ resolve, reject, params })
         )
       })
-      // Wait for promise resolve
-      .then(result => {
-        // Trigger `after` events/middlewares
-        if (after) {
-          return trigger.exec({ name, events: after, params })
-        }
+        // Wait for promise resolve
+        .then(result => {
+          // Trigger `after` events/middlewares
+          if (after) {
+            return trigger.exec({ name, events: after, params })
+          }
 
-        return true
-      }).catch(err => {
-        // TODO What should we do when the action is rejected
-        console.error('caught action error', err)
-      })
+          return true
+        }).catch(err => {
+          // TODO What should we do when the action is rejected
+          console.error('caught action error', err)
+        })
     }
   },
 
