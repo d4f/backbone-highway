@@ -196,8 +196,11 @@ Route.prototype = {
     this.definition[property] = value;
   },
 
-  parse: function parse (params) {
-    return urlComposer.build({ path: this.get('path'), params: params })
+  parse: function parse (ref) {
+    var params = ref.params;
+    var query = ref.query;
+
+    return urlComposer.build({ path: this.get('path'), params: params, query: query })
   },
 
   configure: function configure () {
@@ -242,6 +245,7 @@ Route.prototype = {
 
     // Wrap the route action
     return function actionWrapper () {
+      var this$1 = this;
       var args = [], len = arguments.length;
       while ( len-- ) args[ len ] = arguments[ len ];
 
@@ -256,7 +260,7 @@ Route.prototype = {
             .then(
               // Execute original route action passing route params and promise flow controls
               function () { return Promise.resolve(
-                action({ resolve: resolve, reject: reject, params: params })
+                action({ resolve: resolve, reject: reject, params: params, query: this$1.parseQuery() })
               ); },
               function () { return reject(
                 new Error(("[ backbone-highway ] Route \"" + name + "\" was rejected by a \"before\" middleware"))
@@ -269,19 +273,38 @@ Route.prototype = {
           action({ resolve: resolve, reject: reject, params: params })
         )
       })
-      // Wait for promise resolve
-      .then(function (result) {
-        // Trigger `after` events/middlewares
-        if (after) {
-          return trigger.exec({ name: name, events: after, params: params })
-        }
+        // Wait for promise resolve
+        .then(function (result) {
+          // Trigger `after` events/middlewares
+          if (after) {
+            return trigger.exec({ name: name, events: after, params: params })
+          }
 
-        return true
-      }).catch(function (err) {
-        // TODO What should we do when the action is rejected
-        console.error('caught action error', err);
-      })
+          return true
+        }).catch(function (err) {
+          // TODO What should we do when the action is rejected
+          console.error('caught action error', err);
+        })
     }
+  },
+
+  parseQuery: function parseQuery () {
+    var result = {};
+    var query = window.location.search || '';
+
+    query = query.replace(/^.*?\?/, '');
+
+    var pairs = query.split('&');
+
+    _.forEach(pairs, function (pair) {
+      var ref = pair.split('=');
+      var key = ref[0];
+      var value = ref[1];
+
+      result[key] = value;
+    });
+
+    return result
   },
 
   getNavigateOptions: function getNavigateOptions (options) {
@@ -413,7 +436,7 @@ var highway = {
 
     // Parse the route path passing in arguments
     if (!to.path) {
-      to.path = route.parse(to.args || to.params);
+      to.path = route.parse({ params: to.args || to.params, query: to.query });
     }
 
     // Execute Backbone.Router navigate

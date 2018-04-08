@@ -128,7 +128,7 @@ const highway = {
 
     // Parse the route path passing in arguments
     if (!to.path) {
-      to.path = route.parse(to.args || to.params)
+      to.path = route.parse({ params: to.args || to.params, query: to.query })
     }
 
     // Execute Backbone.Router navigate
