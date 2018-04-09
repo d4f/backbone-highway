@@ -245,7 +245,6 @@ Route.prototype = {
 
     // Wrap the route action
     return function actionWrapper () {
-      var this$1 = this;
       var args = [], len = arguments.length;
       while ( len-- ) args[ len ] = arguments[ len ];
 
@@ -260,7 +259,7 @@ Route.prototype = {
             .then(
               // Execute original route action passing route params and promise flow controls
               function () { return Promise.resolve(
-                action({ resolve: resolve, reject: reject, params: params, query: this$1.parseQuery() })
+                action({ resolve: resolve, reject: reject, params: params, query: parseQuery() })
               ); },
               function () { return reject(
                 new Error(("[ backbone-highway ] Route \"" + name + "\" was rejected by a \"before\" middleware"))
@@ -270,7 +269,7 @@ Route.prototype = {
 
         // Just execute action if no `before` events are declared
         return Promise.resolve(
-          action({ resolve: resolve, reject: reject, params: params })
+          action({ resolve: resolve, reject: reject, params: params, query: parseQuery() })
         )
       })
         // Wait for promise resolve
@@ -288,29 +287,29 @@ Route.prototype = {
     }
   },
 
-  parseQuery: function parseQuery () {
-    var result = {};
-    var query = window.location.search || '';
-
-    query = query.replace(/^.*?\?/, '');
-
-    var pairs = query.split('&');
-
-    _.forEach(pairs, function (pair) {
-      var ref = pair.split('=');
-      var key = ref[0];
-      var value = ref[1];
-
-      result[key] = value;
-    });
-
-    return result
-  },
-
   getNavigateOptions: function getNavigateOptions (options) {
     return _.extend({}, defaultNavigateOptions, _.pick(options, ['trigger', 'replace']))
   }
 };
+
+function parseQuery () {
+  var result = {};
+  var query = window.location.search || '';
+
+  query = query.replace(/^.*?\?/, '');
+
+  var pairs = query.split('&');
+
+  _.forEach(pairs, function (pair) {
+    var ref = pair.split('=');
+    var key = ref[0];
+    var value = ref[1];
+
+    result[key] = value;
+  });
+
+  return result
+}
 
 var defaultOptions = {
   // #### Backbone History options

@@ -147,14 +147,16 @@ describe('Backbone.Highway', () => {
     }
   })
 
-  it('should receive query params in route `action` method', () => {
+  it('should receive query params in route `action` method', (done) => {
     highway.route({
       name: 'test-action-query',
       path: '/test/action/query',
       action (state) {
+        assert.ok(isObject(state.query))
         assert.equal(state.query.hello, 'world')
 
         state.resolve()
+        done()
       }
     })
 

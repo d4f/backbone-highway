@@ -80,7 +80,7 @@ Route.prototype = {
             .then(
               // Execute original route action passing route params and promise flow controls
               () => Promise.resolve(
-                action({ resolve, reject, params, query: this.parseQuery() })
+                action({ resolve, reject, params, query: parseQuery() })
               ),
               () => reject(
                 new Error(`[ backbone-highway ] Route "${name}" was rejected by a "before" middleware`)
@@ -90,7 +90,7 @@ Route.prototype = {
 
         // Just execute action if no `before` events are declared
         return Promise.resolve(
-          action({ resolve, reject, params })
+          action({ resolve, reject, params, query: parseQuery() })
         )
       })
         // Wait for promise resolve
@@ -108,26 +108,26 @@ Route.prototype = {
     }
   },
 
-  parseQuery () {
-    const result = {}
-    let query = window.location.search || ''
-
-    query = query.replace(/^.*?\?/, '')
-
-    const pairs = query.split('&')
-
-    _.forEach(pairs, pair => {
-      const [key, value] = pair.split('=')
-
-      result[key] = value
-    })
-
-    return result
-  },
-
   getNavigateOptions (options) {
     return _.extend({}, defaultNavigateOptions, _.pick(options, ['trigger', 'replace']))
   }
+}
+
+function parseQuery () {
+  const result = {}
+  let query = window.location.search || ''
+
+  query = query.replace(/^.*?\?/, '')
+
+  const pairs = query.split('&')
+
+  _.forEach(pairs, pair => {
+    const [key, value] = pair.split('=')
+
+    result[key] = value
+  })
+
+  return result
 }
 
 export default Route

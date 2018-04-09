@@ -1,5 +1,6 @@
 import { Events } from 'backbone'
-import highway from '../dist/backbone-highway'
+// import highway from '../dist/backbone-highway'
+import highway from '../src/index'
 import _ from 'lodash'
 
 const AppEvents = _.extend({}, Events)
@@ -68,5 +69,14 @@ highway.route({
   path: '/dynamic',
   action () {
     console.log("Hello! I'm a dynamically declared route!")
+  }
+})
+
+highway.route({
+  name: 'action-query',
+  path: '/action/query',
+  action (state) {
+    console.log('action query state', state)
+    state.resolve()
   }
 })
