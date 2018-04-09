@@ -1,9 +1,7 @@
-const assert = require('assert')
-// const defer = require('lodash/defer')
-const isFunction = require('lodash/isFunction')
-const isObject = require('lodash/isObject')
+import assert from 'assert'
+import { isFunction, isObject } from 'lodash'
 
-const highway = require('../../dist/backbone-highway')
+import highway from '../../src/index'
 
 const location = window.location
 
