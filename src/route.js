@@ -68,43 +68,41 @@ Route.prototype = {
     const { name, path, action, before, after } = this.definition
 
     // Wrap the route action
-    return function actionWrapper (...args) {
+    return async function actionWrapper (...args) {
       // Convert args to object
       const params = urlComposer.params(path, args)
+      const query = parseQuery()
 
-      // Create promise for async handling of controller execution
-      return new Promise((resolve, reject) => {
-        // Trigger `before` events/middlewares
-        if (before) {
-          return trigger.exec({ name, events: before, params })
-            .then(
-              // Execute original route action passing route params and promise flow controls
-              () => Promise.resolve(
-                action({ resolve, reject, params, query: parseQuery() })
-              ),
-              () => reject(
-                new Error(`[ backbone-highway ] Route "${name}" was rejected by a "before" middleware`)
-              )
-            )
+      // Trigger `before` events/middlewares
+      if (before) {
+        try {
+          await trigger.exec({ name, events: before, params, query })
+        } catch (err) {
+          throw new Error(`[backbone-highway] Route "${name}" was rejected by a "before" middleware`)
         }
+      }
 
-        // Just execute action if no `before` events are declared
-        return Promise.resolve(
-          action({ resolve, reject, params, query: parseQuery() })
+      // Execute route action and get result
+      let result
+      try {
+        // Wrap action method in a `Promise.resolve()` in case action is not `async`
+        result = await Promise.resolve(
+          action({ params, query })
         )
-      })
-        // Wait for promise resolve
-        .then(result => {
-          // Trigger `after` events/middlewares
-          if (after) {
-            return trigger.exec({ name, events: after, params })
-          }
+      } catch (err) {
+        throw new Error(`[backbone-highway] Route "${name}" was rejected by "action"`)
+      }
 
-          return true
-        }).catch(err => {
-          // TODO What should we do when the action is rejected
-          console.error('caught action error', err)
-        })
+      // Trigger `before` events/middlewares
+      if (after) {
+        try {
+          await trigger.exec({ name, events: after, params, query, result })
+        } catch (err) {
+          throw new Error(`[backbone-higway] Route "${name}" was rejected by an "after" middleware`)
+        }
+      }
+
+      return true
     }
   },
 
@@ -113,6 +111,8 @@ Route.prototype = {
   }
 }
 
+// Parse query params from `window.location.search` and return an object
+// TODO move to `url-composer` or maybe use `query-string`
 function parseQuery () {
   const result = {}
   let query = window.location.search || ''

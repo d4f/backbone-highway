@@ -24,24 +24,29 @@ highway.route({
   path: '/',
   before: [
     { name: 'test-event', params: [1, 2, 3, 4] },
-    (state) => {
+    async () => {
       console.log('before middleware')
-      setTimeout(() => {
-        console.log('resolve before middleware')
-        state.resolve()
-      }, 2000)
+
+      return new Promise(resolve => {
+        setTimeout(() => {
+          console.log('resolve before middleware')
+          resolve()
+        }, 2000)
+      })
     }
   ],
-  action (state) {
+  async action () {
     console.log('home controller')
 
-    setTimeout(() => {
-      state.resolve('youhou!')
-    }, 2000)
+    return new Promise(resolve => {
+      setTimeout(() => {
+        resolve('youhou!')
+      }, 2000)
+    })
   },
   after: [
-    () => {
-      console.log('after middleware')
+    (state) => {
+      console.log(`after middleware`, state)
     }
   ]
 })
@@ -55,7 +60,6 @@ highway.route({
   action (state) {
     console.log(state)
     console.log(`user controller for user #${state.params.id}`)
-    state.resolve()
   }
 })
 
@@ -77,6 +81,5 @@ highway.route({
   path: '/action/query',
   action (state) {
     console.log('action query state', state)
-    state.resolve()
   }
 })
