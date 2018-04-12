@@ -204,4 +204,18 @@ describe('Backbone.Highway', () => {
       highway.go({ name: 'after-events', params: { data: 'events' } })
     )
   })
+
+  it('should execute 404 controller for missing routes', (done) => {
+    highway.route({
+      name: '404',
+      action ({ params }) {
+        assert.ok(isObject(params))
+        done()
+      }
+    })
+
+    assert.ok(
+      highway.go({ name: 'some-random-inexisting-route' })
+    )
+  })
 })
