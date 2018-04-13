@@ -1,9 +1,11 @@
 import assert from 'assert'
-import { isFunction, isObject } from 'lodash'
+import { Events } from 'backbone'
+import { isFunction, isObject, isString, extend } from 'lodash'
 
 import highway from '../../src/index'
 
 const location = window.location
+const AppEvents = extend({}, Events)
 
 const definitions = {
   home: {
@@ -74,7 +76,9 @@ describe('Backbone.Highway', () => {
   })
 
   it('should start the router using `start` method', () => {
-    highway.start()
+    highway.start({
+      dispatcher: AppEvents
+    })
   })
 
   it('should execute routes using the `go` method', () => {
@@ -182,6 +186,29 @@ describe('Backbone.Highway', () => {
     )
   })
 
+  it('should dispatch named `before` events', (done) => {
+    AppEvents.on('before-test-event', ({ params }) => {
+      assert.ok(isObject(params))
+      assert.equal(params.what, 'events')
+      done()
+    })
+
+    highway.route({
+      name: 'named-before-events',
+      path: '/named/before/test/:what',
+      before: [
+        'before-test-event'
+      ],
+      action () {}
+    })
+
+    assert.ok(
+      highway.go({ name: 'named-before-events', params: { what: 'events' } })
+    )
+
+    AppEvents.off('before-test-event')
+  })
+
   it('should handle `after` events', (done) => {
     highway.route({
       name: 'after-events',
@@ -215,7 +242,7 @@ describe('Backbone.Highway', () => {
     })
 
     assert.ok(
-      highway.go({ name: 'some-random-inexisting-route' })
+      !highway.go({ name: 'some-random-inexisting-route' })
     )
   })
 })
