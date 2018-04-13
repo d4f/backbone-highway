@@ -89,7 +89,8 @@ The `name` and `path` need to be uniq to prevent conflicting routes which can le
 The `action` needs to be a `function` which will receive an `Object` as its only argument.
 This `state` object will contain:
 
-* `params` with the parameters received from parsing the dynamic parts of the `path`.
+* `params` an object with the parameters received from parsing the dynamic parts of the `path`.
+* `query` an object with the parsed parameters from `window.location.search`.
 * `resolve` and `reject` methods to control the flow of execution of the route.
 
 ### Options for the `route` method
@@ -159,6 +160,7 @@ The `params` can also be an `Array` which will be mapped onto the dynamic parts 
 * `name {string}` The route name
 * `params {mixed}` An `Object` or `Array` of dynamic parameters passed to the route
 * `path {string}` To use instead of the `name` and `params` to navigate directly to a known URL path
+* `query {object}` Generate a query string to be appended to the path when navigating
 * `force {boolean}` Force the route to execute even if it is the last executed route, default `false`.<br>
   Can be useful when trying to navigate to the same page but with a different value for a dynamic parameter of the route
 

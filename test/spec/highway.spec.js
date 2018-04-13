@@ -108,6 +108,12 @@ describe('Backbone.Highway', () => {
       highway.go({ path: '/users/42' })
     )
     assert.equal(location.pathname, '/users/42')
+
+    assert.ok(
+      highway.go({ name: 'home', query: { test: 'query' } })
+    )
+    assert.equal(location.pathname, '/')
+    assert.equal(location.search, '?test=query')
   })
 
   it('should remove an existing route using the `remove` method', () => {
@@ -139,5 +145,23 @@ describe('Backbone.Highway', () => {
       assert.equal(highway.router[routeName], undefined)
       assert.equal(highway.router.routes[routePath], undefined)
     }
+  })
+
+  it('should receive query params in route `action` method', (done) => {
+    highway.route({
+      name: 'test-action-query',
+      path: '/test/action/query',
+      action (state) {
+        assert.ok(isObject(state.query))
+        assert.equal(state.query.hello, 'world')
+
+        state.resolve()
+        done()
+      }
+    })
+
+    assert.ok(
+      highway.go({ name: 'test-action-query', query: { hello: 'world' } })
+    )
   })
 })
