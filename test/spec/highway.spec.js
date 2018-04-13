@@ -1,32 +1,32 @@
-const assert = require('assert')
-// const defer = require('lodash/defer')
-const isFunction = require('lodash/isFunction')
-const isObject = require('lodash/isObject')
+import assert from 'assert'
+import { Events } from 'backbone'
+import { isFunction, isObject, isString, extend } from 'lodash'
 
-const highway = require('../../dist/backbone-highway')
+import highway from '../../src/index'
 
 const location = window.location
+const AppEvents = extend({}, Events)
 
 const definitions = {
   home: {
     name: 'home',
     path: '/',
-    action (state) {
-      return state.resolve()
+    async action (state) {
+      return true
     }
   },
   profile: {
     name: 'profile',
     path: '/users/:id',
-    action (state) {
-      return state.resolve(state.params.id)
+    async action (state) {
+      return state.params.id
     }
   },
   optional: {
     name: 'optional',
     path: '/optional(/path/:param)',
-    action (state) {
-      return state.resolve(state.params.param)
+    async action (state) {
+      return state.params.param
     }
   }
 }
@@ -76,7 +76,9 @@ describe('Backbone.Highway', () => {
   })
 
   it('should start the router using `start` method', () => {
-    highway.start()
+    highway.start({
+      dispatcher: AppEvents
+    })
   })
 
   it('should execute routes using the `go` method', () => {
@@ -151,17 +153,96 @@ describe('Backbone.Highway', () => {
     highway.route({
       name: 'test-action-query',
       path: '/test/action/query',
-      action (state) {
+      async action (state) {
         assert.ok(isObject(state.query))
         assert.equal(state.query.hello, 'world')
 
-        state.resolve()
         done()
       }
     })
 
     assert.ok(
       highway.go({ name: 'test-action-query', query: { hello: 'world' } })
+    )
+  })
+
+  it('should handle `before` events', (done) => {
+    highway.route({
+      name: 'before-events',
+      path: '/before/:data',
+      before: [
+        async ({ params }) => {
+          assert.equal(params.data, 'events')
+        }
+      ],
+      async action ({ params }) {
+        assert.equal(params.data, 'events')
+        done()
+      }
+    })
+
+    assert.ok(
+      highway.go({ name: 'before-events', params: { data: 'events' } })
+    )
+  })
+
+  it('should dispatch named `before` events', (done) => {
+    AppEvents.on('before-test-event', ({ params }) => {
+      assert.ok(isObject(params))
+      assert.equal(params.what, 'events')
+      done()
+    })
+
+    highway.route({
+      name: 'named-before-events',
+      path: '/named/before/test/:what',
+      before: [
+        'before-test-event'
+      ],
+      action () {}
+    })
+
+    assert.ok(
+      highway.go({ name: 'named-before-events', params: { what: 'events' } })
+    )
+
+    AppEvents.off('before-test-event')
+  })
+
+  it('should handle `after` events', (done) => {
+    highway.route({
+      name: 'after-events',
+      path: '/after/:data',
+      async action ({ params }) {
+        assert.equal(params.data, 'events')
+
+        return 'yeah'
+      },
+      after: [
+        async ({ params, result }) => {
+          assert.equal(params.data, 'events')
+          assert.equal(result, 'yeah')
+          done()
+        }
+      ]
+    })
+
+    assert.ok(
+      highway.go({ name: 'after-events', params: { data: 'events' } })
+    )
+  })
+
+  it('should execute 404 controller for missing routes', (done) => {
+    highway.route({
+      name: '404',
+      action ({ params }) {
+        assert.ok(isObject(params))
+        done()
+      }
+    })
+
+    assert.ok(
+      !highway.go({ name: 'some-random-inexisting-route' })
     )
   })
 })
